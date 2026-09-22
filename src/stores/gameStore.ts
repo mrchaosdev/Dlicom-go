@@ -1,0 +1,110 @@
+import { create } from 'zustand';
+import { defaultSave, loadSave, writeSave, type SaveFile } from '../services/save';
+import { RunSession, equip, upgrade } from '../game/run/RunSession';
+import type { Slot } from '../content/equipment';
+import type { CombatEvent } from '../game/combat/types';
+import type { BattleSnapshot } from '../game/combat/CombatEngine';
+function initial() {
+  try {
+    return loadSave(window.localStorage);
+  } catch {
+    return {
+      save: defaultSave(),
+      warning: 'Browser storage unavailable. Progress lasts for this session.',
+    };
+  }
+}
+const loaded = initial();
+interface GameStore {
+  save: SaveFile;
+  warning: string;
+  run?: RunSession;
+  revision: number;
+  screen: 'home' | 'equipment' | 'settings' | 'achievements' | 'play';
+  paused: boolean;
+  speed: 1 | 2;
+  events: CombatEvent[];
+  snapshot?: BattleSnapshot;
+  sequence: number;
+  navigate: (screen: GameStore['screen']) => void;
+  start: () => void;
+  act: (action: 'enter' | 'skill' | 'reroll' | 'rest' | 'event', value?: string | number) => void;
+  step: () => void;
+  finish: () => void;
+  togglePause: () => void;
+  toggleSpeed: () => void;
+  settings: (settings: Partial<SaveFile['settings']>) => void;
+  equip: (id: string) => void;
+  upgrade: (slot: Slot) => void;
+}
+export const useGame = create<GameStore>((set, get) => {
+  const save = (next: SaveFile) => {
+    let warning = '';
+    try {
+      warning = writeSave(window.localStorage, next);
+    } catch {
+      warning = 'Progress could not be saved in this browser.';
+    }
+    set({ save: next, warning });
+  };
+  const refresh = () => set({ revision: get().revision + 1 });
+  return {
+    ...loaded,
+    revision: 0,
+    screen: 'home',
+    paused: false,
+    speed: loaded.save.settings.speed,
+    events: [],
+    sequence: 0,
+    navigate: (screen) => set({ screen }),
+    start: () => {
+      if (get().run && !get().run?.result) {
+        set({ screen: 'play' });
+        return;
+      }
+      const seed = crypto.randomUUID();
+      set({
+        run: new RunSession(seed, get().save),
+        screen: 'play',
+        paused: false,
+        events: [],
+        snapshot: undefined,
+        revision: get().revision + 1,
+        speed: get().save.settings.speed,
+      });
+    },
+    act: (action, value) => {
+      const run = get().run;
+      if (!run) return;
+      if (action === 'enter') run.enterNode(Number(value ?? 0));
+      else if (action === 'skill') run.selectSkill(String(value));
+      else if (action === 'reroll') run.reroll();
+      else if (action === 'event') run.event(Number(value));
+      else if (action === 'rest') run.rest(value as 'heal' | 'upgrade' | 'shield');
+      set({ snapshot: run.engine?.snapshot(), events: [], paused: false });
+      refresh();
+    },
+    step: () => {
+      const { run, paused } = get();
+      if (!run?.engine || run.phase !== 'battle' || paused) return;
+      const events = run.engine.step();
+      set({ events, snapshot: run.engine.snapshot(), sequence: get().sequence + 1 });
+    },
+    finish: () => {
+      const run = get().run;
+      if (!run?.engine?.outcome || run.phase !== 'battle') return;
+      run.finishBattle();
+      if (run.result) save(run.settle(get().save));
+      refresh();
+    },
+    togglePause: () => set({ paused: !get().paused }),
+    toggleSpeed: () => set({ speed: get().speed === 1 ? 2 : 1 }),
+    settings: (settings) => {
+      const next = structuredClone(get().save);
+      next.settings = { ...next.settings, ...settings };
+      save(next);
+    },
+    equip: (id) => save(equip(get().save, id)),
+    upgrade: (slot) => save(upgrade(get().save, slot)),
+  };
+});

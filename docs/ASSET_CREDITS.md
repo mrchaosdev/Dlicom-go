@@ -1,0 +1,15 @@
+# Asset provenance
+
+- `dlicom-attack-docs/assets/dili-mascot-reference.png`: supplied Dlicom mascot reference poster, preserved unchanged.
+- `public/assets/dili-idle.png`: generated using the built-in image-generation tool from the supplied reference; used in menu and battle with presentation tweens. It is one state sprite, not a completed animation sheet.
+- `public/assets/spam-bot.svg`, `spam-king.svg`: original code-authored vector placeholders; descriptive manifest keys make them replaceable. Scam Link, Bug and Raid Bot currently use tinted versions of the bot placeholder.
+- Feed City: original procedural Phaser graphics; menu chapter illustrations use CSS shapes.
+- `public/assets/attack.wav`, `crit.wav`, `ultimate.wav`, `select.wav`, `feed-loop.wav`: original synthesized audio from `scripts/audio.mjs`. Run `node scripts/audio.mjs` to reproduce. No samples or third-party music used.
+- Icons: Lucide, ISC license, installed as `lucide-react`.
+- Local fonts: Barlow Condensed, DM Sans and Space Mono, SIL Open Font License, bundled through their `@fontsource` packages. See package license files. No remote font calls.
+
+## Exact image-generation prompt
+
+Use case: stylized-concept. Asset type: transparent full-body 2D browser game sprite. Reference image: the supplied Dlicom mascot poster, identity reference only. Create Dili in a relaxed combat pose facing right, holding a compact cyan data blaster. Preserve the distinctive large round glass space helmet, blue speech-bubble face with expressive dark happy eyes, small blue astronaut body, cute proportions. Crisp hand-illustrated cyber mascot aesthetic, navy/cobalt/cyan, tiny magenta accents. Entire character and weapon visible with generous transparent margin, centered. Actual transparent background with alpha. No poster, no text, no chair, no computer, no scenery, no watermark. One character only.
+
+Mode: built-in image generation, reference-image input. Final workspace asset: `public/assets/dili-idle.png`. The reference poster is identity guidance, not a runtime sprite.

@@ -1,0 +1,17 @@
+import { chromium } from '@playwright/test';
+import { mkdirSync } from 'node:fs';
+mkdirSync('artifacts', { recursive: true });
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1440, height: 1050 } });
+await page.goto('http://127.0.0.1:5173');
+await page.evaluate(() => document.fonts.ready);
+await page.screenshot({ path: 'artifacts/home-desktop.png', fullPage: true });
+await page.setViewportSize({ width: 390, height: 844 });
+await page.screenshot({ path: 'artifacts/home-mobile.png', fullPage: true });
+await page.getByRole('button', { name: 'Enter the Feed', exact: false }).first().click();
+await page.getByRole('button', { name: /Data lane/ }).click();
+await page.waitForSelector('canvas');
+await page.getByRole('button', { name: 'Pause', exact: true }).click();
+await page.waitForTimeout(500);
+await page.screenshot({ path: 'artifacts/battle-mobile.png', fullPage: true });
+await browser.close();
