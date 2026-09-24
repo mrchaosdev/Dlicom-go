@@ -432,6 +432,22 @@ class BattleScene extends Phaser.Scene {
       this.floating(target, event);
     } else if (event.type === 'dodge' || event.type === 'heal' || event.type === 'shield') {
       playSound(event.type);
+      if (event.type === 'heal' || event.type === 'shield') {
+        this.tweens.killTweensOf(this.impactRing);
+        this.impactRing
+          .setPosition(target.x, target.y)
+          .setStrokeStyle(4, event.type === 'heal' ? 0x8affb6 : 0x72e5ff)
+          .setScale(0.55)
+          .setAlpha(0.85)
+          .setVisible(true);
+        this.tweens.add({
+          targets: this.impactRing,
+          scale: reduced ? 1.5 : 2.8,
+          alpha: 0,
+          duration: reduced ? 100 : 240,
+          onComplete: () => this.impactRing.setVisible(false),
+        });
+      }
       if (event.type === 'dodge' && event.target === 'dili' && !reduced) {
         const direction = source && source.x < target.x ? 1 : -1;
         this.tweens.add({
