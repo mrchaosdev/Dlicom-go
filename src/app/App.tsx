@@ -912,7 +912,14 @@ export default function App() {
     if (summaryCue.current === cueId) return;
     summaryCue.current = cueId;
     playSound(run.result);
-  }, [run?.phase, run?.result, run?.seed]);
+    const rewardTimers: number[] = [];
+    if (run.result === 'victory' && run.rewardGear) {
+      rewardTimers.push(window.setTimeout(() => playSound('reward'), 350));
+      if (GEAR[run.rewardGear].rarity === 'legendary')
+        rewardTimers.push(window.setTimeout(() => playSound('legendary'), 850));
+    }
+    return () => rewardTimers.forEach(window.clearTimeout);
+  }, [run?.phase, run?.result, run?.rewardGear, run?.seed]);
   useEffect(() => {
     const listener = () => {
       suspendAudio(document.hidden);

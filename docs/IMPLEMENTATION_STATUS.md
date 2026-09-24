@@ -8,7 +8,7 @@ The content set now contains 70 skills, 18 equipment items, and 20 events. Equip
 
 Each chapter now has its own low-detail procedural battle backdrop and original synthesized music loop. The four bosses use original replaceable vector silhouettes through the centralized asset manifest. These are presentation placeholders; final animation and production art remain open.
 
-Combat hits now include a reusable expanding impact spark; critical hits use a warm flash and a short 3–4 px camera shake, while ultimates use a stronger shake. Reduced-motion settings disable camera shake, and the impact effect reuses one Phaser object instead of creating a display object for every hit. Synthesized dodge, heal, shield, enemy-death, boss-intro, victory, and defeat cues now cover the key combat and run-end moments.
+Combat hits now include a reusable expanding impact spark; critical hits use a warm flash and a short 3–4 px camera shake, while ultimates use a stronger shake. Reduced-motion settings disable camera shake, and the impact effect reuses one Phaser object instead of creating a display object for every hit. Synthesized dodge, heal, shield, enemy-death, boss-intro, victory, defeat, reward, and Legendary-drop cues now cover the key combat and run-end moments.
 
 ## Verification
 

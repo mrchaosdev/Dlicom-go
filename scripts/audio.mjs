@@ -55,6 +55,16 @@ wav('victory', 0.62, (t) => {
   return Math.sin(2 * Math.PI * note * t) * Math.exp(-beat * 8) * 0.24;
 });
 wav('defeat', 0.75, (t) => Math.sin(2 * Math.PI * (440 * t - 350 * t * t)) * Math.sin(Math.PI * t / 0.75) * 0.2);
+wav('reward', 0.48, (t) => {
+  const step = Math.min(3, Math.floor(t / 0.12));
+  const note = [523.25, 659.25, 783.99, 1046.5][step];
+  return Math.sin(2 * Math.PI * note * t) * Math.exp(-((t % 0.12) * 9)) * 0.2;
+});
+wav('legendary', 0.82, (t) => {
+  const notes = [523.25, 659.25, 783.99, 1046.5];
+  const sparkle = Math.sin(2 * Math.PI * (1320 + 440 * t) * t) * Math.exp(-t * 4) * 0.05;
+  return notes.reduce((sum, note) => sum + Math.sin(2 * Math.PI * note * t), 0) * Math.sin(Math.PI * t / 0.82) * 0.055 + sparkle;
+});
 const notes = [
   130.81, 196, 261.63, 196, 155.56, 233.08, 311.13, 233.08, 103.83, 155.56, 207.65, 155.56, 116.54,
   174.61, 233.08, 174.61,
