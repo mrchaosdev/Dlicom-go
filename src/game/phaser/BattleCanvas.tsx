@@ -26,6 +26,12 @@ const PARALLAX_COLORS: Record<string, number> = {
   chapter_rooms: 0xf0a16e,
   chapter_core: 0x8d88fa,
 };
+const BOSS_ATTACK_COLORS: Record<string, number> = {
+  boss_spam_king: 0xff8a6d,
+  boss_loop_phantom: 0xc879ff,
+  boss_raid_master: 0xf0a16e,
+  boss_null_exe: 0x8d88fa,
+};
 const STATUS_COLORS: Record<string, number> = {
   burn: 0xff9858,
   glitch: 0xb67cff,
@@ -365,7 +371,12 @@ class BattleScene extends Phaser.Scene {
             ? 0xff78c8
             : viralExplosion
               ? 0xc879ff
-              : statusColor ?? (event.crit ? 0xffd773 : 0x76f5ff),
+              : statusColor ??
+                (bossAttack
+                  ? (BOSS_ATTACK_COLORS[event.source] ?? 0x76f5ff)
+                  : event.crit
+                    ? 0xffd773
+                    : 0x76f5ff),
         )
         .setScale(0.35)
         .setAlpha(0.95)
@@ -418,7 +429,13 @@ class BattleScene extends Phaser.Scene {
           yoyo: true,
         });
         this.projectile
-          .setFillStyle(event.label.startsWith('DliClip') ? 0xff78c8 : 0x7bffff)
+          .setFillStyle(
+            event.label.startsWith('DliClip')
+              ? 0xff78c8
+              : bossAttack
+                ? (BOSS_ATTACK_COLORS[event.source] ?? 0x7bffff)
+                : 0x7bffff,
+          )
           .setPosition(source.x, source.y)
           .setVisible(true)
           .setAlpha(1);
