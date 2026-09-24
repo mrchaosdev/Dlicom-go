@@ -257,6 +257,16 @@ class BattleScene extends Phaser.Scene {
       });
       if (!reduced && hammer) this.cameras.main.shake(120, 0.009);
       else if (event.crit && !reduced) this.cameras.main.shake(90, 0.005);
+      if (event.target === 'dili' && event.source !== 'dili' && !reduced) {
+        target.setTint(0xff607c);
+        this.tweens.add({
+          targets: target,
+          alpha: 0.7,
+          duration: 70,
+          yoyo: true,
+          onComplete: () => target.clearTint().setAlpha(1),
+        });
+      }
       if (source && !reduced) {
         this.tweens.add({
           targets: source,
@@ -281,6 +291,17 @@ class BattleScene extends Phaser.Scene {
       this.floating(target, event);
     } else if (event.type === 'dodge' || event.type === 'heal' || event.type === 'shield') {
       playSound(event.type);
+      if (event.type === 'dodge' && event.target === 'dili' && !reduced) {
+        const direction = source && source.x < target.x ? 1 : -1;
+        this.tweens.add({
+          targets: target,
+          x: target.x + direction * 24,
+          alpha: 0.35,
+          duration: 85,
+          yoyo: true,
+          onComplete: () => target.setAlpha(1),
+        });
+      }
       this.floating(target, event);
     } else if (event.type === 'shield_break') {
       playSound('shield_break');
