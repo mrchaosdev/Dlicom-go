@@ -14,6 +14,8 @@ Combat hits now include a reusable expanding impact spark; critical hits use a w
 
 Boss attacks use chapter-colored impact sparks and projectiles so each boss has a distinct combat identity. DliClip projectiles retain their pink signal color. Each boss also has a distinct synthesized attack cue, generated reproducibly with the existing audio script.
 
+Burn ticks and reflected damage present their impacts without replaying the source's attack sound, lunge, or projectile.
+
 - 52 unit/integration tests and 4 Chromium end-to-end tests pass, including deterministic chapter encounters, complete runs through all four bosses, chapter unlocking, chapter-specific battle and audio assets, save compatibility, shield-break feedback, and Null Pulse damage.
 - ESLint, TypeScript, production build, and content validation pass.
 - Deterministic balance simulations exercised 500 full runs for each chapter with level-6 unlocks and max-level equipment. The heuristic produced 78.8% wins for The Feed, 38.8% for DliClips, 27.0% for Dili Rooms, and 36.0% for Core Network. Core Network tuning reduced early-route attrition: all but 16 of 500 runs reached Null.exe, and the boss remained the main win gate. This is a stress/balance signal, not a human-playtest estimate; optimal build selection is not modeled.

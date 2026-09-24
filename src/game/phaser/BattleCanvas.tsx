@@ -356,10 +356,13 @@ class BattleScene extends Phaser.Scene {
     }
     if (!target) return;
     if (event.type === 'damage') {
-      const bossAttack = event.source.startsWith('boss_');
-      if (event.label === 'Ban Hammer') playSound('hammer');
-      else if (bossAttack) playBossAttackSound(event.source);
-      else playSound(event.crit ? 'crit' : 'attack');
+      const indirectDamage = event.tag === 'status' || event.tag === 'reflect';
+      const bossAttack = event.source.startsWith('boss_') && !indirectDamage;
+      if (!indirectDamage) {
+        if (event.label === 'Ban Hammer') playSound('hammer');
+        else if (bossAttack) playBossAttackSound(event.source);
+        else playSound(event.crit ? 'crit' : 'attack');
+      }
       const hammer = event.label === 'Ban Hammer';
       const viralExplosion = event.label === 'Viral Explosion';
       const statusColor = event.tag === 'status' ? STATUS_COLORS[event.label.toLowerCase()] : undefined;
@@ -423,7 +426,7 @@ class BattleScene extends Phaser.Scene {
           onComplete: () => target.clearTint().setAlpha(1),
         });
       }
-      if (source && !reduced) {
+      if (source && !reduced && !indirectDamage) {
         this.tweens.add({
           targets: source,
           x: source.x + (source.x < target.x ? 1 : -1) * (bossAttack ? 15 : 8),
