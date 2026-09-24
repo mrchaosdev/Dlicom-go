@@ -38,11 +38,11 @@ Impact objects, skill-art overlay, projectiles and damage numbers are reused ins
 
 ## Enemy and boss art
 
-Spam Bot, Scam Link, Bug and Raid Bot have distinct original transparent sprites. The other six normal enemy kinds still use the shared vector fallback. The four bosses have distinct original vector silhouettes, but they remain replaceable placeholders. Existing enemies have idle breathing, attack lunge, hurt reaction and defeat fade; final character-specific poses and production art are still open. The battle scene loads only the enemy art needed for its chapter, plus Spam Bot for Spam King's summons and Raid Bot for elites.
+Spam Bot, Scam Link, Bug, Raid Bot, Fake Account, Data Leech and Corrupted Clip have distinct original transparent sprites. Raid Master's summoned Raid Minions share Raid Bot art. Toxic Reply, Pop-up and Null Fragment still use the shared vector fallback. The four bosses have distinct original vector silhouettes, but they remain replaceable placeholders. Existing enemies have idle breathing, attack lunge, hurt reaction and defeat fade; final character-specific poses and production art are still open. The battle scene loads only the enemy art needed for its chapter, plus Spam Bot for Spam King's summons and Raid Bot for elites.
 
 ## Remaining production checks
 
-1. Create distinct art for the six remaining normal enemies and finalize boss art/attack readability.
+1. Create distinct art for the three remaining normal enemies and finalize boss art/attack readability.
 2. Add Rage burst and crit anticipation without extending combat resolution time.
 3. Review Dili pose alignment and silhouette size on physical Android/iOS devices.
 4. Run human pacing, readability and worst-build performance playtests before calling art final.

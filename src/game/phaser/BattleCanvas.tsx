@@ -25,6 +25,9 @@ const ENEMY_SPRITES: Record<string, string> = {
   scam_link: ASSETS.enemy_scam_link_idle,
   bug: ASSETS.enemy_bug_idle,
   raid_bot: ASSETS.enemy_raid_bot_idle,
+  fake_account: ASSETS.enemy_fake_account_idle,
+  data_leech: ASSETS.enemy_data_leech_idle,
+  corrupted_clip: ASSETS.enemy_corrupted_clip_idle,
 };
 const PARALLAX_COLORS: Record<string, number> = {
   chapter_feed: 0x46c5d9,
@@ -248,10 +251,11 @@ class BattleScene extends Phaser.Scene {
       boss_raid_master: 'raid_master',
       boss_null_exe: 'null_exe',
     };
+    const enemyKind = actor.kind === 'raid_minion' ? 'raid_bot' : actor.kind;
     const sprite = this.add.image(
       x,
       y,
-      hero ? 'dili_idle' : boss ? bossKeys[actor.kind] ?? 'king' : ENEMY_SPRITES[actor.kind] ? actor.kind : 'bot',
+      hero ? 'dili_idle' : boss ? bossKeys[actor.kind] ?? 'king' : ENEMY_SPRITES[enemyKind] ? enemyKind : 'bot',
     );
     const size = hero ? 230 : boss ? 205 : 123;
     sprite
