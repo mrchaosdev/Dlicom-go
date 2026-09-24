@@ -33,7 +33,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Six build families unlock across account levels 1–6, following the supplied progression order.
 - Three equipment slots, 18 equipment items across four rarities, five upgrade levels and a chest on victory.
 - Twenty seeded events with choices, run buffs, healing, Bits, skill drafts and optional elite fights.
-- Dili reference-based combat poses, distinct generated sprites for all ten normal enemy kinds, original vector boss placeholders, four themed procedural battle backdrops, one original synthesized music loop per chapter, bounded VFX/text objects and SFX.
+- Dili reference-based combat poses, distinct generated sprites for all ten normal enemy kinds and four bosses, four themed procedural battle backdrops, one original synthesized music loop per chapter, bounded VFX/text objects and SFX.
 - Responsive desktop/mobile UI, keyboard focus states, local fonts and local audio.
 
 ## Architecture
@@ -71,7 +71,7 @@ Import `mrchaosdev/Dlicom-go` into Vercel. Root directory: repository root. Buil
 
 ## Remaining production work
 
-- Final boss art, Dili pose polish, remaining Rage/crit VFX, and expanded SFX. Current vector boss silhouettes are replaceable placeholders; the [art and animation matrix](docs/ART_ANIMATION_MATRIX.md) tracks state coverage.
+- Character pose polish, remaining Rage/crit VFX, and expanded SFX. The [art and animation matrix](docs/ART_ANIMATION_MATRIX.md) tracks state coverage.
 - Human balance/pacing pass: a deterministic 500-run stress bot with max-level gear won 38.8% of DliClips, 27.0% of Dili Rooms, and 36.0% of Core Network runs; it does not model human build choices. Core tuning now gets nearly every run to Null.exe, where the boss remains the main win gate. The overall 8–15 minute target has **not** been met or verified; human playtesting and a deliberate pacing pass remain necessary.
 - Real Android/iOS device testing, Firefox/Edge QA, long-session performance profiling, deployed smoke test, trailer and final submission.
 - Share result currently copies text and seed; graphical share-card export remains future work.

@@ -38,11 +38,18 @@ Impact objects, skill-art overlay, projectiles and damage numbers are reused ins
 
 ## Enemy and boss art
 
-All ten normal enemy kinds now have distinct original transparent sprites. Raid Master's summoned Raid Minions share Raid Bot art. The four bosses have distinct original vector silhouettes, but they remain replaceable placeholders. Existing enemies have idle breathing, attack lunge, hurt reaction and defeat fade; final character-specific poses and production art are still open. The battle scene loads only the enemy art needed for its chapter, plus Spam Bot for Spam King's summons and Raid Bot for elites.
+All ten normal enemy kinds and four bosses now have distinct original transparent sprites. Raid Master's summoned Raid Minions share Raid Bot art. Existing enemies have idle breathing, attack lunge, hurt reaction and defeat fade; character-specific attack and hurt poses remain open. The battle scene loads only the enemy art needed for its chapter, plus Spam Bot for Spam King's summons and Raid Bot for elites.
+
+| Boss | Silhouette | Existing telegraph and hit cue |
+| --- | --- | --- |
+| Spam King | Signal-bar crown over a stack of notification windows | Warning ring, magenta flash, heavy lunge and chapter-specific attack sound |
+| Loop Phantom | Hooded specter surrounded by looping filmstrips | Warning ring, violet projectile, rewind-themed art and chapter-specific attack sound |
+| Raid Master | Broad armored commander with an orange raid shield | Warning ring, orange projectile, summoned Raid Bot minions and chapter-specific attack sound |
+| Null.exe | Void eye within broken blue data rings | Warning ring, violet projectile, NULL PULSE label and chapter-specific attack sound |
 
 ## Remaining production checks
 
-1. Finalize boss art and attack readability.
+1. Add character-specific attack and hurt poses only where the one-sprite tweens fail a mobile readability playtest.
 2. Add Rage burst and crit anticipation without extending combat resolution time.
 3. Review Dili pose alignment and silhouette size on physical Android/iOS devices.
 4. Run human pacing, readability and worst-build performance playtests before calling art final.

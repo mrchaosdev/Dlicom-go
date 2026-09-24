@@ -62,9 +62,10 @@ test('unlocked chapters load their own backdrop, boss art and soundtrack', async
   });
   await page.reload();
   for (const chapter of [
-    ['DliClips', 'loop-phantom.svg', 'dliclips-loop.wav'],
-    ['Dili Rooms', 'raid-master.svg', 'rooms-loop.wav'],
-    ['Core Network', 'null-exe.svg', 'core-loop.wav'],
+    ['The Feed', 'spam-king.png', 'feed-loop.wav', ['spam-bot.png', 'scam-link.png', 'bug.png']],
+    ['DliClips', 'loop-phantom.png', 'dliclips-loop.wav', ['fake-account.png', 'data-leech.png', 'corrupted-clip.png']],
+    ['Dili Rooms', 'raid-master.png', 'rooms-loop.wav', ['toxic-reply.png', 'popup.png', 'raid-bot.png']],
+    ['Core Network', 'null-exe.png', 'core-loop.wav', ['null-fragment.png', 'data-leech.png', 'corrupted-clip.png']],
   ] as const) {
     await page.getByRole('button', { name: new RegExp(chapter[0]) }).click();
     await page.getByRole('button', { name: /Data lane/ }).click();
@@ -79,6 +80,10 @@ test('unlocked chapters load their own backdrop, boss art and soundtrack', async
     await expect.poll(() => page.evaluate((asset) =>
       performance.getEntriesByType('resource').some((entry) => entry.name.includes(asset)),
     chapter[2])).toBe(true);
+    for (const asset of chapter[3])
+      await expect.poll(() => page.evaluate((name) =>
+        performance.getEntriesByType('resource').some((entry) => entry.name.includes(name)),
+      asset)).toBe(true);
     await page.reload();
   }
 });

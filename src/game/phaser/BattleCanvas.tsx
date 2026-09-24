@@ -148,7 +148,7 @@ class BattleScene extends Phaser.Scene {
       if (asset) this.load.image(kind, asset);
     }
     const bossSprite = BOSS_SPRITES[this.chapterId];
-    this.load.svg(bossSprite.key, bossSprite.asset);
+    this.load.image(bossSprite.key, bossSprite.asset);
   }
   private addParallaxLayer(name: string, color: number, alpha: number, speed: number, offset: number) {
     const graphics = this.make.graphics({ x: 0, y: 0 }, false);
@@ -260,7 +260,7 @@ class BattleScene extends Phaser.Scene {
       y,
       hero ? 'dili_idle' : boss ? bossKeys[actor.kind] ?? 'king' : ENEMY_SPRITES[enemyKind] ? enemyKind : 'bot',
     );
-    const size = hero ? 230 : boss ? 205 : 123;
+    const size = hero ? 230 : boss ? 245 : 155;
     sprite
       .setDisplaySize(size, (size * sprite.height) / sprite.width)
       .setDepth(hero ? 5 : 4 + index);
