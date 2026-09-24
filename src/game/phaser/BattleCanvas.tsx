@@ -116,6 +116,7 @@ function drawChapterBackground(g: Phaser.GameObjects.Graphics, chapterId: string
 
 class BattleScene extends Phaser.Scene {
   private sprites = new Map<string, Phaser.GameObjects.Image>();
+  private enemySlots = new Map<string, number>();
   private breathing = new Map<string, { baseScaleY: number; factor: number }>();
   private queue: PresentationCue[] = [];
   private wait = 0;
@@ -123,6 +124,8 @@ class BattleScene extends Phaser.Scene {
   private numberIndex = 0;
   private projectile!: Phaser.GameObjects.Arc;
   private impactRing!: Phaser.GameObjects.Arc;
+  private enemyPulseRings: Phaser.GameObjects.Arc[] = [];
+  private enemyPulseIndex = 0;
   private skillImpact!: Phaser.GameObjects.Image;
   private label!: Phaser.GameObjects.Text;
   private ring!: Phaser.GameObjects.Arc;
@@ -210,6 +213,10 @@ class BattleScene extends Phaser.Scene {
       .setStrokeStyle(4, 0x76f5ff)
       .setVisible(false)
       .setDepth(16);
+    for (let i = 0; i < 4; i++)
+      this.enemyPulseRings.push(
+        this.add.circle(0, 0, 28).setStrokeStyle(4, 0xff78c8).setVisible(false).setDepth(12),
+      );
     this.skillImpact = this.add.image(0, 0, 'skill_hammer').setVisible(false).setDepth(18);
     this.ring = this.add
       .circle(200, 290, 30)
@@ -270,12 +277,12 @@ class BattleScene extends Phaser.Scene {
     const state = useGame.getState();
     if (state.snapshot) this.sync(state.snapshot);
   }
-  private spawn(actor: Actor, index: number) {
+  private spawn(actor: Actor, index: number, summoned = false) {
     const hero = actor.id === 'dili';
     const boss = actor.tier === 'boss';
     if (boss) playSound('boss_intro');
-    const x = hero ? 197 : 510 + (index % 2) * 120;
-    const y = hero ? 303 : 244 + (index % 2) * 59;
+    const enemyPositions = [[510, 244], [630, 303], [430, 333]];
+    const [x, y] = hero ? [197, 303] : enemyPositions[index % enemyPositions.length];
     const bossKeys: Record<string, string> = {
       boss_spam_king: 'king',
       boss_loop_phantom: 'loop_phantom',
@@ -288,7 +295,7 @@ class BattleScene extends Phaser.Scene {
       y,
       hero ? 'dili_idle' : boss ? bossKeys[actor.kind] ?? 'king' : ENEMY_SPRITES[enemyKind] ? enemyKind : 'bot',
     );
-    const size = hero ? 230 : boss ? 245 : 155;
+    const size = hero ? 230 : boss ? 245 : summoned ? 135 : 155;
     sprite
       .setDisplaySize(size, (size * sprite.height) / sprite.width)
       .setDepth(hero ? 5 : 4 + index);
@@ -306,7 +313,21 @@ class BattleScene extends Phaser.Scene {
     }
     if (actor.tier === 'elite') sprite.setTint(0xffb080);
     this.sprites.set(actor.id, sprite);
+    if (!hero) this.enemySlots.set(actor.id, index);
+    if (summoned && !boss) sprite.setAlpha(0).setY(y + 18);
     if (boss) this.showBossIntro(actor, sprite, x, y);
+  }
+  private pulseEnemy(x: number, y: number, color: number, reduced: boolean) {
+    const ring = this.enemyPulseRings[this.enemyPulseIndex++ % this.enemyPulseRings.length];
+    this.tweens.killTweensOf(ring);
+    ring.setPosition(x, y).setStrokeStyle(4, color).setScale(0.55).setAlpha(0.9).setVisible(true);
+    this.tweens.add({
+      targets: ring,
+      scale: reduced ? 1.4 : 3.3,
+      alpha: 0,
+      duration: reduced ? 120 : 300,
+      onComplete: () => ring.setVisible(false),
+    });
   }
   private showBossIntro(actor: Actor, sprite: Phaser.GameObjects.Image, x: number, y: number) {
     const reduced = useGame.getState().save.settings.reducedMotion;
@@ -341,10 +362,19 @@ class BattleScene extends Phaser.Scene {
     if (breathing) breathing.baseScaleY = hero.scaleY;
     this.heroPoseWait = duration;
   }
-  sync(snapshot: BattleSnapshot) {
+  sync(snapshot: BattleSnapshot, events: CombatEvent[] = []) {
     if (!this.ready) return;
-    [snapshot.hero, ...snapshot.enemies].forEach((actor, i) => {
-      if (!this.sprites.has(actor.id)) this.spawn(actor, Math.max(0, i - 1));
+    const summonedIds = new Set(events.filter((event) => event.type === 'summon').map((event) => event.target));
+    const livingIds = new Set(snapshot.enemies.filter((actor) => actor.hp > 0).map((actor) => actor.id));
+    [snapshot.hero, ...snapshot.enemies].forEach((actor) => {
+      if (actor.id !== 'dili' && actor.hp <= 0) return;
+      if (!this.sprites.has(actor.id)) {
+        const occupied = new Set(
+          [...this.enemySlots].filter(([id]) => livingIds.has(id)).map(([, slot]) => slot),
+        );
+        const slot = [0, 1, 2].find((index) => !occupied.has(index)) ?? this.enemySlots.size % 3;
+        this.spawn(actor, slot, summonedIds.has(actor.id));
+      }
     });
     const hero = this.sprites.get('dili');
     const reduced = useGame.getState().save.settings.reducedMotion;
@@ -725,8 +755,34 @@ class BattleScene extends Phaser.Scene {
     else if (event.type === 'death') {
       if (event.target === 'dili') this.showHeroPose('dili_hurt', 0);
       playSound('death');
-      this.tweens.add({ targets: target, alpha: 0, duration: reduced ? 100 : 300 });
-    } else if (event.type === 'summon') target.setAlpha(1);
+      if (event.target !== 'dili') {
+        this.pulseEnemy(target.x, target.y, 0xff78c8, reduced);
+        target.setTint(0xffa2c8);
+      }
+      this.tweens.killTweensOf(target);
+      this.tweens.add({
+        targets: target,
+        alpha: 0,
+        ...(reduced ? {} : { y: target.y + 20, angle: 12 }),
+        duration: reduced ? 100 : 300,
+        onComplete: () => {
+          if (event.target === 'dili') return;
+          const breathing = this.breathing.get(event.target);
+          if (breathing) this.tweens.killTweensOf(breathing);
+          this.breathing.delete(event.target);
+          this.sprites.delete(event.target);
+          this.enemySlots.delete(event.target);
+          target.destroy();
+        },
+      });
+    } else if (event.type === 'summon') {
+      const y = target.y - (target.alpha === 0 ? 18 : 0);
+      const color = event.source.includes('raid_master') ? 0xffbb73 : 0xff78c8;
+      this.pulseEnemy(target.x, y, color, reduced);
+      this.tweens.killTweensOf(target);
+      if (reduced) target.setY(y).setAlpha(1);
+      else this.tweens.add({ targets: target, y, alpha: 1, duration: 260, ease: 'Cubic.Out' });
+    }
   }
   update(_time: number, delta: number) {
     const state = useGame.getState();
@@ -789,7 +845,7 @@ export default function BattleCanvas() {
   }, [chapterId]);
   useEffect(() => {
     const state = useGame.getState();
-    if (state.snapshot) scene.current?.sync(state.snapshot);
+    if (state.snapshot) scene.current?.sync(state.snapshot, state.events);
     scene.current?.enqueue(state.events);
   }, [sequence]);
   return (

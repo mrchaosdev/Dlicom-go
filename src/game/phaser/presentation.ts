@@ -23,6 +23,7 @@ export const eventDuration = (event: PresentationCue): number => {
   if (event.type === 'warning') return 600;
   if (event.type === 'ultimate') return 800;
   if (event.type === 'damage') return 240;
+  if (event.type === 'summon' || event.type === 'death') return 300;
   return 150;
 };
 export const turnDuration = (events: CombatEvent[]) =>
