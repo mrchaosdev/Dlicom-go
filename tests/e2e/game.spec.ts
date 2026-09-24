@@ -98,6 +98,8 @@ test('all run screens, boss rewards, upgrade and save reload integrate', async (
       .at(-1)!;
     const { useGame } = await import(path);
     useGame.getState().run.baseStats.atk = 10000;
+    useGame.getState().run.baseStats.maxHp = 1000000;
+    useGame.getState().run.hp = 1000000;
   });
   for (let i = 0; i < 50; i++) {
     const phase = await page.evaluate(async () => {
