@@ -20,6 +20,12 @@ const BOSS_SPRITES: Record<string, { key: string; asset: string }> = {
   chapter_rooms: { key: 'raid_master', asset: ASSETS.enemy_boss_raid_master_idle },
   chapter_core: { key: 'null_exe', asset: ASSETS.enemy_boss_null_exe_idle },
 };
+const ENEMY_SPRITES: Record<string, string> = {
+  spam_bot: ASSETS.enemy_spam_bot_idle,
+  scam_link: ASSETS.enemy_scam_link_idle,
+  bug: ASSETS.enemy_bug_idle,
+  raid_bot: ASSETS.enemy_raid_bot_idle,
+};
 const PARALLAX_COLORS: Record<string, number> = {
   chapter_feed: 0x46c5d9,
   chapter_dliclips: 0xdd72d1,
@@ -125,7 +131,16 @@ class BattleScene extends Phaser.Scene {
     this.load.image('dili_ultimate', ASSETS.dili_ultimate);
     this.load.image('skill_hammer', ASSETS.skill_hammer);
     this.load.image('skill_viral', ASSETS.skill_viral);
-    this.load.svg('bot', ASSETS.enemy_spam_bot_idle);
+    this.load.svg('bot', ASSETS.enemy_bot_placeholder);
+    const enemyKinds = new Set([
+      ...getChapter(this.chapterId).enemyPool.map((enemy) => enemy.id),
+      'spam_bot', // Spam King summons this enemy.
+      'raid_bot', // Elite encounters use this enemy in every chapter.
+    ]);
+    for (const kind of enemyKinds) {
+      const asset = ENEMY_SPRITES[kind];
+      if (asset) this.load.image(kind, asset);
+    }
     const bossSprite = BOSS_SPRITES[this.chapterId];
     this.load.svg(bossSprite.key, bossSprite.asset);
   }
@@ -233,7 +248,11 @@ class BattleScene extends Phaser.Scene {
       boss_raid_master: 'raid_master',
       boss_null_exe: 'null_exe',
     };
-    const sprite = this.add.image(x, y, hero ? 'dili_idle' : boss ? bossKeys[actor.kind] ?? 'king' : 'bot');
+    const sprite = this.add.image(
+      x,
+      y,
+      hero ? 'dili_idle' : boss ? bossKeys[actor.kind] ?? 'king' : ENEMY_SPRITES[actor.kind] ? actor.kind : 'bot',
+    );
     const size = hero ? 230 : boss ? 205 : 123;
     sprite
       .setDisplaySize(size, (size * sprite.height) / sprite.width)
@@ -249,8 +268,6 @@ class BattleScene extends Phaser.Scene {
         ease: 'Sine.InOut',
       });
     }
-    if (actor.kind === 'scam_link') sprite.setTint(0xffcc99);
-    if (actor.kind === 'bug') sprite.setTint(0xa3ffbb);
     if (actor.tier === 'elite') sprite.setTint(0xffb080);
     this.sprites.set(actor.id, sprite);
   }
