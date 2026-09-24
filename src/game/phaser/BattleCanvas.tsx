@@ -154,6 +154,7 @@ class BattleScene extends Phaser.Scene {
   private spawn(actor: Actor, index: number) {
     const hero = actor.id === 'dili';
     const boss = actor.tier === 'boss';
+    if (boss) playSound('boss_intro');
     const x = hero ? 197 : 510 + (index % 2) * 120;
     const y = hero ? 303 : 244 + (index % 2) * 59;
     const bossKeys: Record<string, string> = {

@@ -22,7 +22,7 @@ export function startAudio(settings: SaveFile['settings'], chapterId?: string) {
   if (!enabled) {
     enabled = true;
     sounds = Object.fromEntries(
-      ['attack', 'crit', 'ultimate', 'select', 'dodge', 'heal', 'shield', 'death'].map((name) => [
+      ['attack', 'crit', 'ultimate', 'select', 'dodge', 'heal', 'shield', 'death', 'boss_intro', 'victory', 'defeat'].map((name) => [
         name,
         new Howl({
           src: [ASSETS[`sfx_${name}` as keyof typeof ASSETS]],

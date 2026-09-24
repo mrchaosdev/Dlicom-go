@@ -18,4 +18,7 @@ export const ASSETS = {
   sfx_heal: asset('heal.wav'),
   sfx_shield: asset('shield.wav'),
   sfx_death: asset('death.wav'),
+  sfx_boss_intro: asset('boss-intro.wav'),
+  sfx_victory: asset('victory.wav'),
+  sfx_defeat: asset('defeat.wav'),
 };

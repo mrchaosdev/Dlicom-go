@@ -22,6 +22,9 @@ for (const file of [
   'heal.wav',
   'shield.wav',
   'death.wav',
+  'boss-intro.wav',
+  'victory.wav',
+  'defeat.wav',
 ])
   if (!existsSync(`public/assets/${file}`)) throw new Error(`Asset missing: ${file}`);
 console.log(

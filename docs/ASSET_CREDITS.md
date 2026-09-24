@@ -4,7 +4,7 @@
 - `public/assets/dili-idle.png`: generated using the built-in image-generation tool from the supplied reference; used in menu and battle with presentation tweens. It is one state sprite, not a completed animation sheet.
 - `public/assets/spam-bot.svg`, `spam-king.svg`: original code-authored vector placeholders; descriptive manifest keys make them replaceable. Scam Link, Bug and Raid Bot currently use tinted versions of the bot placeholder.
 - Feed City: original procedural Phaser graphics; menu chapter illustrations use CSS shapes.
-- `public/assets/attack.wav`, `crit.wav`, `ultimate.wav`, `select.wav`, `dodge.wav`, `heal.wav`, `shield.wav`, `death.wav` and four chapter loops (`feed-loop.wav`, `dliclips-loop.wav`, `rooms-loop.wav`, `core-loop.wav`): original synthesized audio from `scripts/audio.mjs`. Run `node scripts/audio.mjs` to reproduce. No samples or third-party music used.
+- `public/assets/attack.wav`, `crit.wav`, `ultimate.wav`, `select.wav`, `dodge.wav`, `heal.wav`, `shield.wav`, `death.wav`, `boss-intro.wav`, `victory.wav`, `defeat.wav` and four chapter loops (`feed-loop.wav`, `dliclips-loop.wav`, `rooms-loop.wav`, `core-loop.wav`): original synthesized audio from `scripts/audio.mjs`. Run `node scripts/audio.mjs` to reproduce. No samples or third-party music used.
 - Icons: Lucide, ISC license, installed as `lucide-react`.
 - Local fonts: Barlow Condensed, DM Sans and Space Mono, SIL Open Font License, bundled through their `@fontsource` packages. See package license files. No remote font calls.
 

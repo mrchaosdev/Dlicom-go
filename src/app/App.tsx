@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -901,7 +901,18 @@ function PlayScreen() {
 }
 export default function App() {
   const { screen, navigate, save, warning, run } = useGame();
+  const summaryCue = useRef('');
   useEffect(() => updateAudio(save.settings), [save.settings]);
+  useEffect(() => {
+    if (run?.phase !== 'summary' || !run.result) {
+      summaryCue.current = '';
+      return;
+    }
+    const cueId = `${run.seed}:${run.result}`;
+    if (summaryCue.current === cueId) return;
+    summaryCue.current = cueId;
+    playSound(run.result);
+  }, [run?.phase, run?.result, run?.seed]);
   useEffect(() => {
     const listener = () => {
       suspendAudio(document.hidden);
