@@ -26,6 +26,15 @@ const PARALLAX_COLORS: Record<string, number> = {
   chapter_rooms: 0xf0a16e,
   chapter_core: 0x8d88fa,
 };
+const STATUS_COLORS: Record<string, number> = {
+  burn: 0xff9858,
+  glitch: 0xb67cff,
+  vulnerable: 0xff78c8,
+  silence: 0x7bb9ff,
+  slow: 0x65d9d1,
+  marked: 0xffd773,
+  corrupted: 0xd081ff,
+};
 
 function drawChapterBackground(g: Phaser.GameObjects.Graphics, chapterId: string) {
   if (chapterId === 'chapter_feed') {
@@ -270,8 +279,8 @@ class BattleScene extends Phaser.Scene {
         ? `${event.crit ? 'CRIT ' : ''}${event.amount}`
         : event.type === 'dodge'
           ? 'DODGE'
-          : event.type === 'status'
-            ? event.label.toUpperCase()
+        : event.type === 'status'
+          ? `${event.label.toUpperCase()} ${event.amount}T`
             : `+${event.amount} ${event.type.toUpperCase()}`;
     text
       .setText(message)
@@ -344,22 +353,47 @@ class BattleScene extends Phaser.Scene {
       playSound(event.label === 'Ban Hammer' ? 'hammer' : event.crit ? 'crit' : 'attack');
       const hammer = event.label === 'Ban Hammer';
       const viralExplosion = event.label === 'Viral Explosion';
+      const statusColor = event.tag === 'status' ? STATUS_COLORS[event.label.toLowerCase()] : undefined;
       const reducedScale = reduced && (hammer || viralExplosion);
       this.tweens.killTweensOf(this.impactRing);
       this.impactRing
         .setPosition(target.x, target.y)
         .setStrokeStyle(
-          hammer || viralExplosion || event.crit ? 5 : 3,
-          hammer ? 0xff78c8 : viralExplosion ? 0xc879ff : event.crit ? 0xffd773 : 0x76f5ff,
+          hammer || viralExplosion || event.crit || statusColor ? 5 : 3,
+          hammer
+            ? 0xff78c8
+            : viralExplosion
+              ? 0xc879ff
+              : statusColor ?? (event.crit ? 0xffd773 : 0x76f5ff),
         )
         .setScale(0.35)
         .setAlpha(0.95)
         .setVisible(true);
       this.tweens.add({
         targets: this.impactRing,
-        scale: reducedScale ? 2.5 : hammer ? 4.6 : viralExplosion ? 5.2 : event.crit ? 3.2 : 2.4,
+        scale: reducedScale
+          ? 2.5
+          : hammer
+            ? 4.6
+            : viralExplosion
+              ? 5.2
+              : statusColor
+                ? 2.9
+                : event.crit
+                  ? 3.2
+                  : 2.4,
         alpha: 0,
-        duration: reduced ? 100 : hammer ? 360 : viralExplosion ? 280 : event.crit ? 190 : 130,
+        duration: reduced
+          ? 100
+          : hammer
+            ? 360
+            : viralExplosion
+              ? 280
+              : statusColor
+                ? 210
+                : event.crit
+                  ? 190
+                  : 130,
         onComplete: () => this.impactRing.setVisible(false),
       });
       if (!reduced && hammer) this.cameras.main.shake(120, 0.009);
@@ -437,7 +471,24 @@ class BattleScene extends Phaser.Scene {
         duration: reduced ? 100 : 220,
         onComplete: () => this.impactRing.setVisible(false),
       });
-    } else if (['status', 'revive'].includes(event.type))
+    } else if (event.type === 'status') {
+      const color = STATUS_COLORS[event.label.toLowerCase()] ?? 0xb67cff;
+      this.tweens.killTweensOf(this.impactRing);
+      this.impactRing
+        .setPosition(target.x, target.y)
+        .setStrokeStyle(3, color)
+        .setScale(0.7)
+        .setAlpha(0.8)
+        .setVisible(true);
+      this.tweens.add({
+        targets: this.impactRing,
+        scale: reduced ? 1.7 : 2.3,
+        alpha: 0,
+        duration: reduced ? 100 : 200,
+        onComplete: () => this.impactRing.setVisible(false),
+      });
+      this.floating(target, event);
+    } else if (event.type === 'revive')
       this.floating(target, event);
     else if (event.type === 'death') {
       playSound('death');
