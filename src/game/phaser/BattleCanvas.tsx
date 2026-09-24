@@ -235,21 +235,28 @@ class BattleScene extends Phaser.Scene {
     if (!target) return;
     if (event.type === 'damage') {
       playSound(event.label === 'Ban Hammer' ? 'hammer' : event.crit ? 'crit' : 'attack');
+      const hammer = event.label === 'Ban Hammer';
+      const viralExplosion = event.label === 'Viral Explosion';
+      const reducedScale = reduced && (hammer || viralExplosion);
       this.tweens.killTweensOf(this.impactRing);
       this.impactRing
         .setPosition(target.x, target.y)
-        .setStrokeStyle(event.crit ? 5 : 3, event.crit ? 0xffd773 : 0x76f5ff)
+        .setStrokeStyle(
+          hammer || viralExplosion || event.crit ? 5 : 3,
+          hammer ? 0xff78c8 : viralExplosion ? 0xc879ff : event.crit ? 0xffd773 : 0x76f5ff,
+        )
         .setScale(0.35)
         .setAlpha(0.95)
         .setVisible(true);
       this.tweens.add({
         targets: this.impactRing,
-        scale: event.crit ? 3.2 : 2.4,
+        scale: reducedScale ? 2.5 : hammer ? 4.6 : viralExplosion ? 5.2 : event.crit ? 3.2 : 2.4,
         alpha: 0,
-        duration: event.crit ? 190 : 130,
+        duration: reduced ? 100 : hammer ? 360 : viralExplosion ? 280 : event.crit ? 190 : 130,
         onComplete: () => this.impactRing.setVisible(false),
       });
-      if (event.crit && !reduced) this.cameras.main.shake(90, 0.005);
+      if (!reduced && hammer) this.cameras.main.shake(120, 0.009);
+      else if (event.crit && !reduced) this.cameras.main.shake(90, 0.005);
       if (source && !reduced) {
         this.tweens.add({
           targets: source,
@@ -257,7 +264,11 @@ class BattleScene extends Phaser.Scene {
           duration: 65,
           yoyo: true,
         });
-        this.projectile.setPosition(source.x, source.y).setVisible(true).setAlpha(1);
+        this.projectile
+          .setFillStyle(event.label.startsWith('DliClip') ? 0xff78c8 : 0x7bffff)
+          .setPosition(source.x, source.y)
+          .setVisible(true)
+          .setAlpha(1);
         this.tweens.add({
           targets: this.projectile,
           x: target.x,
