@@ -66,18 +66,24 @@ function Button({
   onClick,
   disabled,
   className = '',
+  audioChapterId,
 }: {
   children: ReactNode;
   onClick?: () => void;
   disabled?: boolean;
   className?: string;
+  audioChapterId?: string;
 }) {
   return (
     <button
       className={`button ${className}`}
       disabled={disabled}
       onClick={() => {
-        startAudio(useGame.getState().save.settings);
+        const state = useGame.getState();
+        startAudio(
+          state.save.settings,
+          audioChapterId ?? state.run?.chapterId ?? 'chapter_feed',
+        );
         playSound('select');
         onClick?.();
       }}
@@ -164,7 +170,11 @@ function HomeScreen() {
             themselves.
           </p>
           <div className="hero-actions">
-            <Button className="primary" onClick={enter}>
+            <Button
+              className="primary"
+              audioChapterId={run && !run.result ? run.chapterId : 'chapter_feed'}
+              onClick={enter}
+            >
               <Play size={18} fill="currentColor" />{' '}
               {run && !run.result ? 'Resume connection' : 'Enter the Network'} <ArrowRight size={20} />
             </Button>
@@ -196,7 +206,7 @@ function HomeScreen() {
         {CHAPTERS.map((chapter) => {
           const available = chapter.order <= save.account.unlockedChapters;
           const selectChapter = () => {
-            startAudio(save.settings);
+            startAudio(save.settings, run && !run.result ? run.chapterId : chapter.id);
             if (run && !run.result) navigate('play');
             else start(chapter.id);
           };
@@ -275,7 +285,7 @@ function EquipmentScreen() {
               DEF <b>{stats.def}</b>
             </span>
           </div>
-          <Button className="primary full" onClick={start}>
+          <Button className="primary full" audioChapterId="chapter_feed" onClick={start}>
             Enter the Feed <ArrowRight size={18} />
           </Button>
         </div>
@@ -831,10 +841,10 @@ function SummaryScreen() {
         ))}
       </div>
       <div className="summary-actions">
-        <Button className="primary" onClick={() => start(run.chapterId)}>
+        <Button className="primary" audioChapterId={run.chapterId} onClick={() => start(run.chapterId)}>
           <RotateCcw size={17} /> Run it back
         </Button>
-        <Button onClick={() => navigate('equipment')}>
+        <Button audioChapterId={run.chapterId} onClick={() => navigate('equipment')}>
           <Cpu size={17} /> Upgrade equipment
         </Button>
         <Button

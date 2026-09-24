@@ -56,3 +56,28 @@ wav('feed-loop', 8, (t) => {
     Math.sin(2 * Math.PI * f * 2 * t) * Math.exp(-beat * 12) * 0.035
   );
 });
+const loop = (file, notes, options) => {
+  const beatLength = options.beatLength ?? 0.5;
+  wav(file, 8, (t) => {
+    const step = Math.floor(t / beatLength), beat = t % beatLength;
+    const note = notes[step % notes.length];
+    const bass = options.bass[(Math.floor(step / 2)) % options.bass.length];
+    const pluck = Math.sin(2 * Math.PI * note * t) * Math.exp(-beat * options.decay) * options.pluck;
+    const overtone = Math.sin(2 * Math.PI * note * 2 * t) * Math.exp(-beat * options.decay * 1.7) * options.overtone;
+    const low = Math.sin(2 * Math.PI * bass * t) * options.low;
+    const pulse = step % 4 === 0 ? Math.sin(2 * Math.PI * (options.kick + beat * 18) * beat) * Math.exp(-beat * 16) * options.pulse : 0;
+    return pluck + overtone + low + pulse;
+  });
+};
+loop('dliclips-loop',
+  [293.66, 369.99, 440, 587.33, 493.88, 440, 369.99, 659.25, 587.33, 440, 369.99, 493.88, 440, 369.99, 293.66, 369.99],
+  { bass: [73.42, 92.5, 110, 92.5], pluck: 0.105, overtone: 0.035, low: 0.055, decay: 11, kick: 68, pulse: 0.045 },
+);
+loop('rooms-loop',
+  [196, 246.94, 293.66, 246.94, 220, 261.63, 329.63, 261.63, 174.61, 220, 261.63, 220, 196, 246.94, 293.66, 246.94],
+  { bass: [98, 123.47, 110, 87.31], pluck: 0.085, overtone: 0.025, low: 0.075, decay: 7, kick: 54, pulse: 0.025 },
+);
+loop('core-loop',
+  [110, 130.81, 146.83, 164.81, 123.47, 146.83, 164.81, 220, 110, 130.81, 155.56, 164.81, 103.83, 123.47, 146.83, 196],
+  { bass: [55, 65.41, 51.91, 61.74], pluck: 0.08, overtone: 0.045, low: 0.095, decay: 5, kick: 42, pulse: 0.055 },
+);

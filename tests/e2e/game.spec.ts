@@ -50,7 +50,7 @@ test('automatic battle pauses, changes speed and reaches a three-choice draft', 
   await expect(page.locator('.owned-skill')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
-test('unlocked chapters load their own battle backdrop and boss art assets', async ({ page }) => {
+test('unlocked chapters load their own backdrop, boss art and soundtrack', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(async () => {
     const path = performance.getEntriesByType('resource').map((e) => e.name)
@@ -62,10 +62,10 @@ test('unlocked chapters load their own battle backdrop and boss art assets', asy
   });
   await page.reload();
   for (const chapter of [
-    ['DliClips', 'loop-phantom.svg'],
-    ['Dili Rooms', 'raid-master.svg'],
-    ['Core Network', 'null-exe.svg'],
-  ]) {
+    ['DliClips', 'loop-phantom.svg', 'dliclips-loop.wav'],
+    ['Dili Rooms', 'raid-master.svg', 'rooms-loop.wav'],
+    ['Core Network', 'null-exe.svg', 'core-loop.wav'],
+  ] as const) {
     await page.getByRole('button', { name: new RegExp(chapter[0]) }).click();
     await page.getByRole('button', { name: /Data lane/ }).click();
     await expect(page.locator('.battle-canvas')).toHaveAttribute(
@@ -76,6 +76,9 @@ test('unlocked chapters load their own battle backdrop and boss art assets', asy
     await expect.poll(() => page.evaluate((asset) =>
       performance.getEntriesByType('resource').some((entry) => entry.name.includes(asset)),
     chapter[1])).toBe(true);
+    await expect.poll(() => page.evaluate((asset) =>
+      performance.getEntriesByType('resource').some((entry) => entry.name.includes(asset)),
+    chapter[2])).toBe(true);
     await page.reload();
   }
 });
