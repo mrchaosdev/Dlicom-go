@@ -351,6 +351,7 @@ class BattleScene extends Phaser.Scene {
     if (!target) return;
     if (event.type === 'damage') {
       playSound(event.label === 'Ban Hammer' ? 'hammer' : event.crit ? 'crit' : 'attack');
+      const bossAttack = event.source.startsWith('boss_');
       const hammer = event.label === 'Ban Hammer';
       const viralExplosion = event.label === 'Viral Explosion';
       const statusColor = event.tag === 'status' ? STATUS_COLORS[event.label.toLowerCase()] : undefined;
@@ -396,7 +397,8 @@ class BattleScene extends Phaser.Scene {
                   : 130,
         onComplete: () => this.impactRing.setVisible(false),
       });
-      if (!reduced && hammer) this.cameras.main.shake(120, 0.009);
+      if (!reduced && bossAttack) this.cameras.main.shake(100, 0.0025);
+      else if (!reduced && hammer) this.cameras.main.shake(120, 0.009);
       else if (event.crit && !reduced) this.cameras.main.shake(90, 0.005);
       if (event.target === 'dili' && event.source !== 'dili' && !reduced) {
         target.setTint(0xff607c);
@@ -411,8 +413,8 @@ class BattleScene extends Phaser.Scene {
       if (source && !reduced) {
         this.tweens.add({
           targets: source,
-          x: source.x + (source.x < target.x ? 8 : -8),
-          duration: 65,
+          x: source.x + (source.x < target.x ? 1 : -1) * (bossAttack ? 15 : 8),
+          duration: bossAttack ? 95 : 65,
           yoyo: true,
         });
         this.projectile
@@ -424,7 +426,7 @@ class BattleScene extends Phaser.Scene {
           targets: this.projectile,
           x: target.x,
           y: target.y,
-          duration: 140,
+          duration: bossAttack ? 190 : 140,
           onComplete: () => this.projectile.setVisible(false),
         });
       }
