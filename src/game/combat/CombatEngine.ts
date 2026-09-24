@@ -115,7 +115,13 @@ export class CombatEngine {
     return true;
   }
   private emit(event: CombatEvent) {
-    if (this.allowed(0)) this.events.push(event);
+    if (!this.allowed(0)) return;
+    const target = event.target === 'dili'
+      ? this.hero
+      : this.enemies.find((enemy) => enemy.id === event.target);
+    this.events.push(target
+      ? { ...event, targetHp: target.hp, targetShield: target.shield }
+      : event);
   }
   private gainRage(value: number) {
     if (this.hero.hp <= 0) return;

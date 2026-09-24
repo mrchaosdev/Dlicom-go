@@ -1,6 +1,18 @@
 import type { CombatEvent } from '../combat/types';
+import type { BattleSnapshot } from '../combat/CombatEngine';
 export const BASIC_PROJECTILE_MS = 150;
 export const BOSS_PROJECTILE_MS = 190;
+export type PresentedVitals = Record<string, { hp: number; shield: number }>;
+export const snapshotVitals = (snapshot: BattleSnapshot): PresentedVitals =>
+  Object.fromEntries([snapshot.hero, ...snapshot.enemies].map((actor) => [
+    actor.id, { hp: actor.hp, shield: actor.shield },
+  ]));
+export const applyCueVitals = (current: PresentedVitals, event: CombatEvent): PresentedVitals => {
+  if (event.targetHp === undefined || event.targetShield === undefined) return current;
+  const previous = current[event.target];
+  if (previous?.hp === event.targetHp && previous.shield === event.targetShield) return current;
+  return { ...current, [event.target]: { hp: event.targetHp, shield: event.targetShield } };
+};
 export type PresentationCue =
   | CombatEvent
   | { type: 'crit_anticipation' | 'rage_burst'; source: string; target: string };

@@ -127,6 +127,7 @@ class BattleScene extends Phaser.Scene {
   private breathing = new Map<string, { baseScaleY: number; factor: number }>();
   private queue: PresentationCue[] = [];
   private wait = 0;
+  private vitalsSettled = true;
   private numbers: Phaser.GameObjects.Text[] = [];
   private numberIndex = 0;
   private projectile!: Phaser.GameObjects.Arc;
@@ -146,7 +147,11 @@ class BattleScene extends Phaser.Scene {
   private outcomePoseShown = false;
   private parallaxLayers: { sprite: Phaser.GameObjects.TileSprite; speed: number }[] = [];
   private ready = false;
-  constructor(private readonly chapterId: string) {
+  constructor(
+    private readonly chapterId: string,
+    private readonly onCue: (event: CombatEvent) => void,
+    private readonly onSnapshot: (snapshot: BattleSnapshot) => void,
+  ) {
     super('battle');
   }
   preload() {
@@ -295,7 +300,10 @@ class BattleScene extends Phaser.Scene {
       );
     this.ready = true;
     const state = useGame.getState();
-    if (state.snapshot) this.sync(state.snapshot);
+    if (state.snapshot) {
+      this.sync(state.snapshot);
+      this.onSnapshot(state.snapshot);
+    }
   }
   private spawn(actor: Actor, index: number, summoned = false) {
     const hero = actor.id === 'dili';
@@ -447,6 +455,7 @@ class BattleScene extends Phaser.Scene {
   enqueue(events: CombatEvent[]) {
     this.queue.push(...buildPresentationQueue(events));
     this.queue = this.queue.slice(0, 200);
+    this.vitalsSettled = false;
     this.outcomePosePending = useGame.getState().snapshot?.outcome ?? null;
   }
   private showOutcomePose(outcome: 'victory' | 'defeat', reduced: boolean) {
@@ -502,6 +511,8 @@ class BattleScene extends Phaser.Scene {
     const target = this.sprites.get(event.target),
       source = this.sprites.get(event.source);
     const reduced = useGame.getState().save.settings.reducedMotion;
+    if ('amount' in event && event.type !== 'damage')
+      this.onCue(event);
     if (event.type === 'crit_anticipation' && source) {
       if (event.source === 'dili') this.showHeroPose('dili_attack', 110);
       this.tweens.killTweensOf(this.ring);
@@ -593,13 +604,17 @@ class BattleScene extends Phaser.Scene {
         }
       }
     }
-    if (!target) return;
+    if (!target) {
+      if (event.type === 'damage') this.onCue(event);
+      return;
+    }
     if (event.type === 'damage') {
       const indirectDamage = event.tag === 'status' || event.tag === 'reflect';
       const bossAttack = event.source.startsWith('boss_') && !indirectDamage;
       if (event.source === 'dili' && !indirectDamage)
         this.showHeroPose('dili_attack', event.crit ? 300 : 230);
       const impact = () => {
+        this.onCue(event);
         if (!target.active) return;
         if (event.target === 'dili' && event.source !== 'dili')
           this.showHeroPose('dili_hurt', 220);
@@ -877,19 +892,35 @@ class BattleScene extends Phaser.Scene {
       this.present(event);
       this.wait = eventDuration(event);
     }
+    if (this.wait <= 0 && !this.queue.length && !this.vitalsSettled) {
+      this.vitalsSettled = true;
+      if (state.snapshot) this.onSnapshot(state.snapshot);
+    }
     if (this.wait <= 0 && !this.queue.length && this.outcomePosePending && !this.outcomePoseShown) {
       this.outcomePoseShown = true;
       this.showOutcomePose(this.outcomePosePending, state.save.settings.reducedMotion);
     }
   }
 }
-export default function BattleCanvas() {
+export default function BattleCanvas({
+  onCue,
+  onSnapshot,
+}: {
+  onCue: (event: CombatEvent) => void;
+  onSnapshot: (snapshot: BattleSnapshot) => void;
+}) {
   const parent = useRef<HTMLDivElement>(null);
   const scene = useRef<BattleScene | null>(null);
+  const handlers = useRef({ onCue, onSnapshot });
+  handlers.current = { onCue, onSnapshot };
   const sequence = useGame((s) => s.sequence);
   const chapterId = useGame((s) => s.run?.chapterId ?? 'chapter_feed');
   useEffect(() => {
-    const current = new BattleScene(chapterId);
+    const current = new BattleScene(
+      chapterId,
+      (event) => handlers.current.onCue(event),
+      (snapshot) => handlers.current.onSnapshot(snapshot),
+    );
     scene.current = current;
     const game = new Phaser.Game({
       type: Phaser.AUTO,

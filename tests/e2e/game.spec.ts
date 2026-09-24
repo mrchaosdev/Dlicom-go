@@ -73,6 +73,43 @@ test('automatic battle pauses, changes speed and reaches a three-choice draft', 
   await expect(page.locator('.owned-skill')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
+test('enemy HP waits for projectile impact and stays still while paused', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    const { useGame } = await import(path);
+    useGame.getState().start();
+    useGame.getState().act('enter', 0);
+    useGame.setState({ paused: true });
+  });
+  await expect(page.locator('.battle-canvas canvas').first()).toBeVisible();
+  await page.waitForTimeout(400);
+  const enemyHp = page.locator('.enemy-hud [role="progressbar"]').first();
+  const initialHp = Number(await enemyHp.getAttribute('aria-valuenow'));
+  const logicalHp = await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    const { useGame } = await import(path);
+    useGame.setState({ paused: false });
+    useGame.getState().step();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    useGame.setState({ paused: true });
+    return useGame.getState().snapshot!.enemies[0].hp;
+  });
+  expect(logicalHp).toBeLessThan(initialHp);
+  await expect(enemyHp).toHaveAttribute('aria-valuenow', String(initialHp));
+  await page.waitForTimeout(250);
+  await expect(enemyHp).toHaveAttribute('aria-valuenow', String(initialHp));
+  await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    (await import(path)).useGame.setState({ paused: false });
+  });
+  await expect(enemyHp).toHaveAttribute('aria-valuenow', String(logicalHp));
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
+});
 test('late-run desktop battle keeps the arena and build visible without a scrollbar', async ({ page }) => {
   await page.setViewportSize({ width: 1513, height: 651 });
   await page.goto('/');

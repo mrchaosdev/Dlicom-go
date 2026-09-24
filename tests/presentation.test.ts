@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CombatEvent } from '../src/game/combat/types';
-import { buildPresentationQueue, eventDuration, turnDuration } from '../src/game/phaser/presentation';
+import { applyCueVitals, buildPresentationQueue, eventDuration, turnDuration } from '../src/game/phaser/presentation';
 
 describe('combat presentation cues', () => {
   it('places a short anticipation before a critical hit and a Rage burst before Ultimate', () => {
@@ -42,5 +42,16 @@ describe('combat presentation cues', () => {
     expect(eventDuration({ ...hit, label: 'Viral Explosion' })).toBe(460);
     expect(eventDuration({ ...hit, source: 'boss_spam_king' })).toBe(330);
     expect(eventDuration({ ...hit, tag: 'status' })).toBe(220);
+  });
+
+  it('holds displayed vitals until the matching resolved cue is presented', () => {
+    const initial = { dili: { hp: 100, shield: 20 } };
+    const hit: CombatEvent = {
+      type: 'damage', source: 'bot', target: 'dili', amount: 45, label: 'Packet',
+      targetHp: 75, targetShield: 0,
+    };
+    expect(applyCueVitals(initial, hit)).toEqual({ dili: { hp: 75, shield: 0 } });
+    expect(initial.dili).toEqual({ hp: 100, shield: 20 });
+    expect(applyCueVitals(initial, { ...hit, targetHp: undefined })).toBe(initial);
   });
 });

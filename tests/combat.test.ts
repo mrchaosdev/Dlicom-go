@@ -42,6 +42,16 @@ describe('combat rules', () => {
     expect(broken).toBeGreaterThan(damage);
     expect(e.hero.shield).toBe(0);
   });
+  it('records authoritative target vitals on each event for the presentation clock', () => {
+    const e = battle({ shield: 100, stats: { dodgeRate: 0 }, enemies: [dummy(1000)] });
+    const events = e.step();
+    const outgoing = events.find((event) => event.type === 'damage' && event.target === 'bot')!;
+    const incoming = events.find((event) => event.type === 'damage' && event.target === 'dili')!;
+    expect(outgoing.targetHp).toBe(100000 - outgoing.amount);
+    expect(outgoing.targetShield).toBe(0);
+    expect(incoming.targetHp).toBe(e.hero.hp);
+    expect(incoming.targetShield).toBe(0);
+  });
   it('caps combo at three extra attacks by default and five with Endless Feed', () => {
     const a = battle({ stats: { comboRate: 1 } });
     a.step();

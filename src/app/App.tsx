@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -29,7 +29,8 @@ import {
   Zap,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
-import type { Archetype } from '../game/combat/types';
+import type { Archetype, CombatEvent } from '../game/combat/types';
+import type { BattleSnapshot } from '../game/combat/CombatEngine';
 import { useGame } from '../stores/gameStore';
 import { ASSETS, SKILL_ART } from '../content/assets';
 import { EQUIPMENT, GEAR, UPGRADE_COSTS, loadoutStats, type Slot } from '../content/equipment';
@@ -38,7 +39,7 @@ import { NODES, generateEncounter } from '../content/encounters';
 import { CHAPTERS } from '../content/chapters';
 import { accountLevel } from '../services/save';
 import { playSound, startAudio, suspendAudio, updateAudio } from '../services/audio';
-import { turnDuration } from '../game/phaser/presentation';
+import { applyCueVitals, snapshotVitals, turnDuration, type PresentedVitals } from '../game/phaser/presentation';
 const BattleCanvas = lazy(() => import('../game/phaser/BattleCanvas'));
 const iconFor = (tag: string, size = 22) => {
   const Icon =
@@ -582,6 +583,15 @@ function RouteScreen() {
 function BattleScreen() {
   const { snapshot, paused, togglePause, speed, toggleSpeed, run, events } = useGame();
   const [inspected, setInspected] = useState<string>('');
+  const [presentedVitals, setPresentedVitals] = useState<PresentedVitals>(() =>
+    snapshot ? snapshotVitals(snapshot) : {},
+  );
+  const onCue = useCallback((event: CombatEvent) => {
+    setPresentedVitals((current) => applyCueVitals(current, event));
+  }, []);
+  const onSnapshot = useCallback((presentedSnapshot: BattleSnapshot) => {
+    setPresentedVitals(snapshotVitals(presentedSnapshot));
+  }, []);
   useEffect(() => {
     let remaining = 850;
     let last = performance.now();
@@ -630,14 +640,14 @@ function BattleScreen() {
       <div className="battle-stage">
         <div className="enemy-hud">
           {snapshot.enemies
-            .filter((e) => e.hp > 0)
+            .filter((enemy) => (presentedVitals[enemy.id]?.hp ?? enemy.hp) > 0)
             .map((enemy) => (
               <div key={enemy.id}>
                 <span>
                   {enemy.tier === 'boss' && <Crown size={13} />} {enemy.name}{' '}
                   <small>{enemy.modifier}</small>
                 </span>
-                <Meter value={enemy.hp} max={enemy.stats.maxHp} label={enemy.name} />
+                <Meter value={presentedVitals[enemy.id]?.hp ?? enemy.hp} max={enemy.stats.maxHp} label={enemy.name} />
                 {enemy.statuses.map((s) => (
                   <button
                     className="status-chip"
@@ -651,7 +661,7 @@ function BattleScreen() {
             ))}
         </div>
         <Suspense fallback={<div className="battle-loading">Connecting to Feed City…</div>}>
-          <BattleCanvas />
+          <BattleCanvas onCue={onCue} onSnapshot={onSnapshot} />
         </Suspense>
         {paused && <div className="pause-banner">Connection paused · Take your time.</div>}
       </div>
@@ -663,10 +673,10 @@ function BattleScreen() {
             </span>
             <strong>DILI</strong>
             <span>
-              <Shield size={14} /> {snapshot.hero.shield} Shield
+              <Shield size={14} /> {presentedVitals.dili?.shield ?? snapshot.hero.shield} Shield
             </span>
           </div>
-          <Meter value={snapshot.hero.hp} max={snapshot.hero.stats.maxHp} label="INTEGRITY" />
+          <Meter value={presentedVitals.dili?.hp ?? snapshot.hero.hp} max={snapshot.hero.stats.maxHp} label="INTEGRITY" />
           <Meter value={snapshot.rage} max={100} label="DLI OVERDRIVE" kind="rage" />
           {snapshot.hero.statuses.map((s) => (
             <button

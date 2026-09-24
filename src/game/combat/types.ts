@@ -186,6 +186,8 @@ export interface CombatEvent {
   label: string;
   crit?: boolean;
   tag?: DamageTag;
+  targetHp?: number;
+  targetShield?: number;
 }
 export interface BattleStats {
   damageDealt: number;
