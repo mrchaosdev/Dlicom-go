@@ -12,6 +12,8 @@ Skill drafts and the owned-skill list now use eight original 256px archetype ico
 
 Combat hits now include a reusable expanding impact spark; critical hits use a warm flash and a short 3–4 px camera shake, Ban Hammer has a larger magenta slam with a 5–7 px shake, and Viral Explosion uses a wider magenta ring. Boss attacks have a stronger lunge, slower projectile, and restrained camera shake so their impacts read distinctly. DliClip projectiles have a distinct color and ultimates use a stronger wave. Status applications show their remaining turns with status-specific rings, and Burn damage uses an orange impact. Healing and shield grants use green and cyan pulses. Dili sidesteps with a ghost fade on dodge and flashes briefly on damage, gains a pulsing aura below 25% HP, and boss warnings pulse around the boss sprite. Actors have subtle idle breathing, with a stronger boss motion; reduced-motion settings turn these idle/hit motions, warning pulses, low-HP aura and camera shake off. Combat effects reuse Phaser objects instead of creating display objects for every hit. Synthesized dodge, heal, shield, shield-break, Ban Hammer, enemy-death, boss-intro, victory, defeat, reward, and Legendary-drop cues now cover the key combat and run-end moments.
 
+Ban Hammer and Viral Explosion also flash their archetype art directly on impact. One pooled Phaser image presents both effects; reduced-motion mode keeps the image static and only fades it.
+
 ## Verification
 
 Boss attacks use chapter-colored impact sparks and projectiles so each boss has a distinct combat identity. DliClip projectiles retain their pink signal color. Each boss also has a distinct synthesized attack cue, generated reproducibly with the existing audio script.

@@ -104,6 +104,7 @@ class BattleScene extends Phaser.Scene {
   private numberIndex = 0;
   private projectile!: Phaser.GameObjects.Arc;
   private impactRing!: Phaser.GameObjects.Arc;
+  private skillImpact!: Phaser.GameObjects.Image;
   private label!: Phaser.GameObjects.Text;
   private ring!: Phaser.GameObjects.Arc;
   private bossWarningRing!: Phaser.GameObjects.Arc;
@@ -116,6 +117,8 @@ class BattleScene extends Phaser.Scene {
   }
   preload() {
     this.load.image('dili_idle', ASSETS.dili_idle);
+    this.load.image('skill_hammer', ASSETS.skill_hammer);
+    this.load.image('skill_viral', ASSETS.skill_viral);
     this.load.svg('bot', ASSETS.enemy_spam_bot_idle);
     const bossSprite = BOSS_SPRITES[this.chapterId];
     this.load.svg(bossSprite.key, bossSprite.asset);
@@ -164,6 +167,7 @@ class BattleScene extends Phaser.Scene {
       .setStrokeStyle(4, 0x76f5ff)
       .setVisible(false)
       .setDepth(16);
+    this.skillImpact = this.add.image(0, 0, 'skill_hammer').setVisible(false).setDepth(18);
     this.ring = this.add
       .circle(200, 290, 30)
       .setStrokeStyle(5, 0x76f5ff)
@@ -413,6 +417,27 @@ class BattleScene extends Phaser.Scene {
                   : 130,
         onComplete: () => this.impactRing.setVisible(false),
       });
+      if (hammer || viralExplosion) {
+        this.tweens.killTweensOf(this.skillImpact);
+        this.skillImpact
+          .setTexture(hammer ? 'skill_hammer' : 'skill_viral')
+          .setPosition(target.x, target.y - (hammer && !reduced ? 34 : 0))
+          .setScale(hammer ? 0.35 : 0.22)
+          .setAngle(0)
+          .setAlpha(0.85)
+          .setVisible(true);
+        this.tweens.add({
+          targets: this.skillImpact,
+          alpha: 0,
+          ...(reduced
+            ? {}
+            : hammer
+              ? { y: target.y - 4, scale: 0.5, angle: -10 }
+              : { scale: 0.72, angle: 18 }),
+          duration: reduced ? 100 : hammer ? 360 : 300,
+          onComplete: () => this.skillImpact.setVisible(false),
+        });
+      }
       if (!reduced && bossAttack) this.cameras.main.shake(100, 0.0025);
       else if (!reduced && hammer) this.cameras.main.shake(120, 0.009);
       else if (event.crit && !reduced) this.cameras.main.shake(90, 0.005);
