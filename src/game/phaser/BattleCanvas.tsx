@@ -91,6 +91,9 @@ class BattleScene extends Phaser.Scene {
   private impactRing!: Phaser.GameObjects.Arc;
   private label!: Phaser.GameObjects.Text;
   private ring!: Phaser.GameObjects.Arc;
+  private bossWarningRing!: Phaser.GameObjects.Arc;
+  private lowHpAura!: Phaser.GameObjects.Arc;
+  private lowHpActive = false;
   private parallaxLayers: { sprite: Phaser.GameObjects.TileSprite; speed: number }[] = [];
   private ready = false;
   constructor(private readonly chapterId: string) {
@@ -151,6 +154,18 @@ class BattleScene extends Phaser.Scene {
       .setStrokeStyle(5, 0x76f5ff)
       .setVisible(false)
       .setDepth(14);
+    this.bossWarningRing = this.add
+      .circle(0, 0, 36)
+      .setStrokeStyle(4, 0xff68c8)
+      .setVisible(false)
+      .setDepth(14);
+    this.lowHpAura = this.add
+      .circle(197, 315, 106)
+      .setStrokeStyle(4, 0xff5577, 0.7)
+      .setScale(0.85)
+      .setAlpha(0.3)
+      .setVisible(false)
+      .setDepth(6);
     this.label = this.add
       .text(380, 82, '', {
         fontFamily: 'monospace',
@@ -219,6 +234,29 @@ class BattleScene extends Phaser.Scene {
     [snapshot.hero, ...snapshot.enemies].forEach((actor, i) => {
       if (!this.sprites.has(actor.id)) this.spawn(actor, Math.max(0, i - 1));
     });
+    const hero = this.sprites.get('dili');
+    const reduced = useGame.getState().save.settings.reducedMotion;
+    if (hero) {
+      this.lowHpAura.setPosition(hero.x, hero.y + 12);
+      const lowHp = snapshot.hero.hp <= snapshot.hero.stats.maxHp * 0.25;
+      if (lowHp && !reduced && !this.lowHpActive) {
+        this.lowHpActive = true;
+        this.lowHpAura.setVisible(true);
+        this.tweens.add({
+          targets: this.lowHpAura,
+          alpha: 0.72,
+          scale: 1.08,
+          duration: 850,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.InOut',
+        });
+      } else if ((!lowHp || reduced) && this.lowHpActive) {
+        this.lowHpActive = false;
+        this.tweens.killTweensOf(this.lowHpAura);
+        this.lowHpAura.setVisible(false).setAlpha(0.3).setScale(0.85);
+      }
+    }
   }
   enqueue(events: CombatEvent[]) {
     this.queue.push(...events.filter((e) => e.type !== 'rage'));
@@ -268,9 +306,37 @@ class BattleScene extends Phaser.Scene {
       this.tweens.add({ targets: this.label, alpha: 0, delay: 450, duration: 250 });
       if (event.type === 'ultimate') {
         playSound('ultimate');
+        this.tweens.killTweensOf(this.ring);
+        this.ring.setPosition(200, 290).setStrokeStyle(5, 0x76f5ff);
         this.ring.setVisible(true).setScale(1).setAlpha(0.9);
         this.tweens.add({ targets: this.ring, scale: reduced ? 3 : 18, alpha: 0, duration: 700 });
         if (!reduced) this.cameras.main.shake(200, 0.012);
+      } else if (event.source.startsWith('boss_') && source) {
+        this.tweens.killTweensOf(this.bossWarningRing);
+        this.bossWarningRing
+          .setPosition(source.x, source.y)
+          .setStrokeStyle(4, 0xff68c8)
+          .setScale(0.7)
+          .setAlpha(0.85)
+          .setVisible(true);
+        this.tweens.add({
+          targets: this.bossWarningRing,
+          scale: reduced ? 1.5 : 3.4,
+          alpha: 0,
+          duration: reduced ? 180 : 600,
+          onComplete: () => this.bossWarningRing.setVisible(false),
+        });
+        if (!reduced) {
+          source.setTint(0xff74ca);
+          this.tweens.add({
+            targets: source,
+            alpha: 0.72,
+            duration: 100,
+            repeat: 2,
+            yoyo: true,
+            onComplete: () => source.clearTint().setAlpha(1),
+          });
+        }
       }
     }
     if (!target) return;
@@ -382,6 +448,11 @@ class BattleScene extends Phaser.Scene {
     const state = useGame.getState();
     this.tweens.timeScale = state.paused ? 0 : state.speed;
     if (state.paused) return;
+    if (state.save.settings.reducedMotion && this.lowHpActive) {
+      this.lowHpActive = false;
+      this.tweens.killTweensOf(this.lowHpAura);
+      this.lowHpAura.setVisible(false).setAlpha(0.3).setScale(0.85);
+    }
     const elapsed = (Math.min(delta, 50) / 1000) * state.speed;
     this.parallaxLayers.forEach(({ sprite, speed }) => {
       sprite.tilePositionX += elapsed * speed;
