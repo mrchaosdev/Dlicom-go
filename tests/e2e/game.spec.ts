@@ -152,7 +152,13 @@ test('all run screens, boss rewards, upgrade and save reload integrate', async (
     else if (phase === 'draft') await page.locator('.skill-card').first().click();
     else if (phase === 'rest')
       await page.getByRole('button', { name: /Recover integrity/ }).click();
-    else await page.locator('.choice-list button').last().click();
+    else {
+      expect(await page.evaluate(() =>
+        document.querySelector('.play-panel')!.getBoundingClientRect().bottom
+        <= document.querySelector('.build-panel')!.getBoundingClientRect().top,
+      )).toBe(true);
+      await page.locator('.choice-list button').last().click();
+    }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
