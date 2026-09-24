@@ -32,6 +32,8 @@ The battle canvas scales as one unit for desktop and mobile. At a 390 px phone w
 
 Pose changes use the same pause and speed clock as the combat presentation queue. Reduced-motion mode suppresses positional tweens and camera shake while leaving readable pose and color changes. The three new pose PNGs are transparent 512 × 512 assets; Idle remains the existing supplied-reference-based runtime sprite. They are separate poses, not a frame animation sheet.
 
+Idle has a different source resolution from the other poses. Breathing now animates a relative factor and recalculates the base scale on each texture change, so Attack, Hurt and Ultimate keep their intended on-screen size. This was checked against mobile battle captures.
+
 ## Skill art and effects
 
 All eight skill archetypes now have original 256 × 256 transparent icons in the central manifest: Packet, Hammer, Firewall, Moderation, Encryption, Viral, Rage, and Heal. The draft and owned-skill UI share these assets. Draft entry is staggered; keyboard focus and hover lift the art. Both the game setting and system reduced-motion preference suppress those animations.

@@ -110,6 +110,7 @@ function drawChapterBackground(g: Phaser.GameObjects.Graphics, chapterId: string
 
 class BattleScene extends Phaser.Scene {
   private sprites = new Map<string, Phaser.GameObjects.Image>();
+  private breathing = new Map<string, { baseScaleY: number; factor: number }>();
   private queue: PresentationCue[] = [];
   private wait = 0;
   private numbers: Phaser.GameObjects.Text[] = [];
@@ -265,11 +266,12 @@ class BattleScene extends Phaser.Scene {
     sprite
       .setDisplaySize(size, (size * sprite.height) / sprite.width)
       .setDepth(hero ? 5 : 4 + index);
+    const breathing = { baseScaleY: sprite.scaleY, factor: 1 };
+    this.breathing.set(actor.id, breathing);
     if (!useGame.getState().save.settings.reducedMotion) {
-      const restingScale = sprite.scaleY;
       this.tweens.add({
-        targets: sprite,
-        scaleY: restingScale * (boss ? 1.04 : 1.018),
+        targets: breathing,
+        factor: boss ? 1.04 : 1.018,
         duration: boss ? 1500 : 2100,
         yoyo: true,
         repeat: -1,
@@ -283,6 +285,8 @@ class BattleScene extends Phaser.Scene {
     const hero = this.sprites.get('dili');
     if (!hero) return;
     hero.setTexture(texture).setDisplaySize(230, (230 * hero.height) / hero.width);
+    const breathing = this.breathing.get('dili');
+    if (breathing) breathing.baseScaleY = hero.scaleY;
     this.heroPoseWait = duration;
   }
   sync(snapshot: BattleSnapshot) {
@@ -660,6 +664,11 @@ class BattleScene extends Phaser.Scene {
     const state = useGame.getState();
     this.tweens.timeScale = state.paused ? 0 : state.speed;
     if (state.paused) return;
+    for (const [id, breathing] of this.breathing) {
+      const sprite = this.sprites.get(id);
+      if (sprite)
+        sprite.scaleY = breathing.baseScaleY * (state.save.settings.reducedMotion ? 1 : breathing.factor);
+    }
     if (state.save.settings.reducedMotion && this.lowHpActive) {
       this.lowHpActive = false;
       this.tweens.killTweensOf(this.lowHpAura);
