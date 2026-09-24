@@ -12,6 +12,8 @@ let wins = 0,
   seconds = 0;
 const timings: Record<string, { battles: number; seconds: number }> = {};
 const reached: Record<number, number> = {};
+const defeatsByNode: Record<number, number> = {};
+const victoriesByNode: Record<number, number> = {};
 for (let i = 0; i < runs; i++) {
   const save = defaultSave();
   if (process.env.SIM_UNLOCKED) {
@@ -41,6 +43,9 @@ for (let i = 0; i < runs; i++) {
         timings[kind].seconds += duration;
         turns++;
       }
+      const battleNode = run.node + 1;
+      const battleResults = run.engine!.outcome === 'victory' ? victoriesByNode : defeatsByNode;
+      battleResults[battleNode] = (battleResults[battleNode] ?? 0) + 1;
       damage += run.engine!.stats.damageDealt;
       run.finishBattle();
     } else if (run.phase === 'draft') {
@@ -80,6 +85,8 @@ console.log(
         ]),
       ),
       nodesReached: reached,
+      battleVictoriesByNode: victoriesByNode,
+      battleDefeatsByNode: defeatsByNode,
     },
     null,
     2,

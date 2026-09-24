@@ -72,7 +72,7 @@ Import `mrchaosdev/Dlicom-go` into Vercel. Root directory: repository root. Buil
 ## Remaining production work
 
 - Final enemy art, Dili state sprites, expanded SFX and boss animation. Current vector boss silhouettes are replaceable placeholders.
-- Human balance/pacing pass: the deterministic later-chapter stress bot wins 27.3% of max-gear Dili Rooms runs and 16.7% of max-gear Core Network runs. It does not model human build choices. The overall 8–15 minute target has **not** been met or verified; the encounter and full-run targets need a deliberate pacing pass.
+- Human balance/pacing pass: a deterministic 500-run stress bot with max-level gear won 38.8% of DliClips, 27.0% of Dili Rooms, and 36.0% of Core Network runs; it does not model human build choices. Core tuning now gets nearly every run to Null.exe, where the boss remains the main win gate. The overall 8–15 minute target has **not** been met or verified; human playtesting and a deliberate pacing pass remain necessary.
 - Real Android/iOS device testing, Firefox/Edge QA, long-session performance profiling, deployed smoke test, trailer and final submission.
 - Share result currently copies text and seed; graphical share-card export remains future work.
 
