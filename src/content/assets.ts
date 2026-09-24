@@ -6,8 +6,11 @@ export const ASSETS = {
   skill_packet: asset('skill-packet.png'),
   skill_hammer: asset('skill-hammer.png'),
   skill_firewall: asset('skill-firewall.png'),
+  skill_moderation: asset('skill-moderation.png'),
+  skill_encryption: asset('skill-encryption.png'),
   skill_viral: asset('skill-viral.png'),
   skill_rage: asset('skill-rage.png'),
+  skill_heal: asset('skill-heal.png'),
   enemy_spam_bot_idle: asset('spam-bot.svg'),
   enemy_boss_spam_king_idle: asset('spam-king.svg'),
   enemy_boss_loop_phantom_idle: asset('loop-phantom.svg'),
@@ -38,10 +41,13 @@ export const ASSETS = {
   sfx_boss_null_attack: asset('boss-null-attack.wav'),
 };
 
-export const SKILL_ART: Partial<Record<Archetype, string>> = {
+export const SKILL_ART: Record<Archetype, string> = {
   packet: ASSETS.skill_packet,
   hammer: ASSETS.skill_hammer,
   firewall: ASSETS.skill_firewall,
+  moderation: ASSETS.skill_moderation,
+  encryption: ASSETS.skill_encryption,
   viral: ASSETS.skill_viral,
   rage: ASSETS.skill_rage,
+  heal: ASSETS.skill_heal,
 };

@@ -61,9 +61,8 @@ const iconFor = (tag: string, size = 22) => {
     )[tag] ?? Hexagon;
   return <Icon size={size} />;
 };
-function SkillIcon({ tag, compact = false }: { tag: Archetype; compact?: boolean }) {
-  const art = SKILL_ART[tag];
-  return art ? <img src={art} alt="" draggable={false} /> : iconFor(tag, compact ? 17 : 48);
+function SkillIcon({ tag }: { tag: Archetype }) {
+  return <img src={SKILL_ART[tag]} alt="" draggable={false} />;
 }
 const title = (text: string) => text.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 function Button({
@@ -464,7 +463,7 @@ function BuildPanel() {
           return (
             <details className={`owned-skill ${skill.rarity}`} key={id}>
               <summary>
-                <span className="mini-icon"><SkillIcon tag={skill.tags[0]} compact /></span>
+                <span className="mini-icon"><SkillIcon tag={skill.tags[0]} /></span>
                 <span>{skill.name}</span>
                 <small>{rank > 1 ? `R${rank}` : '+'}</small>
               </summary>
