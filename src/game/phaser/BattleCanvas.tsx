@@ -198,6 +198,17 @@ class BattleScene extends Phaser.Scene {
     sprite
       .setDisplaySize(size, (size * sprite.height) / sprite.width)
       .setDepth(hero ? 5 : 4 + index);
+    if (!useGame.getState().save.settings.reducedMotion) {
+      const restingScale = sprite.scaleY;
+      this.tweens.add({
+        targets: sprite,
+        scaleY: restingScale * (boss ? 1.04 : 1.018),
+        duration: boss ? 1500 : 2100,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.InOut',
+      });
+    }
     if (actor.kind === 'scam_link') sprite.setTint(0xffcc99);
     if (actor.kind === 'bug') sprite.setTint(0xa3ffbb);
     if (actor.tier === 'elite') sprite.setTint(0xffb080);
