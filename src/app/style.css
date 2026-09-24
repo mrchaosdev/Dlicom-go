@@ -864,6 +864,11 @@ footer i {
   color: #8adce0;
   flex-shrink: 0;
 }
+.mini-icon img {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}
 .owned-skill p {
   padding: 4px 12px 12px;
   font-size: 11px;
@@ -1219,9 +1224,24 @@ footer i {
   position: relative;
   overflow: hidden;
   transition: transform 0.2s;
+  animation: skill-card-arrive 320ms ease-out both;
+}
+.skill-card:nth-child(2) {
+  animation-delay: 65ms;
+}
+.skill-card:nth-child(3) {
+  animation-delay: 130ms;
+}
+@keyframes skill-card-arrive {
+  from { opacity: 0; translate: 0 10px; }
+  to { opacity: 1; translate: 0 0; }
 }
 .skill-card:hover {
   transform: translateY(-5px);
+}
+.skill-card:focus-visible {
+  outline: 2px solid var(--rarity);
+  outline-offset: 3px;
 }
 .rare {
   --rarity: #63aadf;
@@ -1265,6 +1285,17 @@ footer i {
 }
 .skill-art svg {
   filter: drop-shadow(0 0 15px color-mix(in srgb, var(--rarity) 40%, transparent));
+}
+.skill-art img {
+  width: 108px;
+  height: 108px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 13px color-mix(in srgb, var(--rarity) 34%, transparent));
+  transition: transform 200ms ease, filter 200ms ease;
+}
+.skill-card:is(:hover, :focus-visible) .skill-art img {
+  transform: translateY(-4px) scale(1.08);
+  filter: drop-shadow(0 0 19px color-mix(in srgb, var(--rarity) 62%, transparent));
 }
 .skill-card h3 {
   font-size: 26px;
@@ -1468,6 +1499,13 @@ footer i {
   transition: none !important;
   animation: none !important;
   scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skill-card { animation: none; }
+  .skill-card:is(:hover, :focus-visible) .skill-art img { transform: none; }
+}
+.reduced-motion .skill-card:is(:hover, :focus-visible) .skill-art img {
+  transform: none;
 }
 @media (min-width: 1500px) {
   .hero-section {
@@ -2291,6 +2329,10 @@ footer i {
     width: 24px;
     height: 24px;
   }
+  .mini-icon img {
+    width: 21px;
+    height: 21px;
+  }
   .owned-skill summary .mini-icon svg {
     width: 14px;
   }
@@ -2321,6 +2363,10 @@ footer i {
   .skill-art svg {
     width: 37px;
     height: 37px;
+  }
+  .skill-art img {
+    width: 65px;
+    height: 65px;
   }
   .skill-card h3 {
     font-size: 26px;

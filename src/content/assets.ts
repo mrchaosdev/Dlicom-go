@@ -1,6 +1,13 @@
+import type { Archetype } from '../game/combat/types';
+
 const asset = (file: string) => `${import.meta.env.BASE_URL}assets/${file}`;
 export const ASSETS = {
   dili_idle: asset('dili-idle.png'),
+  skill_packet: asset('skill-packet.png'),
+  skill_hammer: asset('skill-hammer.png'),
+  skill_firewall: asset('skill-firewall.png'),
+  skill_viral: asset('skill-viral.png'),
+  skill_rage: asset('skill-rage.png'),
   enemy_spam_bot_idle: asset('spam-bot.svg'),
   enemy_boss_spam_king_idle: asset('spam-king.svg'),
   enemy_boss_loop_phantom_idle: asset('loop-phantom.svg'),
@@ -29,4 +36,12 @@ export const ASSETS = {
   sfx_boss_phantom_attack: asset('boss-phantom-attack.wav'),
   sfx_boss_raid_attack: asset('boss-raid-attack.wav'),
   sfx_boss_null_attack: asset('boss-null-attack.wav'),
+};
+
+export const SKILL_ART: Partial<Record<Archetype, string>> = {
+  packet: ASSETS.skill_packet,
+  hammer: ASSETS.skill_hammer,
+  firewall: ASSETS.skill_firewall,
+  viral: ASSETS.skill_viral,
+  rage: ASSETS.skill_rage,
 };

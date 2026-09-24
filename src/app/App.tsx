@@ -29,8 +29,9 @@ import {
   Zap,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
+import type { Archetype } from '../game/combat/types';
 import { useGame } from '../stores/gameStore';
-import { ASSETS } from '../content/assets';
+import { ASSETS, SKILL_ART } from '../content/assets';
 import { EQUIPMENT, GEAR, UPGRADE_COSTS, loadoutStats, type Slot } from '../content/equipment';
 import { SKILLS, SKILL_BY_ID } from '../content/skills';
 import { NODES, generateEncounter } from '../content/encounters';
@@ -60,6 +61,10 @@ const iconFor = (tag: string, size = 22) => {
     )[tag] ?? Hexagon;
   return <Icon size={size} />;
 };
+function SkillIcon({ tag, compact = false }: { tag: Archetype; compact?: boolean }) {
+  const art = SKILL_ART[tag];
+  return art ? <img src={art} alt="" draggable={false} /> : iconFor(tag, compact ? 17 : 48);
+}
 const title = (text: string) => text.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 function Button({
   children,
@@ -459,7 +464,7 @@ function BuildPanel() {
           return (
             <details className={`owned-skill ${skill.rarity}`} key={id}>
               <summary>
-                <span className="mini-icon">{iconFor(skill.tags[0], 17)}</span>
+                <span className="mini-icon"><SkillIcon tag={skill.tags[0]} compact /></span>
                 <span>{skill.name}</span>
                 <small>{rank > 1 ? `R${rank}` : '+'}</small>
               </summary>
@@ -712,7 +717,7 @@ function DraftScreen() {
                 <span>{skill.rarity.toUpperCase()}</span>
                 <small>{run.skills[id] ? `UPGRADE → R${run.skills[id] + 1}` : 'NEW'}</small>
               </div>
-              <div className="skill-art">{iconFor(skill.tags[0], 48)}</div>
+              <div className="skill-art"><SkillIcon tag={skill.tags[0]} /></div>
               <h3>{skill.name}</h3>
               <p>{skill.description}</p>
               <div className="skill-tags">
