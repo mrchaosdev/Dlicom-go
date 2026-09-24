@@ -117,6 +117,7 @@ function drawChapterBackground(g: Phaser.GameObjects.Graphics, chapterId: string
 class BattleScene extends Phaser.Scene {
   private sprites = new Map<string, Phaser.GameObjects.Image>();
   private enemySlots = new Map<string, number>();
+  private enemyBaseTints = new Map<string, number>();
   private breathing = new Map<string, { baseScaleY: number; factor: number }>();
   private queue: PresentationCue[] = [];
   private wait = 0;
@@ -124,6 +125,7 @@ class BattleScene extends Phaser.Scene {
   private numberIndex = 0;
   private projectile!: Phaser.GameObjects.Arc;
   private impactRing!: Phaser.GameObjects.Arc;
+  private impactSpark!: Phaser.GameObjects.Image;
   private enemyPulseRings: Phaser.GameObjects.Arc[] = [];
   private enemyPulseIndex = 0;
   private skillImpact!: Phaser.GameObjects.Image;
@@ -213,6 +215,18 @@ class BattleScene extends Phaser.Scene {
       .setStrokeStyle(4, 0x76f5ff)
       .setVisible(false)
       .setDepth(16);
+    const sparkGraphics = this.make.graphics({ x: 0, y: 0 }, false);
+    sparkGraphics.lineStyle(5, 0xffffff);
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI) / 4;
+      sparkGraphics.lineBetween(
+        40 + Math.cos(angle) * 13, 40 + Math.sin(angle) * 13,
+        40 + Math.cos(angle) * 34, 40 + Math.sin(angle) * 34,
+      );
+    }
+    sparkGraphics.generateTexture('impact_spark', 80, 80);
+    sparkGraphics.destroy();
+    this.impactSpark = this.add.image(0, 0, 'impact_spark').setVisible(false).setDepth(17);
     for (let i = 0; i < 4; i++)
       this.enemyPulseRings.push(
         this.add.circle(0, 0, 28).setStrokeStyle(4, 0xff78c8).setVisible(false).setDepth(12),
@@ -311,7 +325,10 @@ class BattleScene extends Phaser.Scene {
         ease: 'Sine.InOut',
       });
     }
-    if (actor.tier === 'elite') sprite.setTint(0xffb080);
+    if (actor.tier === 'elite') {
+      this.enemyBaseTints.set(actor.id, 0xffb080);
+      sprite.setTint(0xffb080);
+    }
     this.sprites.set(actor.id, sprite);
     if (!hero) this.enemySlots.set(actor.id, index);
     if (summoned && !boss) sprite.setAlpha(0).setY(y + 18);
@@ -328,6 +345,27 @@ class BattleScene extends Phaser.Scene {
       duration: reduced ? 120 : 300,
       onComplete: () => ring.setVisible(false),
     });
+  }
+  private flashEnemy(target: Phaser.GameObjects.Image, id: string, color: number, reduced: boolean) {
+    target.setTint(color);
+    const restoreTint = () => {
+      if (!target.active) return;
+      const baseTint = this.enemyBaseTints.get(id);
+      if (baseTint) target.setTint(baseTint);
+      else target.clearTint();
+    };
+    if (reduced) {
+      this.tweens.addCounter({ from: 0, to: 1, duration: 90, onComplete: restoreTint });
+    } else {
+      this.tweens.add({
+        targets: target,
+        x: target.x + 11,
+        angle: 6,
+        duration: 80,
+        yoyo: true,
+        onComplete: restoreTint,
+      });
+    }
   }
   private showBossIntro(actor: Actor, sprite: Phaser.GameObjects.Image, x: number, y: number) {
     const reduced = useGame.getState().save.settings.reducedMotion;
@@ -565,23 +603,18 @@ class BattleScene extends Phaser.Scene {
       const hammer = event.label === 'Ban Hammer';
       const viralExplosion = event.label === 'Viral Explosion';
       const statusColor = event.tag === 'status' ? STATUS_COLORS[event.label.toLowerCase()] : undefined;
+      const impactColor = hammer
+        ? 0xff78c8
+        : viralExplosion
+          ? 0xc879ff
+          : statusColor ?? (bossAttack
+            ? BOSS_ATTACK_COLORS[event.source] ?? 0x76f5ff
+            : event.crit ? 0xffd773 : 0x76f5ff);
       const reducedScale = reduced && (hammer || viralExplosion);
       this.tweens.killTweensOf(this.impactRing);
       this.impactRing
         .setPosition(target.x, target.y)
-        .setStrokeStyle(
-          hammer || viralExplosion || event.crit || statusColor ? 5 : 3,
-          hammer
-            ? 0xff78c8
-            : viralExplosion
-              ? 0xc879ff
-              : statusColor ??
-                (bossAttack
-                  ? (BOSS_ATTACK_COLORS[event.source] ?? 0x76f5ff)
-                  : event.crit
-                    ? 0xffd773
-                    : 0x76f5ff),
-        )
+        .setStrokeStyle(hammer || viralExplosion || event.crit || statusColor ? 5 : 3, impactColor)
         .setScale(0.35)
         .setAlpha(0.95)
         .setVisible(true);
@@ -611,6 +644,20 @@ class BattleScene extends Phaser.Scene {
                   ? 190
                   : 130,
         onComplete: () => this.impactRing.setVisible(false),
+      });
+      this.tweens.killTweensOf(this.impactSpark);
+      this.impactSpark
+        .setPosition(target.x, target.y)
+        .setTint(impactColor)
+        .setScale(reduced ? 0.75 : 0.4)
+        .setAlpha(0.95)
+        .setVisible(true);
+      this.tweens.add({
+        targets: this.impactSpark,
+        scale: reduced ? 0.75 : event.crit ? 1.25 : 1,
+        alpha: 0,
+        duration: reduced ? 90 : 130,
+        onComplete: () => this.impactSpark.setVisible(false),
       });
       if (hammer || viralExplosion) {
         this.tweens.killTweensOf(this.skillImpact);
@@ -672,7 +719,11 @@ class BattleScene extends Phaser.Scene {
           onComplete: () => this.projectile.setVisible(false),
         });
       }
-      if (!reduced) this.tweens.add({ targets: target, angle: 5, duration: 70, yoyo: true });
+      if (event.target === 'dili') {
+        if (!reduced) this.tweens.add({ targets: target, angle: 5, duration: 70, yoyo: true });
+      } else {
+        this.flashEnemy(target, event.target, event.crit ? 0xffe2a8 : 0xd4faff, reduced);
+      }
       this.floating(target, event);
     } else if (event.type === 'dodge' || event.type === 'heal' || event.type === 'shield') {
       if (event.type === 'dodge' && event.target === 'dili') this.showHeroPose('dili_idle', 0);
@@ -772,6 +823,7 @@ class BattleScene extends Phaser.Scene {
           this.breathing.delete(event.target);
           this.sprites.delete(event.target);
           this.enemySlots.delete(event.target);
+          this.enemyBaseTints.delete(event.target);
           target.destroy();
         },
       });

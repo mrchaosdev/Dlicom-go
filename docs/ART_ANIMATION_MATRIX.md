@@ -60,7 +60,7 @@ Impact objects, skill-art overlay, projectiles, enemy pulse rings and damage num
 | Cue | Presentation time | Readability rule |
 | --- | --- | --- |
 | Basic projectile | 140 ms; boss projectile 190 ms | Cyan or boss color, one reused projectile object |
-| Basic impact | 130 ms | Small ring, damage number and hit reaction |
+| Basic impact | 130 ms | Reused spark and ring, damage number and a brief enemy flash/knockback |
 | Crit anticipation / impact | 70 ms / 190 ms | Gold source ring before damage, larger number and restrained shake |
 | Ban Hammer | 360 ms | Hammer image descends, magenta ring and stronger shake |
 | Viral Explosion | 280-300 ms | Viral image expands and impact ring covers a wider area |
@@ -71,7 +71,7 @@ Normal Rage gain has no floating text because it happens repeatedly; the HUD bar
 
 ## Enemy and boss art
 
-All ten normal enemy kinds and four bosses now have distinct original transparent sprites. Raid Master's summoned Raid Minions share Raid Bot art. Existing enemies have idle breathing, attack lunge, hurt reaction and defeat collapse; character-specific attack and hurt poses remain open. Summoned minions stay hidden until their combat cue, enter with a colored pulse, and occupy separate positions around the boss instead of covering it. Defeated sprites and their idle tweens are released after the fade. The battle scene loads only the enemy art needed for its chapter, plus Spam Bot for Spam King's summons and Raid Bot for elites.
+All ten normal enemy kinds and four bosses now have distinct original transparent sprites. Raid Master's summoned Raid Minions share Raid Bot art. Existing enemies have idle breathing, attack lunge, colored hurt flash with short knockback, and defeat collapse; character-specific attack and hurt poses remain open. Elite tint returns after a hit. Reduced-motion mode keeps the flash without the knockback. Summoned minions stay hidden until their combat cue, enter with a colored pulse, and occupy separate positions around the boss instead of covering it. Defeated sprites and their idle tweens are released after the fade. The battle scene loads only the enemy art needed for its chapter, plus Spam Bot for Spam King's summons and Raid Bot for elites.
 
 Bosses enter with a short sprite reveal and chapter-colored name banner before the first attack. Major moves show a warning icon above the boss during the existing 600 ms telegraph. Both cues use Phaser presentation objects and respect reduced motion, pause and battle speed; neither changes combat timing or results.
 
