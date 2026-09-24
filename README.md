@@ -33,7 +33,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Six build families unlock across account levels 1–6, following the supplied progression order.
 - Three equipment slots, 18 equipment items across four rarities, five upgrade levels and a chest on victory.
 - Twenty seeded events with choices, run buffs, healing, Bits, skill drafts and optional elite fights.
-- Dili reference-based generated sprite, original vector enemy placeholders, procedural Feed City, bounded VFX/text objects, and original synthesized music/SFX.
+- Dili reference-based generated sprite, original vector boss placeholders, four themed procedural battle backdrops, bounded VFX/text objects, and original synthesized music/SFX.
 - Responsive desktop/mobile UI, keyboard focus states, local fonts and local audio.
 
 ## Architecture
@@ -71,7 +71,7 @@ Import `mrchaosdev/Dlicom-go` into Vercel. Root directory: repository root. Buil
 
 ## Remaining production work
 
-- Final enemy art, Dili state sprites, expanded SFX and chapter backgrounds. Current vector enemies are replaceable placeholders.
+- Final enemy art, Dili state sprites, expanded SFX and boss animation. Current vector boss silhouettes are replaceable placeholders.
 - Human balance/pacing pass: the deterministic later-chapter stress bot wins 27.3% of max-gear Dili Rooms runs and 16.7% of max-gear Core Network runs. It does not model human build choices. The overall 8–15 minute target has **not** been met or verified; the encounter and full-run targets need a deliberate pacing pass.
 - Real Android/iOS device testing, Firefox/Edge QA, long-session performance profiling, deployed smoke test, trailer and final submission.
 - Share result currently copies text and seed; graphical share-card export remains future work.

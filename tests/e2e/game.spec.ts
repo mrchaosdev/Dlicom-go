@@ -50,6 +50,35 @@ test('automatic battle pauses, changes speed and reaches a three-choice draft', 
   await expect(page.locator('.owned-skill')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
+test('unlocked chapters load their own battle backdrop and boss art assets', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((e) => e.name)
+      .filter((url) => url.includes('/src/services/save.ts')).at(-1)!;
+    const { defaultSave, SAVE_KEY } = await import(path);
+    const save = defaultSave();
+    save.account.unlockedChapters = 4;
+    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+  });
+  await page.reload();
+  for (const chapter of [
+    ['DliClips', 'loop-phantom.svg'],
+    ['Dili Rooms', 'raid-master.svg'],
+    ['Core Network', 'null-exe.svg'],
+  ]) {
+    await page.getByRole('button', { name: new RegExp(chapter[0]) }).click();
+    await page.getByRole('button', { name: /Data lane/ }).click();
+    await expect(page.locator('.battle-canvas')).toHaveAttribute(
+      'aria-label',
+      `Dili automatically battles in ${chapter[0]}`,
+    );
+    await expect(page.locator('.battle-canvas canvas')).toBeVisible();
+    await expect.poll(() => page.evaluate((asset) =>
+      performance.getEntriesByType('resource').some((entry) => entry.name.includes(asset)),
+    chapter[1])).toBe(true);
+    await page.reload();
+  }
+});
 test('all run screens, boss rewards, upgrade and save reload integrate', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));

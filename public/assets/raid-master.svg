@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="300" viewBox="0 0 280 300">
+  <defs><linearGradient id="armor" x2="0" y2="1"><stop stop-color="#a74854"/><stop offset="1" stop-color="#3d233e"/></linearGradient></defs>
+  <ellipse cx="140" cy="278" rx="94" ry="12" fill="#080b16" opacity=".6"/>
+  <path d="M52 115L35 220L71 261H209L245 220L228 115Z" fill="url(#armor)" stroke="#ffb56e" stroke-width="5"/>
+  <path d="M72 239L58 278H105L119 244M161 244L175 278H222L208 239" fill="#30243f" stroke="#d77c71" stroke-width="5"/>
+  <path d="M56 78L90 51H190L224 78L213 153H67Z" fill="#5a3249" stroke="#ffd17f" stroke-width="6"/>
+  <path d="M62 91H218" stroke="#ffd17f" stroke-width="5"/>
+  <path d="M87 113L111 130L88 143M193 113L169 130L192 143" fill="none" stroke="#ffde8b" stroke-width="10" stroke-linecap="square"/>
+  <path d="M105 171H175L190 200H90Z" fill="#271c37" stroke="#f88b79" stroke-width="5"/>
+  <path d="M113 184H167" stroke="#79e7dc" stroke-width="7" stroke-linecap="round"/>
+  <path d="M140 50V24M125 26H155" stroke="#ffd17f" stroke-width="7" stroke-linecap="round"/>
+  <path d="M31 116L15 92M249 116L265 92" stroke="#f37c83" stroke-width="7"/>
+  <circle cx="22" cy="82" r="11" fill="#ffbe70" stroke="#522d45" stroke-width="5"/><circle cx="258" cy="82" r="11" fill="#ffbe70" stroke="#522d45" stroke-width="5"/>
+  <path d="M68 66L43 48M212 66L237 48" stroke="#8af1e4" stroke-width="5" opacity=".8"/>
+</svg>
