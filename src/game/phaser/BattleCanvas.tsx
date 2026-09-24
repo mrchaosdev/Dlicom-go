@@ -14,6 +14,12 @@ const BACKGROUND_PALETTES: Record<string, [number, number, number, number]> = {
   chapter_rooms: [0x321b38, 0x4b2542, 0x17182b, 0x21172b],
   chapter_core: [0x091c35, 0x0c3150, 0x080e24, 0x12122d],
 };
+const BACKGROUND_SPRITES: Record<string, string> = {
+  chapter_feed: ASSETS.background_feed_city,
+  chapter_dliclips: ASSETS.background_dliclip_stream,
+  chapter_rooms: ASSETS.background_dili_rooms,
+  chapter_core: ASSETS.background_core_network,
+};
 const BOSS_SPRITES: Record<string, { key: string; asset: string }> = {
   chapter_feed: { key: 'king', asset: ASSETS.enemy_boss_spam_king_idle },
   chapter_dliclips: { key: 'loop_phantom', asset: ASSETS.enemy_boss_loop_phantom_idle },
@@ -132,6 +138,7 @@ class BattleScene extends Phaser.Scene {
     super('battle');
   }
   preload() {
+    this.load.image('battle_background', BACKGROUND_SPRITES[this.chapterId]);
     this.load.image('dili_idle', ASSETS.dili_idle);
     this.load.image('dili_attack', ASSETS.dili_attack);
     this.load.image('dili_hurt', ASSETS.dili_hurt);
@@ -171,11 +178,17 @@ class BattleScene extends Phaser.Scene {
   }
   create() {
     const chapter = getChapter(this.chapterId);
-    const [topLeft, topRight, bottomLeft, bottomRight] = BACKGROUND_PALETTES[this.chapterId];
+    const hasBackground = this.textures.exists('battle_background');
+    if (hasBackground) this.add.image(380, 255, 'battle_background').setDisplaySize(760, 510);
     const g = this.add.graphics();
-    g.fillGradientStyle(topLeft, topRight, bottomLeft, bottomRight, 1);
-    g.fillRect(0, 0, 760, 510);
-    drawChapterBackground(g, this.chapterId);
+    if (hasBackground) {
+      g.fillStyle(0x081527, 0.12).fillRect(0, 0, 760, 510);
+    } else {
+      const [topLeft, topRight, bottomLeft, bottomRight] = BACKGROUND_PALETTES[this.chapterId];
+      g.fillGradientStyle(topLeft, topRight, bottomLeft, bottomRight, 1);
+      g.fillRect(0, 0, 760, 510);
+      drawChapterBackground(g, this.chapterId);
+    }
     const accent = PARALLAX_COLORS[this.chapterId];
     this.addParallaxLayer(`${this.chapterId}_far_grid`, accent, 0.12, 2, 0);
     this.addParallaxLayer(`${this.chapterId}_near_grid`, accent, 0.08, 6, 1);

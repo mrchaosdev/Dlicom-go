@@ -4,6 +4,10 @@ import { existsSync } from 'node:fs';
 import { validateContent } from '../src/content/validate';
 validateContent();
 for (const file of [
+  'background-feed-city.png',
+  'background-dliclip-stream.png',
+  'background-dili-rooms.png',
+  'background-core-network.png',
   'dili-idle.png',
   'dili-attack.png',
   'dili-hurt.png',

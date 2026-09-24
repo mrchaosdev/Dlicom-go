@@ -12,7 +12,7 @@ The visual anchor is the supplied Dili mascot: rounded helmet and speech-bubble 
 | Normal enemies | Transparent 512 x 512 PNGs | 155 logical px wide, including elites |
 | Bosses | Transparent 768 x 768 PNGs | 245 logical px wide, larger than Dili |
 | Skill archetype icons | Transparent 256 x 256 PNGs | Draft cards, owned-skill list and selected battle effects |
-| Battle backgrounds | Procedural Phaser layers | Four chapter palettes, low detail behind fighters, two subtle moving parallax grids |
+| Battle backgrounds | Four 1024 x 680 PNGs with procedural fallback | One environment per chapter, clear center floor behind fighters, two subtle moving parallax grids |
 
 The battle canvas scales as one unit for desktop and mobile. At a 390 px phone width, the normal enemy silhouette is about 70 px wide and a boss about 110 px. Art is loaded per chapter through the central asset manifest rather than hardcoded URLs. Source and attribution are recorded in [asset credits](ASSET_CREDITS.md).
 

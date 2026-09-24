@@ -33,7 +33,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Six build families unlock across account levels 1–6, following the supplied progression order.
 - Three equipment slots, 18 equipment items across four rarities, five upgrade levels and a chest on victory.
 - Twenty seeded events with choices, run buffs, healing, Bits, skill drafts and optional elite fights.
-- Dili reference-based combat poses, distinct generated sprites for all ten normal enemy kinds and four bosses, four themed procedural battle backdrops, one original synthesized music loop per chapter, bounded VFX/text objects and SFX.
+- Dili reference-based combat poses, distinct generated sprites for all ten normal enemy kinds and four bosses, four illustrated chapter battle backgrounds, one original synthesized music loop per chapter, bounded VFX/text objects and SFX.
 - Responsive desktop/mobile UI, keyboard focus states, local fonts and local audio.
 
 ## Architecture
