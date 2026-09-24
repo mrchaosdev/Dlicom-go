@@ -20,6 +20,12 @@ const BOSS_SPRITES: Record<string, { key: string; asset: string }> = {
   chapter_rooms: { key: 'raid_master', asset: ASSETS.enemy_boss_raid_master_idle },
   chapter_core: { key: 'null_exe', asset: ASSETS.enemy_boss_null_exe_idle },
 };
+const PARALLAX_COLORS: Record<string, number> = {
+  chapter_feed: 0x46c5d9,
+  chapter_dliclips: 0xdd72d1,
+  chapter_rooms: 0xf0a16e,
+  chapter_core: 0x8d88fa,
+};
 
 function drawChapterBackground(g: Phaser.GameObjects.Graphics, chapterId: string) {
   if (chapterId === 'chapter_feed') {
@@ -85,6 +91,7 @@ class BattleScene extends Phaser.Scene {
   private impactRing!: Phaser.GameObjects.Arc;
   private label!: Phaser.GameObjects.Text;
   private ring!: Phaser.GameObjects.Arc;
+  private parallaxLayers: { sprite: Phaser.GameObjects.TileSprite; speed: number }[] = [];
   private ready = false;
   constructor(private readonly chapterId: string) {
     super('battle');
@@ -95,6 +102,23 @@ class BattleScene extends Phaser.Scene {
     const bossSprite = BOSS_SPRITES[this.chapterId];
     this.load.svg(bossSprite.key, bossSprite.asset);
   }
+  private addParallaxLayer(name: string, color: number, alpha: number, speed: number, offset: number) {
+    const graphics = this.make.graphics({ x: 0, y: 0 }, false);
+    graphics.lineStyle(1, color, 0.34);
+    for (let row = 0; row < 8; row++) {
+      for (let column = 0; column < 8; column++) {
+        const x = column * 32 + ((row + offset) % 2) * 16;
+        const y = row * 32;
+        graphics.fillStyle(color, 0.56).fillCircle(x % 256, y, offset ? 1.2 : 1.8);
+        graphics.lineBetween(x, y, x + 32, y);
+        if ((row + column + offset) % 2 === 0) graphics.lineBetween(x, y, x + 16, y + 32);
+      }
+    }
+    graphics.generateTexture(name, 256, 256);
+    graphics.destroy();
+    const sprite = this.add.tileSprite(380, 255, 760, 510, name).setAlpha(alpha).setDepth(1);
+    this.parallaxLayers.push({ sprite, speed });
+  }
   create() {
     const chapter = getChapter(this.chapterId);
     const [topLeft, topRight, bottomLeft, bottomRight] = BACKGROUND_PALETTES[this.chapterId];
@@ -102,14 +126,20 @@ class BattleScene extends Phaser.Scene {
     g.fillGradientStyle(topLeft, topRight, bottomLeft, bottomRight, 1);
     g.fillRect(0, 0, 760, 510);
     drawChapterBackground(g, this.chapterId);
-    this.add.text(24, 25, `${chapter.name.toUpperCase()} / SECTOR ${String(chapter.order).padStart(2, '0')}`, {
-      fontFamily: 'monospace',
-      fontSize: '12px',
-      color: '#6d99b3',
-    });
+    const accent = PARALLAX_COLORS[this.chapterId];
+    this.addParallaxLayer(`${this.chapterId}_far_grid`, accent, 0.12, 2, 0);
+    this.addParallaxLayer(`${this.chapterId}_near_grid`, accent, 0.08, 6, 1);
+    this.add
+      .text(24, 25, `${chapter.name.toUpperCase()} / SECTOR ${String(chapter.order).padStart(2, '0')}`, {
+        fontFamily: 'monospace',
+        fontSize: '12px',
+        color: '#6d99b3',
+      })
+      .setDepth(2);
     this.add
       .text(733, 25, '● LIVE', { fontFamily: 'monospace', fontSize: '12px', color: '#62e6bd' })
-      .setOrigin(1, 0);
+      .setOrigin(1, 0)
+      .setDepth(2);
     this.projectile = this.add.circle(0, 0, 6, 0x7bffff).setVisible(false).setDepth(15);
     this.impactRing = this.add
       .circle(0, 0, 18)
@@ -341,6 +371,10 @@ class BattleScene extends Phaser.Scene {
     const state = useGame.getState();
     this.tweens.timeScale = state.paused ? 0 : state.speed;
     if (state.paused) return;
+    const elapsed = (Math.min(delta, 50) / 1000) * state.speed;
+    this.parallaxLayers.forEach(({ sprite, speed }) => {
+      sprite.tilePositionX += elapsed * speed;
+    });
     this.wait -= Math.min(delta, 100) * state.speed;
     if (this.wait <= 0 && this.queue.length) {
       const event = this.queue.shift()!;
