@@ -67,6 +67,10 @@ wav('legendary', 0.82, (t) => {
 });
 wav('hammer', 0.38, (t) => Math.sin(2 * Math.PI * (230 - 90 * t) * t) * Math.exp(-t * 7) * 0.42);
 wav('shield-break', 0.34, (t) => (Math.sin(2 * Math.PI * (680 - 900 * t) * t) + Math.sin(2 * Math.PI * 1360 * t) * Math.exp(-t * 14)) * Math.exp(-t * 8) * 0.22);
+wav('boss-king-attack', 0.24, (t) => (Math.sin(2 * Math.PI * 92 * t) + Math.sin(2 * Math.PI * 184 * t) * 0.45) * Math.exp(-t * 11) * 0.32);
+wav('boss-phantom-attack', 0.26, (t) => (Math.sin(2 * Math.PI * (480 - 850 * t) * t) + Math.sin(2 * Math.PI * (490 - 850 * t) * t) * 0.7) * Math.exp(-t * 13) * 0.2);
+wav('boss-raid-attack', 0.24, (t) => (Math.sin(2 * Math.PI * 310 * t) + Math.sin(2 * Math.PI * 467 * t) * 0.7 + Math.sin(2 * Math.PI * 622 * t) * 0.4) * Math.exp(-t * 15) * 0.16);
+wav('boss-null-attack', 0.28, (t) => Math.sin(2 * Math.PI * (t % 0.07 < 0.035 ? 720 : 180) * t) * Math.exp(-t * 8) * 0.2);
 const notes = [
   130.81, 196, 261.63, 196, 155.56, 233.08, 311.13, 233.08, 103.83, 155.56, 207.65, 155.56, 116.54,
   174.61, 233.08, 174.61,

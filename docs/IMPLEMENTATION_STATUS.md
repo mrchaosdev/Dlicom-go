@@ -12,7 +12,7 @@ Combat hits now include a reusable expanding impact spark; critical hits use a w
 
 ## Verification
 
-Boss attacks use chapter-colored impact sparks and projectiles so each boss has a distinct combat identity. DliClip projectiles retain their pink signal color.
+Boss attacks use chapter-colored impact sparks and projectiles so each boss has a distinct combat identity. DliClip projectiles retain their pink signal color. Each boss also has a distinct synthesized attack cue, generated reproducibly with the existing audio script.
 
 - 52 unit/integration tests and 4 Chromium end-to-end tests pass, including deterministic chapter encounters, complete runs through all four bosses, chapter unlocking, chapter-specific battle and audio assets, save compatibility, shield-break feedback, and Null Pulse damage.
 - ESLint, TypeScript, production build, and content validation pass.

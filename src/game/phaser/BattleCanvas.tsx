@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 import { ASSETS } from '../../content/assets';
 import { getChapter } from '../../content/chapters';
 import { useGame } from '../../stores/gameStore';
-import { playSound } from '../../services/audio';
+import { playBossAttackSound, playSound } from '../../services/audio';
 import type { Actor, CombatEvent } from '../combat/types';
 import type { BattleSnapshot } from '../combat/CombatEngine';
 import { eventDuration } from './presentation';
@@ -356,8 +356,10 @@ class BattleScene extends Phaser.Scene {
     }
     if (!target) return;
     if (event.type === 'damage') {
-      playSound(event.label === 'Ban Hammer' ? 'hammer' : event.crit ? 'crit' : 'attack');
       const bossAttack = event.source.startsWith('boss_');
+      if (event.label === 'Ban Hammer') playSound('hammer');
+      else if (bossAttack) playBossAttackSound(event.source);
+      else playSound(event.crit ? 'crit' : 'attack');
       const hammer = event.label === 'Ban Hammer';
       const viralExplosion = event.label === 'Viral Explosion';
       const statusColor = event.tag === 'status' ? STATUS_COLORS[event.label.toLowerCase()] : undefined;

@@ -12,6 +12,12 @@ const MUSIC_BY_CHAPTER: Record<string, string> = {
   chapter_rooms: ASSETS.music_rooms,
   chapter_core: ASSETS.music_core,
 };
+const BOSS_ATTACK_SOUNDS: Record<string, string> = {
+  boss_spam_king: 'boss_king_attack',
+  boss_loop_phantom: 'boss_phantom_attack',
+  boss_raid_master: 'boss_raid_attack',
+  boss_null_exe: 'boss_null_attack',
+};
 
 function loadMusic(volume: number) {
   music = new Howl({ src: [MUSIC_BY_CHAPTER[musicChapter] ?? ASSETS.music_feed], loop: true, volume });
@@ -22,7 +28,7 @@ export function startAudio(settings: SaveFile['settings'], chapterId?: string) {
   if (!enabled) {
     enabled = true;
     sounds = Object.fromEntries(
-      ['attack', 'crit', 'ultimate', 'select', 'dodge', 'heal', 'shield', 'death', 'boss_intro', 'victory', 'defeat', 'reward', 'legendary', 'hammer', 'shield_break'].map((name) => [
+      ['attack', 'crit', 'ultimate', 'select', 'dodge', 'heal', 'shield', 'death', 'boss_intro', 'victory', 'defeat', 'reward', 'legendary', 'hammer', 'shield_break', 'boss_king_attack', 'boss_phantom_attack', 'boss_raid_attack', 'boss_null_attack'].map((name) => [
         name,
         new Howl({
           src: [ASSETS[`sfx_${name}` as keyof typeof ASSETS]],
@@ -48,6 +54,10 @@ export function updateAudio(settings: SaveFile['settings']) {
 }
 export function playSound(name: string) {
   sounds[name]?.play();
+}
+export function playBossAttackSound(bossId: string) {
+  const sound = BOSS_ATTACK_SOUNDS[bossId];
+  if (sound) playSound(sound);
 }
 export function suspendAudio(hidden: boolean) {
   suspended = hidden;

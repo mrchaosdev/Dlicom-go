@@ -25,4 +25,8 @@ export const ASSETS = {
   sfx_legendary: asset('legendary.wav'),
   sfx_hammer: asset('hammer.wav'),
   sfx_shield_break: asset('shield-break.wav'),
+  sfx_boss_king_attack: asset('boss-king-attack.wav'),
+  sfx_boss_phantom_attack: asset('boss-phantom-attack.wav'),
+  sfx_boss_raid_attack: asset('boss-raid-attack.wav'),
+  sfx_boss_null_attack: asset('boss-null-attack.wav'),
 };
