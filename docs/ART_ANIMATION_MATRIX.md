@@ -16,7 +16,7 @@ The visual anchor is the supplied Dili mascot: rounded helmet and speech-bubble 
 
 The battle canvas scales as one unit for desktop and mobile. At a 390 px phone width, the normal enemy silhouette is about 70 px wide and a boss about 110 px. Art is loaded per chapter through the central asset manifest rather than hardcoded URLs. Source and attribution are recorded in [asset credits](ASSET_CREDITS.md).
 
-Active run screens occupy one viewport on the documented phone sizes and desktop. Route, draft and choice content scrolls inside the game section when needed; the battle image and HUD fit without page scrolling. The build list opens from the battle toolbar. Phaser centers the canvas horizontally; vertical centering is handled by the page layout to prevent an extra blank margin from pushing the combat HUD off-screen.
+Active run screens occupy one viewport on the documented phone sizes and desktop. Route, draft and choice content scrolls inside the game section when needed. Battle has no panel scrollbar: on wide screens its canvas takes the available height and the Dili HUD, current build and combat log occupy a side column; on mobile the HUD stacks below the canvas and the build opens from the toolbar. Phaser centers the canvas horizontally; vertical centering is handled by the page layout to prevent an extra blank margin from pushing the combat HUD off-screen.
 
 ## Dili states
 

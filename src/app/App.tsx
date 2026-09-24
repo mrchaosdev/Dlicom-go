@@ -627,69 +627,74 @@ function BattleScreen() {
           </Button>
         </div>
       </div>
-      <div className="enemy-hud">
-        {snapshot.enemies
-          .filter((e) => e.hp > 0)
-          .map((enemy) => (
-            <div key={enemy.id}>
-              <span>
-                {enemy.tier === 'boss' && <Crown size={13} />} {enemy.name}{' '}
-                <small>{enemy.modifier}</small>
-              </span>
-              <Meter value={enemy.hp} max={enemy.stats.maxHp} label={enemy.name} />
-              {enemy.statuses.map((s) => (
-                <button
-                  className="status-chip"
-                  key={s.id}
-                  onClick={() => setInspected(`${title(s.id)} · ${s.turns} turn(s) remaining`)}
-                >
-                  {s.id} {s.turns}
-                </button>
-              ))}
-            </div>
-          ))}
-      </div>
-      <Suspense fallback={<div className="battle-loading">Connecting to Feed City…</div>}>
-        <BattleCanvas />
-      </Suspense>
-      {paused && <div className="pause-banner">Connection paused · Take your time.</div>}
-      <div className="player-hud">
-        <div className="player-hud-title">
-          <span className="mini-icon">
-            <Cpu size={20} />
-          </span>
-          <strong>DILI</strong>
-          <span>
-            <Shield size={14} /> {snapshot.hero.shield} Shield
-          </span>
+      <div className="battle-stage">
+        <div className="enemy-hud">
+          {snapshot.enemies
+            .filter((e) => e.hp > 0)
+            .map((enemy) => (
+              <div key={enemy.id}>
+                <span>
+                  {enemy.tier === 'boss' && <Crown size={13} />} {enemy.name}{' '}
+                  <small>{enemy.modifier}</small>
+                </span>
+                <Meter value={enemy.hp} max={enemy.stats.maxHp} label={enemy.name} />
+                {enemy.statuses.map((s) => (
+                  <button
+                    className="status-chip"
+                    key={s.id}
+                    onClick={() => setInspected(`${title(s.id)} · ${s.turns} turn(s) remaining`)}
+                  >
+                    {s.id} {s.turns}
+                  </button>
+                ))}
+              </div>
+            ))}
         </div>
-        <Meter value={snapshot.hero.hp} max={snapshot.hero.stats.maxHp} label="INTEGRITY" />
-        <Meter value={snapshot.rage} max={100} label="DLI OVERDRIVE" kind="rage" />
-        {snapshot.hero.statuses.map((s) => (
-          <button
-            className="status-chip"
-            key={s.id}
-            onClick={() => setInspected(`${title(s.id)} · ${s.turns} turn(s) remaining`)}
-          >
-            {s.id} {s.turns}
-          </button>
-        ))}
-        {inspected && (
-          <p className="status-info" role="status">
-            {inspected}
-          </p>
-        )}
+        <Suspense fallback={<div className="battle-loading">Connecting to Feed City…</div>}>
+          <BattleCanvas />
+        </Suspense>
+        {paused && <div className="pause-banner">Connection paused · Take your time.</div>}
       </div>
-      <div className="combat-log" aria-label="Recent combat events">
-        {events
-          .filter((e) => e.type !== 'rage')
-          .slice(-3)
-          .map((e, i) => (
-            <span key={i}>
-              {e.label}
-              {e.amount ? ` · ${e.amount}` : ''}
+      <div className="battle-status-side">
+        <div className="player-hud">
+          <div className="player-hud-title">
+            <span className="mini-icon">
+              <Cpu size={20} />
             </span>
+            <strong>DILI</strong>
+            <span>
+              <Shield size={14} /> {snapshot.hero.shield} Shield
+            </span>
+          </div>
+          <Meter value={snapshot.hero.hp} max={snapshot.hero.stats.maxHp} label="INTEGRITY" />
+          <Meter value={snapshot.rage} max={100} label="DLI OVERDRIVE" kind="rage" />
+          {snapshot.hero.statuses.map((s) => (
+            <button
+              className="status-chip"
+              key={s.id}
+              onClick={() => setInspected(`${title(s.id)} · ${s.turns} turn(s) remaining`)}
+            >
+              {s.id} {s.turns}
+            </button>
           ))}
+          {inspected && (
+            <p className="status-info" role="status">
+              {inspected}
+            </p>
+          )}
+        </div>
+        <div className="battle-side-build"><BuildPanel /></div>
+        <div className="combat-log" aria-label="Recent combat events">
+          {events
+            .filter((e) => e.type !== 'rage')
+            .slice(-3)
+            .map((e, i) => (
+              <span key={i}>
+                {e.label}
+                {e.amount ? ` · ${e.amount}` : ''}
+              </span>
+            ))}
+        </div>
       </div>
     </>
   );

@@ -10,6 +10,7 @@
   --mono: 'Space Mono', monospace;
   --display: 'Barlow Condensed', Impact, sans-serif;
 }
+
 * {
   box-sizing: border-box;
 }
@@ -1105,7 +1106,7 @@ footer i {
   height: auto;
   max-height: 100%;
   min-height: 0;
-  overflow-y: auto;
+  overflow: hidden;
 }
 .battle-app .battle-canvas {
   aspect-ratio: 760/510;
@@ -1122,6 +1123,10 @@ footer i {
 .battle-app .player-hud {
   max-height: 28dvh;
   overflow-y: auto;
+  scrollbar-width: none;
+}
+.battle-app .player-hud::-webkit-scrollbar {
+  display: none;
 }
 .run-app footer {
   display: none;
@@ -1183,7 +1188,7 @@ footer i {
 .enemy-hud {
   position: absolute;
   z-index: 2;
-  top: 86px;
+  top: 12px;
   left: 28px;
   right: 28px;
   display: flex;
@@ -1233,6 +1238,19 @@ footer i {
   width: 100%;
   aspect-ratio: 760/510;
   position: relative;
+}
+.battle-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 760/510;
+}
+.battle-status-side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.battle-side-build {
+  display: none;
 }
 .battle-canvas canvas {
   display: block;
@@ -1716,7 +1734,7 @@ footer i {
     font-size: 21px;
   }
   .enemy-hud {
-    top: 80px;
+    top: 12px;
     left: 20px;
     right: 20px;
   }
@@ -2358,7 +2376,7 @@ footer i {
     width: 13px;
   }
   .enemy-hud {
-    top: 72px;
+    top: 9px;
     left: 13px;
     right: 13px;
     gap: 10px;
@@ -2581,5 +2599,65 @@ footer i {
     font-size: 6px;
     gap: 12px;
     letter-spacing: 0.5px;
+  }
+}
+
+@media (min-width: 900px) {
+  .battle-app .battle-build-toggle {
+    display: none;
+  }
+  .battle-app .phase-battle {
+    display: block;
+    width: min(100%, calc((100dvh - 240px) * 760 / 510 + 260px));
+    max-width: 1350px;
+  }
+  .battle-app .battle-stage {
+    width: calc(100% - 260px);
+  }
+  .battle-app .battle-status-side {
+    position: absolute;
+    top: 73px;
+    right: 0;
+    bottom: 0;
+    width: 260px;
+    min-height: 0;
+    overflow: hidden;
+    border-left: 1px solid #22374d;
+  }
+  .battle-app .player-hud {
+    flex: 0 0 auto;
+    max-height: 45%;
+    padding: 0 18px 14px;
+  }
+  .battle-app .battle-side-build {
+    display: block;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .battle-app .battle-side-build::-webkit-scrollbar {
+    display: none;
+  }
+  .battle-app .battle-side-build .build-panel {
+    border: 0;
+    border-top: 1px solid #22374d;
+    border-radius: 0;
+    background: transparent;
+    padding: 16px 18px;
+  }
+  .battle-app .combat-log {
+    display: grid;
+    gap: 6px;
+    max-height: 88px;
+    padding: 11px 18px;
+    white-space: normal;
+    line-height: 1.4;
+    overflow: hidden;
+  }
+}
+@media (min-width: 900px) and (max-width: 1000px) {
+  .battle-app .battle-status-side {
+    top: 69px;
   }
 }
