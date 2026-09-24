@@ -1,6 +1,6 @@
-# v0.1 implementation assumptions
+# Implementation assumptions
 
-Source order follows AGENTS.md. Chapter 1 is the initial public milestone in `13_GAME_JAM_ROADMAP.md`; unavailable chapters are explicitly labeled as later builds. No specification files were rewritten to pretend missing final content is complete.
+Source order follows AGENTS.md. Chapter 1 was the first public milestone in `13_GAME_JAM_ROADMAP.md`; v0.2 extends the playable route while retaining that milestone's documented rules. No specification files were rewritten to claim remaining production work is complete.
 
 ## Reversible numeric defaults
 
@@ -11,7 +11,7 @@ Source order follows AGENTS.md. Chapter 1 is the initial public milestone in `13
 - Rest Shield: 25% max HP for next battle. Rest always also drafts, matching nodes 5 and 10's documented skill cadence.
 - Infinite Scroll event costs/heals 15% max HP. Encryption Key gives +4% run Dodge or 30 Bits. Suspicious Plugin uses documented 20% HP cost / Epic+ / Rare+ alternatives, or 20 Bits. Event HP costs cannot kill Dili.
 - Account XP: battle 10, elite 30, boss 80, non-combat node 10; 120 XP per account level, capped at six. Levels unlock the specified families; they give no raw stat power.
-- All v0.1 gear is Common. Three starting items, six chest unlocks. Gear rarity rolls are deferred. Weapon/armor base stats gain 20% per upgrade; module upgrades add 3 DEF per level, with passive values fixed. Costs use the exact 100/180/300/500 table. Duplicate chest items convert to 50 Bits. Only winning a run grants a chest.
+- Three items are the starting loadout; remaining equipment is awarded through chest drops. Weapon/armor base stats gain 20% per upgrade; module upgrades add 3 DEF per level, with passive values fixed. Costs use the exact 100/180/300/500 table. Duplicate chest items convert to 50 Bits. Only winning a run grants a chest.
 - Upgradeable skills: Packet Boost only, using the supplied 20/35/50% values. Other rule-changing skills remain one-time.
 - Ultimate bonus packets: three at 45% ATK (coefficient unspecified). Repost repeats once at 40% explosion damage; no extra random repeat chance is invented.
 - Network Effect counts damaging skill activations, not each AoE target. Its own generated explosion does not increment its activation count. DliClip bounces to up to two distinct additional living enemies. Status and reflected damage cannot counter.
@@ -23,10 +23,17 @@ Source order follows AGENTS.md. Chapter 1 is the initial public milestone in `13
 - 150-turn failsafe ends a stalled battle as a defeat. A chain limit only skips remaining effects, warns once that turn, and lets the run continue.
 - At ×1, the minimum turn presentation is 2.8 seconds; event-dense turns can take longer. Warning anticipation is 600 ms; Ultimate 800 ms. ×2 halves time only. Leaving the tab automatically pauses combat.
 
-## Intentional first-milestone limits
+## v0.2 chapter and event defaults
+
+- Chapter multipliers follow the balance spec exactly: 1.00 / 1.35 / 1.80 / 2.40. They scale enemy HP and ATK; DEF is not multiplied because the spec defines HP/ATK scaling. Later-chapter normal enemies, elite bases, and boss base HP/ATK are explicit reversible content values in `src/content/chapters.ts`; the docs do not supply those per-enemy values. Chapter 3–4 normal encounters cap at one early or two late enemies to stay within the documented 1–3 composition rule while controlling stacked incoming damage.
+- The later boss mechanics follow the dedicated encounter doc: Loop Phantom marks/repeats and rewinds once; Raid Master summons two minions, gains shields while they live, and uses Silence; Null.exe reduces healing at 60%, overclocks at 25%, and uses unavoidable true damage equal to 18% of Dili's max HP. The final damage interpretation follows “% max HP damage” as the player's maximum HP.
+- Equipment rarity assignment and chest odds are provisional because the docs require rarity-based equipment but leave individual rarities and odds open. Current chest odds are Common 55%, Rare 30%, Epic 12%, Legendary 3%.
+- Event pool content, outcomes, and numeric rewards are reversible defaults. A server cache trap deals non-lethal 10% max HP damage; event damage cannot reduce Dili below 1 HP.
+
+## Intentional current limits
 
 Active runs are in memory; only account and settings are saved as specified. Refreshing ends the run, disclosed in Settings. A future run-resume save needs a separate versioned schema including RNG state.
 
-Chapter 1 uses fixed GDD node types, with three seeded encounter alternatives at later normal nodes. It does not invent a new branching node topology. Event pools, final equipment rarity/drop tables and later chapters remain production work.
+All chapters use the documented fixed node sequence with seeded encounters; this does not invent a new branching node topology. Later-chapter art remains placeholder presentation work.
 
-The combat timing targets imply about three minutes of combat for this chapter. Adding short decisions still falls below the overall 8–15 minute target. We keep both requirements visible instead of padding combat with blocking waits; resolve through human playtesting before final release.
+Current combat timing and decision pacing have not been validated against the overall 8–15 minute target. Resolve through human playtesting before final release rather than padding combat with blocking waits.

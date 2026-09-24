@@ -3,6 +3,7 @@ import { defaultSave } from '../src/services/save';
 import { NODES } from '../src/content/encounters';
 import { SKILL_BY_ID } from '../src/content/skills';
 import { turnDuration } from '../src/game/phaser/presentation';
+import { EQUIPMENT } from '../src/content/equipment';
 const runs = Number(process.env.SIM_RUNS ?? 1000);
 let wins = 0,
   battles = 0,
@@ -13,8 +14,17 @@ const timings: Record<string, { battles: number; seconds: number }> = {};
 const reached: Record<number, number> = {};
 for (let i = 0; i < runs; i++) {
   const save = defaultSave();
-  if (process.env.SIM_UNLOCKED) save.account.xp = 600;
-  const run = new RunSession(`simulation-${i}`, save);
+  if (process.env.SIM_UNLOCKED) {
+    save.account.xp = 600;
+    save.account.unlockedChapters = 4;
+    for (const item of EQUIPMENT) save.account.inventory[item.id] = 5;
+    save.account.equipped = {
+      weapon: 'weapon_viral_launcher',
+      armor: 'armor_core_armor',
+      module: 'module_safe_mode',
+    };
+  }
+  const run = new RunSession(`simulation-${i}`, save, process.env.SIM_CHAPTER ?? 'chapter_feed');
   let guard = 0;
   while (!run.result && guard++ < 100) {
     if (run.phase === 'route') {

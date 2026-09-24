@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { BASE_STATS, type SkillDefinition } from '../game/combat/types';
 import { SKILLS } from './skills';
 import { EQUIPMENT } from './equipment';
+import { CHAPTERS } from './chapters';
+import { EVENTS, eventsForChapter } from './events';
 const id = z.string().regex(/^[a-z][a-z0-9_]+$/);
 const action = z.discriminatedUnion('kind', [
   z.object({
@@ -122,4 +124,38 @@ export function validateContent(skills: SkillDefinition[] = SKILLS) {
       stats: z.record(z.number().finite()),
     }).parse(item);
   }
+  if (EQUIPMENT.length !== 18) throw new Error(`Expected 18 equipment definitions, got ${EQUIPMENT.length}`);
+  const chapterIds = new Set<string>();
+  for (const chapter of CHAPTERS) {
+    if (chapterIds.has(chapter.id)) throw new Error(`Duplicate chapter ID: ${chapter.id}`);
+    chapterIds.add(chapter.id);
+    z.object({
+      id,
+      name: z.string().min(1),
+      order: z.number().int().positive(),
+      bossId: id,
+      bossName: z.string().min(1),
+      bossHp: z.number().positive(),
+      bossAtk: z.number().positive(),
+      multiplier: z.number().min(1),
+      eliteHp: z.number().positive(),
+      eliteAtk: z.number().positive(),
+      enemyPool: z.array(z.object({ id, name: z.string().min(1), hp: z.number().positive(), atk: z.number().positive(), def: z.number().min(0) })).min(1),
+    }).parse(chapter);
+    if (eventsForChapter(chapter.id).length < 2) throw new Error(`${chapter.id}: expected at least 2 events`);
+  }
+  if (CHAPTERS.length !== 4) throw new Error(`Expected 4 chapters, got ${CHAPTERS.length}`);
+  const eventIds = new Set<string>();
+  for (const event of EVENTS) {
+    if (ids.has(event.id) || eventIds.has(event.id)) throw new Error(`Duplicate content ID: ${event.id}`);
+    eventIds.add(event.id);
+    z.object({
+      id,
+      title: z.string().min(1),
+      body: z.string().min(1),
+      chapters: z.array(id).optional(),
+      choices: z.array(z.object({ label: z.string().min(1), outcomeText: z.string().min(1), effects: z.array(z.unknown()) })).min(2),
+    }).parse(event);
+  }
+  if (EVENTS.length !== 20) throw new Error(`Expected 20 events, got ${EVENTS.length}`);
 }

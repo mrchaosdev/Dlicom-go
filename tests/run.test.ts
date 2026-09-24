@@ -2,8 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { defaultSave, loadSave, migrateSave, SAVE_KEY, writeSave } from '../src/services/save';
 import { equip, RunSession, upgrade } from '../src/game/run/RunSession';
 import { NODES } from '../src/content/encounters';
-const winRun = () => {
-  const run = new RunSession('integration', defaultSave());
+import { CHAPTERS } from '../src/content/chapters';
+const winRun = (chapterId = 'chapter_feed') => {
+  const run = new RunSession('integration', defaultSave(), chapterId);
   run.baseStats.atk = 10000;
   for (let step = 0; step < 100 && !run.result; step++) {
     if (run.phase === 'route') run.enterNode();
@@ -34,6 +35,15 @@ describe('run progression', () => {
       new RunSession('next', defaultSave()).baseStats.atk,
     );
   });
+  it.each(CHAPTERS.map((chapter) => [chapter.id, Math.min(4, chapter.order + 1)] as const))(
+    'completes %s and unlocks the next chapter',
+    (chapterId, nextChapter) => {
+      const run = winRun(chapterId);
+      expect(run.result).toBe('victory');
+      expect(run.chapter.id).toBe(chapterId);
+      expect(run.settle(defaultSave()).account.unlockedChapters).toBe(nextChapter);
+    },
+  );
   it('never pays run rewards twice', () => {
     const run = winRun(),
       paid = run.settle(defaultSave());

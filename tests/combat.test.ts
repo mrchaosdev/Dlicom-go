@@ -213,6 +213,16 @@ describe('combat rules', () => {
     e.enemies[0].hp = 29000;
     expect(e.step().some((x) => x.label === 'Overclocked King')).toBe(true);
   });
+  it('Null Pulse deals 18% of Dili max HP as unavoidable true damage', () => {
+    const e = battle({
+      stats: { atk: 1, maxHp: 1000, dodgeRate: 1 },
+      enemies: [makeActor('null', 'Null.exe', { maxHp: 100000, atk: 10 }, 'boss', 'boss_null_exe')],
+    });
+    let pulse: ReturnType<typeof e.step>[number] | undefined;
+    for (let turn = 0; turn < 5; turn++) pulse = e.step().find((event) => event.label === 'NULL PULSE') ?? pulse;
+    expect(pulse).toMatchObject({ type: 'damage', amount: 180, target: 'dili' });
+    expect(e.hero.hp).toBe(820);
+  });
   it('preserves hero damage attribution for burn ticks', () => {
     const e = battle();
     e.applyStatus(e.enemies[0], 'burn', 3, 0.2);

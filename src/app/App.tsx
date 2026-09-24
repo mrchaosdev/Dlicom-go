@@ -34,6 +34,7 @@ import { ASSETS } from '../content/assets';
 import { EQUIPMENT, GEAR, UPGRADE_COSTS, loadoutStats, type Slot } from '../content/equipment';
 import { SKILLS, SKILL_BY_ID } from '../content/skills';
 import { NODES, generateEncounter } from '../content/encounters';
+import { CHAPTERS } from '../content/chapters';
 import { accountLevel } from '../services/save';
 import { playSound, startAudio, suspendAudio, updateAudio } from '../services/audio';
 import { turnDuration } from '../game/phaser/presentation';
@@ -159,13 +160,13 @@ function HomeScreen() {
             <em>firepower.</em>
           </h1>
           <p>
-            The Feed is corrupted. Build your Dili, stack wild skills, and turn the network against
-            itself.
+            The network is corrupted. Build your Dili, stack wild skills, and turn its systems against
+            themselves.
           </p>
           <div className="hero-actions">
             <Button className="primary" onClick={enter}>
               <Play size={18} fill="currentColor" />{' '}
-              {run && !run.result ? 'Resume connection' : 'Enter the Feed'} <ArrowRight size={20} />
+              {run && !run.result ? 'Resume connection' : 'Enter the Network'} <ArrowRight size={20} />
             </Button>
             <Button onClick={() => navigate('equipment')}>
               <Cpu size={18} /> Loadout
@@ -189,61 +190,37 @@ function HomeScreen() {
             The network awaits<span>.</span>
           </h2>
         </div>
-        <span className="muted">01 / 04 SECTORS ONLINE</span>
+        <span className="muted">{String(save.account.unlockedChapters).padStart(2, '0')} / 04 SECTORS ONLINE</span>
       </div>
       <section className="chapters">
-        <button
-          className="chapter active"
-          onClick={() => {
+        {CHAPTERS.map((chapter) => {
+          const available = chapter.order <= save.account.unlockedChapters;
+          const selectChapter = () => {
             startAudio(save.settings);
-            enter();
-          }}
-        >
-          <div className="chapter-illustration city">
-            <div className="city-buildings" />
-            <span className="chapter-number">01</span>
-            <span className="available">AVAILABLE</span>
-            <Radio size={62} />
-          </div>
-          <div className="chapter-content">
-            <span className="eyebrow">CHAPTER 01</span>
-            <h3>
-              The Feed <ArrowRight size={19} />
-            </h3>
-            <p>Spam never sleeps. Neither does Dili.</p>
-            <div className="chapter-meta">
-              <span>
-                <Crown size={14} /> Spam King
-              </span>
-              <span>12 nodes</span>
-            </div>
-          </div>
-        </button>
-        {[
-          ['02', 'DliClips', 'Loop Phantom'],
-          ['03', 'Dili Rooms', 'Raid Master'],
-          ['04', 'Core Network', 'Null.exe'],
-        ].map(([n, name, boss]) => (
-          <article className="chapter locked" key={n}>
-            <div className={`chapter-illustration chapter-${n}`}>
-              <span className="chapter-number">{n}</span>
-              <LockKeyhole size={38} />
-              <span className="coming">COMING IN A LATER BUILD</span>
-            </div>
-            <div className="chapter-content">
-              <span className="eyebrow">CHAPTER {n}</span>
-              <h3>{name}</h3>
-              <p>A deeper layer of the network.</p>
-              <div className="chapter-meta">
-                <span>
-                  <Crown size={14} />
-                  {boss}
-                </span>
-                <LockKeyhole size={13} />
+            if (run && !run.result) navigate('play');
+            else start(chapter.id);
+          };
+          const details = (
+            <>
+              <div className={`chapter-illustration chapter-${String(chapter.order).padStart(2, '0')}`}>
+                {chapter.order === 1 && <div className="city-buildings" />}
+                <span className="chapter-number">{String(chapter.order).padStart(2, '0')}</span>
+                {available ? <span className="available">{chapter.order === save.account.unlockedChapters ? 'AVAILABLE' : 'UNLOCKED'}</span> : <LockKeyhole size={38} />}
+                {chapter.order === 1 ? <Radio size={62} /> : <Crown size={47} />}
+                {!available && <span className="coming">CLEAR THE PREVIOUS BOSS</span>}
               </div>
-            </div>
-          </article>
-        ))}
+              <div className="chapter-content">
+                <span className="eyebrow">CHAPTER {String(chapter.order).padStart(2, '0')}</span>
+                <h3>{chapter.name} {available && <ArrowRight size={19} />}</h3>
+                <p>{chapter.theme}</p>
+                <div className="chapter-meta"><span><Crown size={14} /> {chapter.bossName}</span><span>12 nodes</span></div>
+              </div>
+            </>
+          );
+          return available
+            ? <button className="chapter active" key={chapter.id} onClick={selectChapter}>{details}</button>
+            : <article className="chapter locked" key={chapter.id}>{details}</article>;
+        })}
       </section>
       <section className="bottom-panels">
         <div className="profile-strip">
@@ -254,7 +231,7 @@ function HomeScreen() {
             <h3>Build something ridiculous.</h3>
             <p>
               Level {level} operator · {SKILLS.filter((s) => s.unlockLevel <= level).length} skills
-              unlocked · {save.account.wins} Feed clears
+              unlocked · {save.account.wins} network clears
             </p>
           </div>
           <Button onClick={() => navigate('equipment')}>
@@ -280,7 +257,7 @@ function EquipmentScreen() {
   return (
     <>
       <PageHeading
-        kicker="PREPARE FOR THE FEED"
+        kicker="PREPARE YOUR LOADOUT"
         title="Your loadout"
         text="Three slots. A different way to break the network."
       />
@@ -312,7 +289,10 @@ function EquipmentScreen() {
               <section className="panel gear-slot" key={slot}>
                 <div className="section-heading">
                   <span className="eyebrow">{slot.toUpperCase()}</span>
-                  <span className="chip">LEVEL {level} / 5</span>
+                  <div>
+                    <span className={`chip ${item.rarity ?? 'common'}`}>{(item.rarity ?? 'common').toUpperCase()}</span>
+                    <span className="chip">LEVEL {level} / 5</span>
+                  </div>
                 </div>
                 <div className="gear-title">
                   <div className="square-icon">
@@ -343,7 +323,7 @@ function EquipmentScreen() {
             );
           })}
           <p className="muted">
-            Clear The Feed to open an equipment chest. Duplicate drops become 50 Bits. Gear changes
+            Clear a chapter boss to open an equipment chest. Duplicate drops become 50 Bits. Gear changes
             apply to your next run.
           </p>
         </div>
@@ -502,10 +482,10 @@ function RouteScreen() {
   return (
     <>
       <div className="node-intro">
-        <span className="eyebrow">CHAPTER 01 · THE FEED</span>
+        <span className="eyebrow">CHAPTER {String(run.chapter.order).padStart(2, '0')} · {run.chapter.name.toUpperCase()}</span>
         <h2>
           {kind === 'boss'
-            ? 'The king of spam awaits.'
+            ? `${run.chapter.bossName} awaits.`
             : kind === 'rest'
               ? 'Take a breath. Reconnect.'
               : kind === 'event'
@@ -514,7 +494,7 @@ function RouteScreen() {
         </h2>
         <p>
           {kind === 'boss'
-            ? 'Summons bots every 3 turns. Spam Flood every 5. Below 30% HP, the King attacks twice.'
+            ? run.chapter.bossDescription
             : 'Dili handles the fighting. You decide what comes next.'}
         </p>
       </div>
@@ -538,7 +518,7 @@ function RouteScreen() {
       </div>
       <div className="route-options">
         {Array.from({ length: kind === 'battle' && run.node > 0 ? 3 : 1 }, (_, route) => {
-          const enemies = fighting ? generateEncounter(run.seed, run.node, route) : [];
+          const enemies = fighting ? generateEncounter(run.seed, run.node, route, run.chapterId) : [];
           return (
             <button
               className={`route-card ${kind}`}
@@ -551,7 +531,7 @@ function RouteScreen() {
               </span>
               <h3>
                 {kind === 'boss'
-                  ? 'Spam King'
+                  ? run.chapter.bossName
                   : kind === 'elite'
                     ? `${enemies[0]?.modifier} encounter`
                     : kind === 'rest'
@@ -615,7 +595,7 @@ function BattleScreen() {
       <div className="battle-toolbar">
         <div>
           <span className="live-dot" />{' '}
-          {NODES[run.node] === 'boss' ? 'BOSS CONNECTION' : 'AUTO BATTLE'}{' '}
+          {NODES[run.node] === 'boss' ? `${run.chapter.bossName.toUpperCase()} CONNECTION` : 'AUTO BATTLE'}{' '}
           <small>TURN {snapshot.turn}</small>
         </div>
         <div>
@@ -750,33 +730,14 @@ function ChoiceScreen() {
   const { run, act } = useGame();
   if (!run) return null;
   const rest = run.phase === 'rest';
-  const eventNames = ['Suspicious Plugin', 'Infinite Scroll', 'Encryption Key'];
-  const eventBodies = [
-    'A mysterious plugin promises more reach. How much do you trust it?',
-    'The Feed keeps going. One more scroll might change everything.',
-    'A forgotten key opens a private lane through the network.',
-  ];
+  const event = run.phase === 'event' ? run.currentEvent : undefined;
   const choices = rest
     ? [
         ['heal', 'Recover integrity', 'Heal 30% of maximum HP.'],
         ['upgrade', 'Upgrade a skill', 'Rank up an owned skill that has room to grow.'],
         ['shield', 'Prepare a firewall', 'Gain 25% max HP Shield for the next battle.'],
       ]
-    : run.eventId === 0
-      ? [
-          ['0', 'Install', 'Choose an Epic+ skill. Lose 20% max HP.'],
-          ['1', 'Scan', 'Choose a verified Rare+ skill.'],
-          ['2', 'Ignore', 'Keep your connection clean. Gain 20 Bits.'],
-        ]
-      : run.eventId === 1
-        ? [
-            ['0', 'Continue scrolling', 'Choose a skill. Lose 15% max HP.'],
-            ['1', 'Close the Feed', 'Recover 15% max HP.'],
-          ]
-        : [
-            ['0', 'Use the key', 'Dodge +4% for the rest of this run.'],
-            ['1', 'Sell the key', 'Gain 30 Bits.'],
-          ];
+    : (event?.choices ?? []).map((choice, index) => [String(index), choice.label, choice.outcomeText]);
   return (
     <div className="choice-screen">
       <div className="event-symbol">{iconFor(rest ? 'rest' : 'event', 56)}</div>
@@ -784,8 +745,8 @@ function ChoiceScreen() {
         <span className="eyebrow">
           NODE {run.node + 1} · {rest ? 'REST CONNECTION' : 'NETWORK EVENT'}
         </span>
-        <h2>{rest ? 'Room to breathe.' : eventNames[run.eventId]}</h2>
-        <p>{rest ? 'Make one choice, then install a new skill.' : eventBodies[run.eventId]}</p>
+        <h2>{rest ? 'Room to breathe.' : event?.title}</h2>
+        <p>{rest ? 'Make one choice, then install a new skill.' : event?.body}</p>
       </div>
       <div className="choice-list">
         {choices.map(([value, label, desc]) => (
@@ -813,7 +774,7 @@ function SummaryScreen() {
   const { run, start, navigate } = useGame();
   const [copied, setCopied] = useState(false);
   if (!run) return null;
-  const share = `Dlicom Attack — The Feed\n${run.result === 'victory' ? 'SPAM KING DEFEATED' : 'RUN ENDED'}\nScore: ${run.score}\n${Object.keys(
+  const share = `Dlicom Attack — ${run.chapter.name}\n${run.result === 'victory' ? `${run.chapter.bossName.toUpperCase()} DEFEATED` : 'RUN ENDED'}\nScore: ${run.score}\n${Object.keys(
     run.skills,
   )
     .map((id) => SKILL_BY_ID[id].name)
@@ -824,11 +785,11 @@ function SummaryScreen() {
         {run.result === 'victory' ? <Crown size={55} /> : <Radio size={55} />}
       </div>
       <PageHeading
-        kicker="CHAPTER 01 · THE FEED"
-        title={run.result === 'victory' ? 'The Feed is yours' : 'Connection lost'}
+        kicker={`CHAPTER ${String(run.chapter.order).padStart(2, '0')} · ${run.chapter.name.toUpperCase()}`}
+        title={run.result === 'victory' ? `${run.chapter.name} is yours` : 'Connection lost'}
         text={
           run.result === 'victory'
-            ? 'Spam King disconnected. That build was something else.'
+            ? `${run.chapter.bossName} disconnected. That build was something else.`
             : 'Every run leaves you a little stronger. Try another connection.'
         }
       />
@@ -870,7 +831,7 @@ function SummaryScreen() {
         ))}
       </div>
       <div className="summary-actions">
-        <Button className="primary" onClick={start}>
+        <Button className="primary" onClick={() => start(run.chapterId)}>
           <RotateCcw size={17} /> Run it back
         </Button>
         <Button onClick={() => navigate('equipment')}>
@@ -904,7 +865,7 @@ function PlayScreen() {
     <>
       <div className="run-heading">
         <span className="eyebrow">
-          <Radio size={15} /> THE FEED
+          <Radio size={15} /> {run.chapter.name.toUpperCase()}
         </span>
         <span>
           NODE <b>{String(run.node + 1).padStart(2, '0')}</b> / 12
@@ -1022,7 +983,7 @@ export default function App() {
       </main>
       <footer>
         <span>
-          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.1.0
+          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.2.0
         </span>
         <span>
           {inRun

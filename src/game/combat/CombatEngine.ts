@@ -60,6 +60,10 @@ export class CombatEngine {
   private comboIndex = 0;
   private damagingSkills = 0;
   private enemyTurns: Record<string, number> = {};
+  private bossPhases = new Set<string>();
+  private rewoundBosses = new Set<string>();
+  private previousBossMove: Record<string, number> = {};
+  private dodgeDamage = 0;
   constructor(options: BattleOptions) {
     this.rng = new SeededRng(options.seed);
     this.consumed = new Set(options.consumed);
@@ -167,6 +171,7 @@ export class CombatEngine {
   }
   private trigger(on: Trigger, target?: Actor, depth = 0) {
     if (this.hero.hp <= 0 || !this.allowed(depth)) return;
+    if (this.status(this.hero, 'silence')) return;
     for (const { key, effect } of this.effects) {
       if (effect.type !== 'trigger' || effect.on !== on || !this.allowed(depth)) continue;
       if (effect.comboIndex !== undefined && this.comboIndex !== effect.comboIndex) continue;
@@ -222,10 +227,9 @@ export class CombatEngine {
         mult = 100000;
     }
     if (label === 'Viral Explosion')
-      mult *=
-        1 +
-        this.hero.stats.explosionDamage +
+      mult *= 1 + this.hero.stats.explosionDamage + this.hero.stats.viralLauncher +
         (this.rule('share_count') ? this.stats.kills * 0.03 : 0);
+    if (label.startsWith('DliClip')) mult *= 1 + this.hero.stats.clipDamage;
     this.hit(this.hero, target, mult, 'skill', label, depth);
     if (hammer && this.rule('mass_ban'))
       for (const other of this.living().filter((e) => e !== target))
@@ -257,8 +261,9 @@ export class CombatEngine {
       const forcedDodge =
         heroHit && ((this.rule('first_dodge') && this.incoming === 1) || this.ghost);
       if (forcedDodge || this.rng.chance(target.stats.dodgeRate)) {
-        if (heroHit) {
-          this.stats.dodges++;
+      if (heroHit) {
+        this.stats.dodges++;
+        this.dodgeDamage = this.hero.stats.dodgeFollowup;
           this.ghost = false;
           this.avoided++;
           if (this.rule('end_to_end') && this.avoided % 3 === 0) this.ghost = true;
@@ -277,12 +282,15 @@ export class CombatEngine {
     const crit =
       tag === 'basic' && this.rng.chance(source.stats.critRate + (fromHero ? this.nextCrit : 0));
     if (fromHero && tag === 'basic') this.nextCrit = 0;
-    let modifier =
-      1 -
-      Math.min(
-        0.9,
-        target.stats.damageReduction + (target.shield ? target.stats.shieldReduction : 0),
-      );
+    let incomingReduction = target.stats.damageReduction;
+    if (heroHit) {
+      if (target.hp < target.stats.maxHp * 0.25) incomingReduction += target.stats.lowHpReduction;
+      if (source.statuses.length) incomingReduction += target.stats.debuffedReduction;
+      if (source.kind.includes('bot') || ['boss_spam_king', 'boss_raid_master'].includes(source.kind))
+        incomingReduction += target.stats.botReduction;
+    }
+    let modifier = 1 - Math.min(0.9,
+      incomingReduction + (target.shield ? target.stats.shieldReduction : 0));
     modifier *= 1 + (this.status(target, 'vulnerable')?.power ?? 0);
     if (this.status(source, 'glitch'))
       modifier *= 1 - Math.min(0.9, 0.1 + (heroHit ? this.hero.stats.glitchedReduction : 0));
@@ -299,7 +307,7 @@ export class CombatEngine {
           1 + source.stats.debuffDamage + (tag === 'basic' ? source.stats.cleanPacket : 0);
       if (tag === 'basic')
         modifier *=
-          1 + source.stats.basicDamage + this.scrollBonus + (this.bandwidth > 0 ? 0.35 : 0);
+          1 + source.stats.basicDamage + this.scrollBonus + (this.bandwidth > 0 ? 0.35 : 0) + this.dodgeDamage;
       if (tag === 'basic' && !counter) modifier *= 1 + this.comboIndex * source.stats.comboMomentum;
       if (this.rule('adaptation') && (this.enemyTurns[target.id] ?? 0) > 10) modifier *= 1.3;
       if (this.rule('final_push') && source.hp < source.stats.maxHp * 0.25) modifier *= 1.35;
@@ -320,6 +328,7 @@ export class CombatEngine {
     target.hp = result.hp;
     target.shield = result.shield;
     this.emit({ type: 'damage', source: source.id, target: target.id, amount, label, crit, tag });
+    if (fromHero && direct && this.dodgeDamage) this.dodgeDamage = 0;
     if (heroHit) this.stats.damageTaken += result.lostHp;
     else if (fromHero) {
       this.stats.damageDealt += result.lostHp + result.absorbed;
@@ -440,11 +449,84 @@ export class CombatEngine {
         return;
       }
     }
+    if (enemy.kind === 'boss_loop_phantom' && !silenced) {
+      if (enemy.hp <= enemy.stats.maxHp * 0.5 && !this.rewoundBosses.has(enemy.id)) {
+        this.rewoundBosses.add(enemy.id);
+        const healed = Math.min(enemy.stats.maxHp * 0.3, enemy.stats.maxHp - enemy.hp);
+        enemy.hp += healed;
+        this.emit({ type: 'heal', source: enemy.id, target: enemy.id, amount: Math.round(healed), label: 'LOOP REWIND' });
+      }
+      if (this.turn % 3 === 0) {
+        this.applyStatus(this.hero, 'vulnerable', 2, 0.2, enemy.id);
+        this.emit({ type: 'warning', source: enemy.id, target: 'dili', amount: 0, label: 'LOOP MARK — REPEATING LAST MOVE' });
+        this.hit(enemy, this.hero, this.previousBossMove[enemy.id] ?? 1, 'skill', 'Repeated Move');
+        return;
+      }
+      this.previousBossMove[enemy.id] = 0.8;
+    }
+    if (enemy.kind === 'boss_raid_master' && !silenced) {
+      if (this.turn === 1) {
+        for (let i = 0; i < 2 && this.enemies.length < 3; i++) {
+          const minion = makeActor(`${enemy.id}_minion_${i}`, 'Raid Minion', { maxHp: 190 * enemy.stats.maxHp / 2200, atk: 40 * enemy.stats.atk / 54, def: enemy.stats.def * 0.7 }, 'normal', 'raid_minion');
+          this.enemies.push(minion);
+          this.emit({ type: 'summon', source: enemy.id, target: minion.id, amount: 0, label: 'RAID PARTY JOINED' });
+        }
+      }
+      const minions = this.living().filter(other => other.kind === 'raid_minion');
+      if (minions.length) {
+        const shield = Math.round(enemy.stats.maxHp * 0.04);
+        const gain = Math.min(shield, enemy.stats.maxHp * 0.3 - enemy.shield);
+        enemy.shield += Math.max(0, gain);
+        if (gain > 0) this.emit({ type: 'shield', source: enemy.id, target: enemy.id, amount: gain, label: 'PARTY FIREWALL' });
+      }
+      if (this.turn % 4 === 0) {
+        this.emit({ type: 'warning', source: enemy.id, target: 'dili', amount: 0, label: 'SILENCE WAVE' });
+        this.applyStatus(this.hero, 'silence', 2, 1, enemy.id);
+        this.hit(enemy, this.hero, 0.65, 'skill', 'Silence Wave');
+        return;
+      }
+    }
+    if (enemy.kind === 'boss_null_exe' && !silenced) {
+      if (enemy.hp <= enemy.stats.maxHp * 0.6 && !this.bossPhases.has(`${enemy.id}:glitch`)) {
+        this.bossPhases.add(`${enemy.id}:glitch`);
+        this.hero.stats.healingPower *= 0.65;
+        this.applyStatus(this.hero, 'glitch', 3, 0.1, enemy.id);
+        this.emit({ type: 'warning', source: enemy.id, target: 'dili', amount: 0, label: 'PHASE 2 — GLITCH FIELD / HEALING REDUCED' });
+      }
+      if (enemy.hp <= enemy.stats.maxHp * 0.25 && !this.bossPhases.has(`${enemy.id}:overclock`)) {
+        this.bossPhases.add(`${enemy.id}:overclock`);
+        enemy.stats.atk *= 1.35;
+        this.emit({ type: 'warning', source: enemy.id, target: 'dili', amount: 0, label: 'PHASE 3 — OVERCLOCK' });
+      }
+      if (this.turn % 5 === 0) {
+        this.emit({ type: 'warning', source: enemy.id, target: 'dili', amount: 0, label: 'NULL PULSE INCOMING' });
+        this.hit(enemy, this.hero, this.hero.stats.maxHp * 0.18 / enemy.stats.atk, 'true', 'NULL PULSE', 0, false, true);
+        return;
+      }
+    }
     this.hit(enemy, this.hero, 1, 'basic', enemy.name);
     if (!silenced && enemy.kind === 'scam_link' && this.turn % 3 === 0)
       this.applyStatus(this.hero, 'vulnerable', 2, 0.15, enemy.id);
     if (!silenced && enemy.kind === 'bug' && this.rng.chance(0.25))
       this.applyStatus(this.hero, 'glitch', 2, 0.1, enemy.id);
+    if (!silenced && enemy.kind === 'data_leech' && this.turn % 2 === 0) {
+      const stolen = Math.min(this.rage, 15 * (1 - this.hero.stats.rageLeechReduction));
+      this.rage = Math.max(0, this.rage - stolen);
+      this.emit({ type: 'rage', source: enemy.id, target: 'dili', amount: -Math.round(stolen), label: 'RAGE LEECHED' });
+    }
+    if (!silenced && enemy.kind === 'popup' && this.turn % 3 === 0) {
+      for (const ally of this.living().filter(other => other !== enemy)) {
+        const amount = Math.min(Math.round(ally.stats.maxHp * 0.12), ally.stats.maxHp - ally.shield);
+        ally.shield += amount;
+        if (amount) this.emit({ type: 'shield', source: enemy.id, target: ally.id, amount, label: 'POP-UP BARRIER' });
+      }
+    }
+    if (!silenced && enemy.kind === 'toxic_reply' && this.turn % 3 === 0) {
+      this.emit({ type: 'warning', source: enemy.id, target: 'dili', amount: 0, label: 'TOXIC RETORT' });
+      this.hit(enemy, this.hero, 0.65, 'skill', 'Toxic Retort');
+    }
+    if (!silenced && enemy.kind === 'corrupted_clip' && this.turn % 2 === 0)
+      this.hit(enemy, this.hero, 0.6, 'skill', 'Corrupted Burst');
     if (enemy.kind === 'boss_spam_king' && enemy.hp < enemy.stats.maxHp * 0.3)
       this.hit(enemy, this.hero, 0.6, 'basic', 'Overclocked King');
   }

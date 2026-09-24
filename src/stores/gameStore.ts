@@ -27,7 +27,7 @@ interface GameStore {
   snapshot?: BattleSnapshot;
   sequence: number;
   navigate: (screen: GameStore['screen']) => void;
-  start: () => void;
+  start: (chapterId?: string) => void;
   act: (action: 'enter' | 'skill' | 'reroll' | 'rest' | 'event', value?: string | number) => void;
   step: () => void;
   finish: () => void;
@@ -57,14 +57,14 @@ export const useGame = create<GameStore>((set, get) => {
     events: [],
     sequence: 0,
     navigate: (screen) => set({ screen }),
-    start: () => {
+    start: (chapterId = 'chapter_feed') => {
       if (get().run && !get().run?.result) {
         set({ screen: 'play' });
         return;
       }
       const seed = crypto.randomUUID();
       set({
-        run: new RunSession(seed, get().save),
+        run: new RunSession(seed, get().save, chapterId),
         screen: 'play',
         paused: false,
         events: [],

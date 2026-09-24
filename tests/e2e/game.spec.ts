@@ -31,7 +31,7 @@ test('automatic battle pauses, changes speed and reaches a three-choice draft', 
   page.on('pageerror', (error) => errors.push(error.message));
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Enter the Feed', exact: false }).first().click();
+  await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
   await page.getByRole('button', { name: /Data lane/ }).click();
   await expect(page.locator('canvas')).toBeVisible();
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
@@ -55,7 +55,7 @@ test('all run screens, boss rewards, upgrade and save reload integrate', async (
   page.on('pageerror', (error) => errors.push(error.message));
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Enter the Feed', exact: false }).first().click();
+  await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
   // Resolve only combat through the public store boundary to keep this screen-integration test fast.
   // Real animation, speed and pause are exercised by the preceding browser test.
   await page.evaluate(async () => {

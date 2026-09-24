@@ -1,5 +1,7 @@
 import { EQUIPMENT, loadoutStats, GEAR, UPGRADE_COSTS, type Slot } from '../../content/equipment';
-import { NODES, generateEncounter } from '../../content/encounters';
+import { getChapter } from '../../content/chapters';
+import { NODES, generateEncounter, generateEventElite } from '../../content/encounters';
+import { eventsForChapter, type EventEffect } from '../../content/events';
 import { SKILL_BY_ID } from '../../content/skills';
 import { accountLevel, type SaveFile } from '../../services/save';
 import { CombatEngine } from '../combat/CombatEngine';
@@ -36,14 +38,20 @@ export class RunSession {
   rewardGear = '';
   settled = false;
   eventId = 0;
+  battleBuffs: { stat: keyof Stats; value: number; battles: number }[] = [];
+  private eventFight = false;
   startedAt = Date.now();
   endedAt = 0;
   notice = '';
+  get chapter() { return getChapter(this.chapterId); }
+  get currentEvent() { return eventsForChapter(this.chapterId)[this.eventId]; }
   private minRarity?: Rarity;
   constructor(
     readonly seed: string,
     save: SaveFile,
+    readonly chapterId = 'chapter_feed',
   ) {
+    getChapter(chapterId);
     this.rng = new SeededRng(seed);
     this.level = accountLevel(save.account.xp);
     this.baseStats = loadoutStats(save.account.equipped, save.account.inventory);
@@ -54,19 +62,22 @@ export class RunSession {
     const type = NODES[this.node];
     if (type === 'event') {
       this.phase = 'event';
-      this.eventId = this.rng.pick([0, 1, 2]);
+      this.eventId = this.rng.pick(eventsForChapter(this.chapterId).map((_, index) => index));
     } else if (type === 'rest') this.phase = 'rest';
     else {
       this.phase = 'battle';
+      const stats = { ...this.baseStats };
+      for (const buff of this.battleBuffs) stats[buff.stat] += buff.value;
       this.engine = new CombatEngine({
-        seed: `${this.seed}:battle:${this.node}:${route}`,
-        stats: this.baseStats,
+        seed: `${this.seed}:${this.chapterId}:battle:${this.node}:${route}`,
+        stats,
         hp: this.hp,
         shield: this.shield,
         skills: this.skills,
         consumed: this.consumed,
-        enemies: generateEncounter(this.seed, this.node, route),
+        enemies: generateEncounter(this.seed, this.node, route, this.chapterId),
       });
+      this.battleBuffs = this.battleBuffs.map(buff => ({ ...buff, battles: buff.battles - 1 })).filter(buff => buff.battles > 0);
       this.shield = 0;
     }
   }
@@ -81,6 +92,14 @@ export class RunSession {
           : this.stats[key] + this.engine.stats[key];
     if (this.engine.outcome === 'defeat') {
       this.end('defeat');
+      return;
+    }
+    if (this.eventFight) {
+      this.eventFight = false;
+      this.xp += 30;
+      this.bits += 50;
+      this.elites++;
+      this.offer('rare');
       return;
     }
     const type = NODES[this.node];
@@ -139,40 +158,40 @@ export class RunSession {
     this.offer();
   }
   event(choice: number) {
-    if (this.phase !== 'event' || choice < 0 || choice > 2) return;
+    if (this.phase !== 'event' || !Number.isInteger(choice)) return;
+    const selected = this.currentEvent.choices[choice];
+    if (!selected) return;
     this.cleared++;
     this.xp += 10;
-    if (this.eventId === 0) {
-      if (choice < 2) {
-        if (choice === 0) this.hp = Math.max(1, this.hp - Math.round(this.baseStats.maxHp * 0.2));
-        this.notice =
-          choice === 0
-            ? 'Plugin installed. Lost 20% max HP.'
-            : 'Scan complete. Choose a verified upgrade.';
-        this.offer(choice === 0 ? 'epic' : 'rare');
-        return;
-      }
-      this.bits += 20;
-      this.notice = 'Plugin ignored. +20 Bits.';
-    } else if (this.eventId === 1) {
-      if (choice === 0) {
-        this.hp = Math.max(1, this.hp - Math.round(this.baseStats.maxHp * 0.15));
-        this.notice = 'One more scroll. Lost 15% max HP.';
-        this.offer();
-        return;
-      }
-      this.hp = Math.min(this.baseStats.maxHp, this.hp + Math.round(this.baseStats.maxHp * 0.15));
-      this.notice = 'Disconnected to recharge. Recovered 15% max HP.';
-    } else {
-      if (choice === 0) {
-        this.baseStats.dodgeRate += 0.04;
-        this.notice = 'Encryption key active. Dodge +4% this run.';
-      } else {
-        this.bits += 30;
-        this.notice = 'Key sold. +30 Bits.';
-      }
-    }
+    this.notice = selected.outcomeText;
+    for (const effect of selected.effects) if (this.applyEventEffect(effect)) return;
     this.advance();
+  }
+  private applyEventEffect(effect: EventEffect): boolean {
+    if (effect.type === 'bits') this.bits = Math.max(0, this.bits + effect.amount);
+    else if (effect.type === 'xp') this.xp += effect.amount;
+    else if (effect.type === 'heal') this.hp = Math.min(this.baseStats.maxHp, this.hp + Math.round(this.baseStats.maxHp * effect.fraction));
+    else if (effect.type === 'damage') this.hp = Math.max(1, this.hp - Math.round(this.baseStats.maxHp * effect.fraction));
+    else if (effect.type === 'shield') this.shield = Math.min(this.baseStats.maxHp, this.shield + Math.round(this.baseStats.maxHp * effect.fraction));
+    else if (effect.type === 'buff') this.battleBuffs.push({ stat: effect.stat, value: effect.value, battles: effect.battles });
+    else if (effect.type === 'skill') { this.offer(effect.rarity); return true; }
+    else if (effect.type === 'random_cache') {
+      if (this.rng.chance(0.5)) this.bits += 40;
+      else this.hp = Math.max(1, this.hp - Math.round(this.baseStats.maxHp * 0.1));
+    } else if (effect.type === 'elite_fight') {
+      this.eventFight = true;
+      const stats = { ...this.baseStats };
+      for (const buff of this.battleBuffs) stats[buff.stat] += buff.value;
+      this.engine = new CombatEngine({
+        seed: `${this.seed}:${this.chapterId}:event-elite:${this.node}`,
+        stats, hp: this.hp, shield: this.shield, skills: this.skills, consumed: this.consumed,
+        enemies: generateEventElite(this.seed, this.node, this.chapterId),
+      });
+      this.battleBuffs = this.battleBuffs.map(buff => ({ ...buff, battles: buff.battles - 1 })).filter(buff => buff.battles > 0);
+      this.phase = 'battle';
+      return true;
+    }
+    return false;
   }
   private advance() {
     this.node++;
@@ -183,7 +202,16 @@ export class RunSession {
     this.result = result;
     this.phase = 'summary';
     this.endedAt = Date.now();
-    if (result === 'victory') this.rewardGear = this.rng.pick(EQUIPMENT).id;
+    if (result === 'victory') {
+      const rarity = this.rng.weighted(
+        [
+          { rarity: 'common' as const, weight: 55 }, { rarity: 'rare' as const, weight: 30 },
+          { rarity: 'epic' as const, weight: 12 }, { rarity: 'legendary' as const, weight: 3 },
+        ],
+        entry => entry.weight,
+      ).rarity;
+      this.rewardGear = this.rng.pick(EQUIPMENT.filter(item => (item.rarity ?? 'common') === rarity)).id;
+    }
   }
   get score() {
     return Math.round(
@@ -200,6 +228,8 @@ export class RunSession {
     const a = next.account;
     a.runs++;
     a.wins += this.result === 'victory' ? 1 : 0;
+    if (this.result === 'victory')
+      a.unlockedChapters = Math.max(a.unlockedChapters, Math.min(4, this.chapter.order + 1));
     a.bits += this.bits;
     a.xp += this.xp;
     a.bestScore = Math.max(a.bestScore, this.score);

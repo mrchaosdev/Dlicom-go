@@ -41,6 +41,13 @@ export interface Stats {
   glitchedReduction: number;
   maxCombo: number;
   comboMomentum: number;
+  dodgeFollowup: number;
+  debuffedReduction: number;
+  botReduction: number;
+  lowHpReduction: number;
+  viralLauncher: number;
+  clipDamage: number;
+  rageLeechReduction: number;
 }
 export const BASE_STATS: Stats = {
   maxHp: 1000,
@@ -72,6 +79,13 @@ export const BASE_STATS: Stats = {
   glitchedReduction: 0,
   maxCombo: 3,
   comboMomentum: 0,
+  dodgeFollowup: 0,
+  debuffedReduction: 0,
+  botReduction: 0,
+  lowHpReduction: 0,
+  viralLauncher: 0,
+  clipDamage: 0,
+  rageLeechReduction: 0,
 };
 export interface Actor {
   id: string;

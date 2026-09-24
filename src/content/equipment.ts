@@ -1,10 +1,11 @@
-import { BASE_STATS, type Stats } from '../game/combat/types';
+import { BASE_STATS, type Rarity, type Stats } from '../game/combat/types';
 export type Slot = 'weapon' | 'armor' | 'module';
 export interface Equipment {
   id: string;
   name: string;
   slot: Slot;
   description: string;
+  rarity?: Rarity;
   stats: Partial<Stats>;
 }
 export const EQUIPMENT: Equipment[] = [
@@ -30,6 +31,18 @@ export const EQUIPMENT: Equipment[] = [
     stats: { atk: 10, startRage: 20 },
   },
   {
+    id: 'weapon_viral_launcher', name: 'Viral Launcher', slot: 'weapon', rarity: 'rare',
+    description: '+12 ATK · Viral explosions +20%', stats: { atk: 12, viralLauncher: 0.2 },
+  },
+  {
+    id: 'weapon_encryption_blade', name: 'Encryption Blade', slot: 'weapon', rarity: 'rare',
+    description: '+12 ATK · After a Dodge, your next attack +30%', stats: { atk: 12, dodgeFollowup: 0.3 },
+  },
+  {
+    id: 'weapon_dliclip_cannon', name: 'DliClip Cannon', slot: 'weapon', rarity: 'epic',
+    description: '+14 ATK · Critical DliClip damage +25%', stats: { atk: 14, clipDamage: 0.25 },
+  },
+  {
     id: 'armor_firewall_shell',
     name: 'Firewall Shell',
     slot: 'armor',
@@ -51,6 +64,18 @@ export const EQUIPMENT: Equipment[] = [
     stats: { maxHp: 100, dodgeRate: 0.04 },
   },
   {
+    id: 'armor_moderator_vest', name: 'Moderator Vest', slot: 'armor',
+    description: '+6 DEF · Debuffed enemies deal 8% less damage', stats: { def: 6, debuffedReduction: 0.08 },
+  },
+  {
+    id: 'armor_antispam_plating', name: 'Anti-Spam Plating', slot: 'armor', rarity: 'rare',
+    description: '+8 DEF · Bot enemies deal 10% less damage', stats: { def: 8, botReduction: 0.1 },
+  },
+  {
+    id: 'armor_core_armor', name: 'Core Armor', slot: 'armor', rarity: 'epic',
+    description: '+60 HP · +6 DEF · Below 25% HP, gain 15% damage reduction', stats: { maxHp: 60, def: 6, lowHpReduction: 0.15 },
+  },
+  {
     id: 'module_viral_chip',
     name: 'Viral Chip',
     slot: 'module',
@@ -70,6 +95,18 @@ export const EQUIPMENT: Equipment[] = [
     slot: 'module',
     description: 'Counter chance +6%',
     stats: { counterRate: 0.06 },
+  },
+  {
+    id: 'module_rage_cache', name: 'Rage Cache', slot: 'module',
+    description: 'Start battles with 10 Rage', stats: { startRage: 10 },
+  },
+  {
+    id: 'module_safe_mode', name: 'Safe Mode', slot: 'module', rarity: 'rare',
+    description: 'Damage taken −4%', stats: { damageReduction: 0.04 },
+  },
+  {
+    id: 'module_trust', name: 'Trust Module', slot: 'module', rarity: 'legendary',
+    description: 'Boss damage +8%', stats: { bossDamage: 0.08 },
   },
 ];
 export const GEAR = Object.fromEntries(EQUIPMENT.map((e) => [e.id, e]));

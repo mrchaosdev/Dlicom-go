@@ -2,7 +2,7 @@
 
 Build an overpowered Dili, chain Dlicom-themed skills, and fight through a corrupted social network. A browser auto-battle roguelite built with React, TypeScript and Phaser 3.
 
-**Version 0.1.0 — playable Chapter 1 foundation.** This is the first public milestone from the supplied roadmap, not the final four-chapter Game Jam release.
+**Version 0.2.0 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
 
 ![Dlicom Attack home](artifacts/home-desktop.png)
 
@@ -15,7 +15,7 @@ npm ci
 npm run dev
 ```
 
-Open the URL printed by Vite. Click **Enter the Feed**, choose a connection, and watch Dili fight automatically. Between fights, choose one of three skills. Reach the Spam King at node 12, collect Bits and equipment, upgrade your loadout, and try another build.
+Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight automatically. Between fights, choose one of three skills. Reach that chapter's boss at node 12, collect Bits and equipment, upgrade your loadout, and try another build.
 
 - Mouse/touch only; no aiming or manual movement.
 - Pause and ×1/×2 during battle.
@@ -23,15 +23,16 @@ Open the URL printed by Vite. Click **Enter the Feed**, choose a connection, and
 - Music, SFX, reduced motion and default speed in Settings.
 - Equipment, Bits, account unlocks, records and settings save locally. An active run is in memory; refreshing ends it. A malformed save is backed up where storage permits and defaults recover safely.
 
-## Included in v0.1
+## Included in v0.2
 
-- Full Chapter 1 loop: 12 nodes, route alternatives, normal battles, three elites, events, rest, Spam King, victory/defeat, rewards and retry.
+- Four complete chapter routes: The Feed / Spam King, DliClips / Loop Phantom, Dili Rooms / Raid Master, and Core Network / Null.exe. Win to unlock the next chapter.
+- Each run has 12 nodes, normal battles, elites, events, rest, its chapter boss, victory/defeat, rewards and retry.
 - Seeded combat, encounters, skill drafts and chest drops. Seed appears in the result text for reproduction.
 - Crit, capped combo, counter, dodge, shields, statuses, lifesteal, Rage/Ultimate, lethal prevention and once-per-run revive.
 - All 70 starter skill definitions; prerequisites, four skill rarities, affinity weighting, Rare+ pity, Packet Boost ranks and one free reroll.
 - Six build families unlock across account levels 1–6, following the supplied progression order.
-- Three equipment slots, nine common equipment items, five upgrade levels and guaranteed equipment chest on victory.
-- Three documented event types: Suspicious Plugin, Infinite Scroll and Encryption Key.
+- Three equipment slots, 18 equipment items across four rarities, five upgrade levels and a chest on victory.
+- Twenty seeded events with choices, run buffs, healing, Bits, skill drafts and optional elite fights.
 - Dili reference-based generated sprite, original vector enemy placeholders, procedural Feed City, bounded VFX/text objects, and original synthesized music/SFX.
 - Responsive desktop/mobile UI, keyboard focus states, local fonts and local audio.
 
@@ -70,9 +71,8 @@ Import `mrchaosdev/Dlicom-go` into Vercel. Root directory: repository root. Buil
 
 ## Remaining production work
 
-- Chapters 2–4, their boss mechanics, remaining enemy families, 18-item equipment library, equipment rarity rolls and the full event/achievement library.
 - Final enemy art, Dili state sprites, expanded SFX and chapter backgrounds. Current vector enemies are replaceable placeholders.
-- Human balance/pacing pass: current automated Chapter 1 combat is about 159 seconds at ×1 before decisions. The overall 8–15 minute target has **not** been met or verified; the docs' short encounter targets and full-run target need a deliberate pacing pass.
+- Human balance/pacing pass: the deterministic later-chapter stress bot wins 27.3% of max-gear Dili Rooms runs and 16.7% of max-gear Core Network runs. It does not model human build choices. The overall 8–15 minute target has **not** been met or verified; the encounter and full-run targets need a deliberate pacing pass.
 - Real Android/iOS device testing, Firefox/Edge QA, long-session performance profiling, deployed smoke test, trailer and final submission.
 - Share result currently copies text and seed; graphical share-card export remains future work.
 

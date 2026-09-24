@@ -10,6 +10,7 @@ const schema = z
       xp: z.number().int().min(0).max(1e9),
       runs: z.number().int().min(0),
       wins: z.number().int().min(0),
+      unlockedChapters: z.number().int().min(1).max(4).default(1),
       bestScore: z.number().min(0),
       inventory: z.record(equipmentId, z.number().int().min(1).max(5)),
       equipped: z.object({ weapon: equipmentId, armor: equipmentId, module: equipmentId }),
@@ -40,6 +41,7 @@ export function defaultSave(): SaveFile {
       xp: 0,
       runs: 0,
       wins: 0,
+      unlockedChapters: 1,
       bestScore: 0,
       inventory: { weapon_packet_blaster: 1, armor_firewall_shell: 1, module_viral_chip: 1 },
       equipped: {
