@@ -61,7 +61,7 @@ npm run test:e2e
 npm run simulate
 ```
 
-CI runs types, lint, validation, unit/integration tests, build and Chromium browser tests. Simulations use a deterministic bot with a simple damage-oriented draft heuristic; they are not human playtests.
+CI runs types, lint, validation, unit/integration tests, build and Chromium browser tests. Simulations use a deterministic bot with a simple damage-oriented draft heuristic; they are not human playtests. Set `SIM_RUNS`, `SIM_CHAPTER`, and `SIM_UNLOCKED=1` to sample a particular chapter with unlocked equipment. The output includes median and 90th-percentile combat time, plus the share spent between presented events; menu and decision time is excluded.
 
 See [verification and balance report](docs/IMPLEMENTATION_STATUS.md) for measured results and limitations.
 
