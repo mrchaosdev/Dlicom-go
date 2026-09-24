@@ -2,6 +2,7 @@
 
 - `dlicom-attack-docs/assets/dili-mascot-reference.png`: supplied Dlicom mascot reference poster, preserved unchanged.
 - `public/assets/dili-idle.png`: generated using the built-in image-generation tool from the supplied reference; used in menu and battle with presentation tweens. It is one state sprite, not a completed animation sheet.
+- `public/assets/dili-attack.png`, `dili-hurt.png`, `dili-ultimate.png`: original pose variants generated with the built-in image-generation tool using the existing Dili runtime sprite as the identity reference, then resized to transparent 512px PNGs. They preserve the helmet, face, suit, cape and blaster design.
 - `public/assets/skill-packet.png`, `skill-hammer.png`, `skill-firewall.png`, `skill-viral.png`, `skill-rage.png`: original skill-archetype icons generated with the built-in image-generation tool from the supplied prompt direction, then resized to 256px PNG for browser use. The Ban Hammer image served as a style reference for the other four. They contain no copied game artwork.
 - `public/assets/skill-moderation.png`, `skill-encryption.png`, `skill-heal.png`: original matching archetype icons generated with the built-in image-generation tool, then resized to 256px PNG for browser use.
 - `public/assets/spam-bot.svg`, `spam-king.svg`: original code-authored vector placeholders; descriptive manifest keys make them replaceable. Scam Link, Bug and Raid Bot currently use tinted versions of the bot placeholder.

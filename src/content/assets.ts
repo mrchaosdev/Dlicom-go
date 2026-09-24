@@ -3,6 +3,9 @@ import type { Archetype } from '../game/combat/types';
 const asset = (file: string) => `${import.meta.env.BASE_URL}assets/${file}`;
 export const ASSETS = {
   dili_idle: asset('dili-idle.png'),
+  dili_attack: asset('dili-attack.png'),
+  dili_hurt: asset('dili-hurt.png'),
+  dili_ultimate: asset('dili-ultimate.png'),
   skill_packet: asset('skill-packet.png'),
   skill_hammer: asset('skill-hammer.png'),
   skill_firewall: asset('skill-firewall.png'),

@@ -110,6 +110,9 @@ class BattleScene extends Phaser.Scene {
   private bossWarningRing!: Phaser.GameObjects.Arc;
   private lowHpAura!: Phaser.GameObjects.Arc;
   private lowHpActive = false;
+  private heroPoseWait = 0;
+  private outcomePosePending: 'victory' | 'defeat' | null = null;
+  private outcomePoseShown = false;
   private parallaxLayers: { sprite: Phaser.GameObjects.TileSprite; speed: number }[] = [];
   private ready = false;
   constructor(private readonly chapterId: string) {
@@ -117,6 +120,9 @@ class BattleScene extends Phaser.Scene {
   }
   preload() {
     this.load.image('dili_idle', ASSETS.dili_idle);
+    this.load.image('dili_attack', ASSETS.dili_attack);
+    this.load.image('dili_hurt', ASSETS.dili_hurt);
+    this.load.image('dili_ultimate', ASSETS.dili_ultimate);
     this.load.image('skill_hammer', ASSETS.skill_hammer);
     this.load.image('skill_viral', ASSETS.skill_viral);
     this.load.svg('bot', ASSETS.enemy_spam_bot_idle);
@@ -248,6 +254,12 @@ class BattleScene extends Phaser.Scene {
     if (actor.tier === 'elite') sprite.setTint(0xffb080);
     this.sprites.set(actor.id, sprite);
   }
+  private showHeroPose(texture: 'dili_idle' | 'dili_attack' | 'dili_hurt' | 'dili_ultimate', duration: number) {
+    const hero = this.sprites.get('dili');
+    if (!hero) return;
+    hero.setTexture(texture).setDisplaySize(230, (230 * hero.height) / hero.width);
+    this.heroPoseWait = duration;
+  }
   sync(snapshot: BattleSnapshot) {
     if (!this.ready) return;
     [snapshot.hero, ...snapshot.enemies].forEach((actor, i) => {
@@ -280,6 +292,22 @@ class BattleScene extends Phaser.Scene {
   enqueue(events: CombatEvent[]) {
     this.queue.push(...events.filter((e) => e.type !== 'rage'));
     this.queue = this.queue.slice(0, 200);
+    this.outcomePosePending = useGame.getState().snapshot?.outcome ?? null;
+  }
+  private showOutcomePose(outcome: 'victory' | 'defeat', reduced: boolean) {
+    const hero = this.sprites.get('dili');
+    if (!hero) return;
+    if (outcome === 'victory') {
+      this.showHeroPose('dili_idle', 0);
+      hero.setTint(0xa8ffe8);
+      if (!reduced)
+        this.tweens.add({ targets: hero, y: hero.y - 14, angle: -5, duration: 150, yoyo: true });
+    } else if (useGame.getState().snapshot?.hero.hp) {
+      this.showHeroPose('dili_hurt', 0);
+      hero.setTint(0x8195b1);
+      if (!reduced)
+        this.tweens.add({ targets: hero, y: hero.y + 16, angle: 12, alpha: 0.45, duration: 280 });
+    }
   }
   private floating(target: Phaser.GameObjects.Image, event: CombatEvent) {
     const text = this.numbers[this.numberIndex++ % this.numbers.length];
@@ -324,6 +352,7 @@ class BattleScene extends Phaser.Scene {
       this.label.setText(event.label).setAlpha(1);
       this.tweens.add({ targets: this.label, alpha: 0, delay: 450, duration: 250 });
       if (event.type === 'ultimate') {
+        this.showHeroPose('dili_ultimate', 700);
         playSound('ultimate');
         this.tweens.killTweensOf(this.ring);
         this.ring.setPosition(200, 290).setStrokeStyle(5, 0x76f5ff);
@@ -362,6 +391,10 @@ class BattleScene extends Phaser.Scene {
     if (event.type === 'damage') {
       const indirectDamage = event.tag === 'status' || event.tag === 'reflect';
       const bossAttack = event.source.startsWith('boss_') && !indirectDamage;
+      if (event.source === 'dili' && !indirectDamage)
+        this.showHeroPose('dili_attack', event.crit ? 210 : 150);
+      else if (event.target === 'dili' && event.source !== 'dili')
+        this.showHeroPose('dili_hurt', 220);
       if (!indirectDamage) {
         if (event.label === 'Ban Hammer') playSound('hammer');
         else if (bossAttack) playBossAttackSound(event.source);
@@ -480,6 +513,7 @@ class BattleScene extends Phaser.Scene {
       if (!reduced) this.tweens.add({ targets: target, angle: 5, duration: 70, yoyo: true });
       this.floating(target, event);
     } else if (event.type === 'dodge' || event.type === 'heal' || event.type === 'shield') {
+      if (event.type === 'dodge' && event.target === 'dili') this.showHeroPose('dili_idle', 0);
       playSound(event.type);
       if (event.type === 'heal' || event.type === 'shield') {
         this.tweens.killTweensOf(this.impactRing);
@@ -556,6 +590,7 @@ class BattleScene extends Phaser.Scene {
     } else if (event.type === 'revive')
       this.floating(target, event);
     else if (event.type === 'death') {
+      if (event.target === 'dili') this.showHeroPose('dili_hurt', 0);
       playSound('death');
       this.tweens.add({ targets: target, alpha: 0, duration: reduced ? 100 : 300 });
     } else if (event.type === 'summon') target.setAlpha(1);
@@ -573,11 +608,19 @@ class BattleScene extends Phaser.Scene {
     this.parallaxLayers.forEach(({ sprite, speed }) => {
       sprite.tilePositionX += elapsed * speed;
     });
+    if (this.heroPoseWait > 0) {
+      this.heroPoseWait -= Math.min(delta, 100) * state.speed;
+      if (this.heroPoseWait <= 0) this.showHeroPose('dili_idle', 0);
+    }
     this.wait -= Math.min(delta, 100) * state.speed;
     if (this.wait <= 0 && this.queue.length) {
       const event = this.queue.shift()!;
       this.present(event);
       this.wait = eventDuration(event);
+    }
+    if (this.wait <= 0 && !this.queue.length && this.outcomePosePending && !this.outcomePoseShown) {
+      this.outcomePoseShown = true;
+      this.showOutcomePose(this.outcomePosePending, state.save.settings.reducedMotion);
     }
   }
 }

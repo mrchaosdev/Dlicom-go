@@ -5,6 +5,9 @@ import { validateContent } from '../src/content/validate';
 validateContent();
 for (const file of [
   'dili-idle.png',
+  'dili-attack.png',
+  'dili-hurt.png',
+  'dili-ultimate.png',
   'skill-packet.png',
   'skill-hammer.png',
   'skill-firewall.png',
