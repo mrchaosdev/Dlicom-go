@@ -52,7 +52,7 @@ All eight skill archetypes now have original 256 × 256 transparent icons in the
 | Ultimate | Dili charge pose, network wave, screen feedback and sound |
 | Rage full | 150 ms Rage-art burst immediately before Ultimate; ordinary Rage gains stay unobtrusive |
 | Dodge | Ghost fade and sidestep |
-| Boss warning | Ring and tint around the boss |
+| Boss warning | Boss-colored ring, flash, readable label and reusable warning icon above the boss |
 
 Impact objects, skill-art overlay, projectiles and damage numbers are reused instead of created per hit. Crit and Rage cues are generated only in the presentation queue; the combat engine remains the sole authority for damage, Rage and Ultimate. The turn clock includes the extra presentation cue durations so fast chains do not overlap the next turn.
 
@@ -71,6 +71,8 @@ Normal Rage gain has no floating text because it happens repeatedly; the HUD bar
 ## Enemy and boss art
 
 All ten normal enemy kinds and four bosses now have distinct original transparent sprites. Raid Master's summoned Raid Minions share Raid Bot art. Existing enemies have idle breathing, attack lunge, hurt reaction and defeat fade; character-specific attack and hurt poses remain open. The battle scene loads only the enemy art needed for its chapter, plus Spam Bot for Spam King's summons and Raid Bot for elites.
+
+Bosses enter with a short sprite reveal and chapter-colored name banner before the first attack. Major moves show a warning icon above the boss during the existing 600 ms telegraph. Both cues use Phaser presentation objects and respect reduced motion, pause and battle speed; neither changes combat timing or results.
 
 | Enemy | Silhouette and mechanic cue |
 | --- | --- |

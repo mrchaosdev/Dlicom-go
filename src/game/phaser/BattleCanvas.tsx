@@ -127,6 +127,7 @@ class BattleScene extends Phaser.Scene {
   private label!: Phaser.GameObjects.Text;
   private ring!: Phaser.GameObjects.Arc;
   private bossWarningRing!: Phaser.GameObjects.Arc;
+  private bossWarningBadge!: Phaser.GameObjects.Container;
   private lowHpAura!: Phaser.GameObjects.Arc;
   private lowHpActive = false;
   private heroPoseWait = 0;
@@ -220,6 +221,16 @@ class BattleScene extends Phaser.Scene {
       .setStrokeStyle(4, 0xff68c8)
       .setVisible(false)
       .setDepth(14);
+    const warningShape = this.add.graphics();
+    warningShape.fillStyle(0xffd773).fillRoundedRect(-31, -31, 62, 62, 9);
+    warningShape.lineStyle(4, 0x081527).strokeRoundedRect(-31, -31, 62, 62, 9);
+    const warningMark = this.add
+      .text(0, 1, '!', { fontFamily: 'Arial', fontSize: '43px', fontStyle: 'bold', color: '#081527' })
+      .setOrigin(0.5);
+    this.bossWarningBadge = this.add
+      .container(0, 0, [warningShape, warningMark])
+      .setVisible(false)
+      .setDepth(21);
     this.lowHpAura = this.add
       .circle(197, 315, 106)
       .setStrokeStyle(4, 0xff5577, 0.7)
@@ -228,13 +239,15 @@ class BattleScene extends Phaser.Scene {
       .setVisible(false)
       .setDepth(6);
     this.label = this.add
-      .text(380, 82, '', {
+      .text(380, 420, '', {
         fontFamily: 'monospace',
         fontSize: '20px',
         fontStyle: 'bold',
         color: '#d2fbff',
         backgroundColor: '#152941',
         padding: { x: 14, y: 10 },
+        align: 'center',
+        wordWrap: { width: 680 },
       })
       .setOrigin(0.5)
       .setDepth(30)
@@ -293,6 +306,32 @@ class BattleScene extends Phaser.Scene {
     }
     if (actor.tier === 'elite') sprite.setTint(0xffb080);
     this.sprites.set(actor.id, sprite);
+    if (boss) this.showBossIntro(actor, sprite, x, y);
+  }
+  private showBossIntro(actor: Actor, sprite: Phaser.GameObjects.Image, x: number, y: number) {
+    const reduced = useGame.getState().save.settings.reducedMotion;
+    const color = BOSS_ATTACK_COLORS[actor.kind] ?? 0xff78c8;
+    if (!reduced) {
+      sprite.setPosition(x + 30, y + 16).setAlpha(0);
+      this.tweens.add({ targets: sprite, x, y, alpha: 1, duration: 480, ease: 'Cubic.Out' });
+    }
+    const banner = this.add.container(380, reduced ? 430 : 447).setDepth(22);
+    const backdrop = this.add.rectangle(0, 0, 394, 76, 0x081527, 0.93)
+      .setStrokeStyle(2, color, 0.9);
+    const tag = this.add.text(0, -20, 'BOSS SIGNAL', {
+      fontFamily: 'monospace', fontSize: '13px', color: '#c9d8e8',
+    }).setOrigin(0.5);
+    const name = this.add.text(0, 10, actor.name.toUpperCase(), {
+      fontFamily: 'Barlow Condensed', fontSize: '36px', fontStyle: 'bold',
+      color: `#${color.toString(16).padStart(6, '0')}`,
+    }).setOrigin(0.5);
+    banner.add([backdrop, tag, name]).setAlpha(reduced ? 1 : 0);
+    this.tweens.add({
+      targets: banner,
+      alpha: reduced ? 0 : 1,
+      ...(reduced ? { delay: 450, duration: 150 } : { y: 430, duration: 220, yoyo: true, hold: 320 }),
+      onComplete: () => banner.destroy(),
+    });
   }
   private showHeroPose(texture: 'dili_idle' | 'dili_attack' | 'dili_hurt' | 'dili_ultimate', duration: number) {
     const hero = this.sprites.get('dili');
@@ -427,7 +466,7 @@ class BattleScene extends Phaser.Scene {
     }
     if (event.type === 'warning' || event.type === 'ultimate') {
       this.tweens.killTweensOf(this.label);
-      this.label.setText(event.label).setAlpha(1);
+      this.label.setText(event.label).setPosition(380, 420).setColor('#d2fbff').setAlpha(1);
       this.tweens.add({ targets: this.label, alpha: 0, delay: 450, duration: 250 });
       if (event.type === 'ultimate') {
         this.showHeroPose('dili_ultimate', 700);
@@ -438,10 +477,12 @@ class BattleScene extends Phaser.Scene {
         this.tweens.add({ targets: this.ring, scale: reduced ? 3 : 18, alpha: 0, duration: 700 });
         if (!reduced) this.cameras.main.shake(200, 0.012);
       } else if (event.source.startsWith('boss_') && source) {
+        const color = BOSS_ATTACK_COLORS[event.source] ?? 0xff68c8;
+        this.label.setColor(`#${color.toString(16).padStart(6, '0')}`);
         this.tweens.killTweensOf(this.bossWarningRing);
         this.bossWarningRing
           .setPosition(source.x, source.y)
-          .setStrokeStyle(4, 0xff68c8)
+          .setStrokeStyle(4, color)
           .setScale(0.7)
           .setAlpha(0.85)
           .setVisible(true);
@@ -452,8 +493,21 @@ class BattleScene extends Phaser.Scene {
           duration: reduced ? 180 : 600,
           onComplete: () => this.bossWarningRing.setVisible(false),
         });
+        this.tweens.killTweensOf(this.bossWarningBadge);
+        this.bossWarningBadge
+          .setPosition(source.x + 160, source.y - 56)
+          .setScale(reduced ? 1 : 0.85)
+          .setAlpha(1)
+          .setVisible(true);
+        this.tweens.add({
+          targets: this.bossWarningBadge,
+          ...(reduced ? {} : { y: source.y - 66, scale: 1.08 }),
+          alpha: 0,
+          duration: reduced ? 450 : 600,
+          onComplete: () => this.bossWarningBadge.setVisible(false),
+        });
         if (!reduced) {
-          source.setTint(0xff74ca);
+          source.setTint(color);
           this.tweens.add({
             targets: source,
             alpha: 0.72,
@@ -627,6 +681,7 @@ class BattleScene extends Phaser.Scene {
       this.label
         .setText(event.label)
         .setPosition(target.x, target.y - 105)
+        .setColor('#72e5ff')
         .setAlpha(1);
       this.tweens.add({
         targets: this.label,
