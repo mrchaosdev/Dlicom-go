@@ -71,7 +71,7 @@ Import `mrchaosdev/Dlicom-go` into Vercel. Root directory: repository root. Buil
 
 ## Remaining production work
 
-- Character pose polish, remaining Rage/crit VFX, and expanded SFX. The [art and animation matrix](docs/ART_ANIMATION_MATRIX.md) tracks state coverage.
+- Character pose polish and expanded SFX. The [art and animation matrix](docs/ART_ANIMATION_MATRIX.md) tracks state coverage and remaining physical-device QA.
 - Human balance/pacing pass: a deterministic 500-run stress bot with max-level gear won 38.8% of DliClips, 27.0% of Dili Rooms, and 36.0% of Core Network runs; it does not model human build choices. Core tuning now gets nearly every run to Null.exe, where the boss remains the main win gate. The overall 8–15 minute target has **not** been met or verified; human playtesting and a deliberate pacing pass remain necessary.
 - Real Android/iOS device testing, Firefox/Edge QA, long-session performance profiling, deployed smoke test, trailer and final submission.
 - Share result currently copies text and seed; graphical share-card export remains future work.

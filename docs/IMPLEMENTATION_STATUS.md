@@ -16,6 +16,8 @@ Combat hits now include a reusable expanding impact spark; critical hits use a w
 
 Ban Hammer and Viral Explosion also flash their archetype art directly on impact. One pooled Phaser image presents both effects; reduced-motion mode keeps the image static and only fades it.
 
+Critical hits now get a 70 ms yellow source-ring anticipation before the hit cue. Ultimate also gets a 150 ms Rage-art burst just before the existing network wave. These cues are presentation-only and share the turn timing calculation, so combat results and pause/speed controls remain deterministic.
+
 ## Verification
 
 Boss attacks use chapter-colored impact sparks and projectiles so each boss has a distinct combat identity. DliClip projectiles retain their pink signal color. Each boss also has a distinct synthesized attack cue, generated reproducibly with the existing audio script.

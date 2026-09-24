@@ -6,7 +6,7 @@ import { useGame } from '../../stores/gameStore';
 import { playBossAttackSound, playSound } from '../../services/audio';
 import type { Actor, CombatEvent } from '../combat/types';
 import type { BattleSnapshot } from '../combat/CombatEngine';
-import { eventDuration } from './presentation';
+import { buildPresentationQueue, eventDuration, type PresentationCue } from './presentation';
 
 const BACKGROUND_PALETTES: Record<string, [number, number, number, number]> = {
   chapter_feed: [0x0d203c, 0x102947, 0x081321, 0x101525],
@@ -110,7 +110,7 @@ function drawChapterBackground(g: Phaser.GameObjects.Graphics, chapterId: string
 
 class BattleScene extends Phaser.Scene {
   private sprites = new Map<string, Phaser.GameObjects.Image>();
-  private queue: CombatEvent[] = [];
+  private queue: PresentationCue[] = [];
   private wait = 0;
   private numbers: Phaser.GameObjects.Text[] = [];
   private numberIndex = 0;
@@ -137,6 +137,7 @@ class BattleScene extends Phaser.Scene {
     this.load.image('dili_ultimate', ASSETS.dili_ultimate);
     this.load.image('skill_hammer', ASSETS.skill_hammer);
     this.load.image('skill_viral', ASSETS.skill_viral);
+    this.load.image('skill_rage', ASSETS.skill_rage);
     this.load.svg('bot', ASSETS.enemy_bot_placeholder);
     const enemyKinds = new Set([
       ...getChapter(this.chapterId).enemyPool.map((enemy) => enemy.id),
@@ -314,7 +315,7 @@ class BattleScene extends Phaser.Scene {
     }
   }
   enqueue(events: CombatEvent[]) {
-    this.queue.push(...events.filter((e) => e.type !== 'rage'));
+    this.queue.push(...buildPresentationQueue(events));
     this.queue = this.queue.slice(0, 200);
     this.outcomePosePending = useGame.getState().snapshot?.outcome ?? null;
   }
@@ -367,10 +368,46 @@ class BattleScene extends Phaser.Scene {
       onComplete: () => text.setVisible(false),
     });
   }
-  private present(event: CombatEvent) {
+  private present(event: PresentationCue) {
     const target = this.sprites.get(event.target),
       source = this.sprites.get(event.source);
     const reduced = useGame.getState().save.settings.reducedMotion;
+    if (event.type === 'crit_anticipation' && source) {
+      if (event.source === 'dili') this.showHeroPose('dili_attack', 110);
+      this.tweens.killTweensOf(this.ring);
+      this.ring
+        .setPosition(source.x, source.y)
+        .setStrokeStyle(4, 0xffd773)
+        .setScale(0.65)
+        .setAlpha(0.9)
+        .setVisible(true);
+      this.tweens.add({
+        targets: this.ring,
+        scale: reduced ? 1 : 1.7,
+        alpha: 0,
+        duration: reduced ? 70 : 100,
+        onComplete: () => this.ring.setVisible(false),
+      });
+      return;
+    }
+    if (event.type === 'rage_burst' && source) {
+      this.tweens.killTweensOf(this.skillImpact);
+      this.skillImpact
+        .setTexture('skill_rage')
+        .setPosition(source.x, source.y)
+        .setScale(0.22)
+        .setAngle(0)
+        .setAlpha(0.9)
+        .setVisible(true);
+      this.tweens.add({
+        targets: this.skillImpact,
+        scale: reduced ? 0.3 : 0.62,
+        alpha: 0,
+        duration: reduced ? 100 : 180,
+        onComplete: () => this.skillImpact.setVisible(false),
+      });
+      return;
+    }
     if (event.type === 'warning' || event.type === 'ultimate') {
       this.tweens.killTweensOf(this.label);
       this.label.setText(event.label).setAlpha(1);
