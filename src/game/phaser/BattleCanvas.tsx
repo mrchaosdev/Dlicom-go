@@ -267,11 +267,15 @@ class BattleScene extends Phaser.Scene {
       }
       if (!reduced) this.tweens.add({ targets: target, angle: 5, duration: 70, yoyo: true });
       this.floating(target, event);
-    } else if (['dodge', 'heal', 'shield', 'status', 'revive'].includes(event.type))
+    } else if (event.type === 'dodge' || event.type === 'heal' || event.type === 'shield') {
+      playSound(event.type);
       this.floating(target, event);
-    else if (event.type === 'death')
+    } else if (['status', 'revive'].includes(event.type))
+      this.floating(target, event);
+    else if (event.type === 'death') {
+      playSound('death');
       this.tweens.add({ targets: target, alpha: 0, duration: reduced ? 100 : 300 });
-    else if (event.type === 'summon') target.setAlpha(1);
+    } else if (event.type === 'summon') target.setAlpha(1);
   }
   update(_time: number, delta: number) {
     const state = useGame.getState();

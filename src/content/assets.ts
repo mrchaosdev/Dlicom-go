@@ -14,4 +14,8 @@ export const ASSETS = {
   sfx_crit: asset('crit.wav'),
   sfx_ultimate: asset('ultimate.wav'),
   sfx_select: asset('select.wav'),
+  sfx_dodge: asset('dodge.wav'),
+  sfx_heal: asset('heal.wav'),
+  sfx_shield: asset('shield.wav'),
+  sfx_death: asset('death.wav'),
 };

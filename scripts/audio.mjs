@@ -44,6 +44,10 @@ wav(
   0.25,
   (t) => Math.sin(2 * Math.PI * (t < 0.1 ? 523 : 784) * t) * Math.exp(-t * 15) * 0.3,
 );
+wav('dodge', 0.2, (t) => Math.sin(2 * Math.PI * (850 - 650 * t) * t) * Math.exp(-t * 18) * 0.24);
+wav('heal', 0.38, (t) => Math.sin(2 * Math.PI * (420 * t + 480 * t * t)) * Math.sin(Math.PI * t / 0.38) * 0.2);
+wav('shield', 0.28, (t) => (Math.sin(2 * Math.PI * 392 * t) + Math.sin(2 * Math.PI * 587 * t)) * Math.exp(-t * 9) * 0.16);
+wav('death', 0.32, (t) => Math.sin(2 * Math.PI * (520 * t - 500 * t * t)) * Math.exp(-t * 11) * 0.25);
 const notes = [
   130.81, 196, 261.63, 196, 155.56, 233.08, 311.13, 233.08, 103.83, 155.56, 207.65, 155.56, 116.54,
   174.61, 233.08, 174.61,
