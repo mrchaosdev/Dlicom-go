@@ -82,6 +82,7 @@ class BattleScene extends Phaser.Scene {
   private numbers: Phaser.GameObjects.Text[] = [];
   private numberIndex = 0;
   private projectile!: Phaser.GameObjects.Arc;
+  private impactRing!: Phaser.GameObjects.Arc;
   private label!: Phaser.GameObjects.Text;
   private ring!: Phaser.GameObjects.Arc;
   private ready = false;
@@ -110,6 +111,11 @@ class BattleScene extends Phaser.Scene {
       .text(733, 25, '● LIVE', { fontFamily: 'monospace', fontSize: '12px', color: '#62e6bd' })
       .setOrigin(1, 0);
     this.projectile = this.add.circle(0, 0, 6, 0x7bffff).setVisible(false).setDepth(15);
+    this.impactRing = this.add
+      .circle(0, 0, 18)
+      .setStrokeStyle(4, 0x76f5ff)
+      .setVisible(false)
+      .setDepth(16);
     this.ring = this.add
       .circle(200, 290, 30)
       .setStrokeStyle(5, 0x76f5ff)
@@ -222,12 +228,27 @@ class BattleScene extends Phaser.Scene {
         playSound('ultimate');
         this.ring.setVisible(true).setScale(1).setAlpha(0.9);
         this.tweens.add({ targets: this.ring, scale: reduced ? 3 : 18, alpha: 0, duration: 700 });
-        if (!reduced) this.cameras.main.shake(200, 0.003);
+        if (!reduced) this.cameras.main.shake(200, 0.012);
       }
     }
     if (!target) return;
     if (event.type === 'damage') {
       playSound(event.crit ? 'crit' : 'attack');
+      this.tweens.killTweensOf(this.impactRing);
+      this.impactRing
+        .setPosition(target.x, target.y)
+        .setStrokeStyle(event.crit ? 5 : 3, event.crit ? 0xffd773 : 0x76f5ff)
+        .setScale(0.35)
+        .setAlpha(0.95)
+        .setVisible(true);
+      this.tweens.add({
+        targets: this.impactRing,
+        scale: event.crit ? 3.2 : 2.4,
+        alpha: 0,
+        duration: event.crit ? 190 : 130,
+        onComplete: () => this.impactRing.setVisible(false),
+      });
+      if (event.crit && !reduced) this.cameras.main.shake(90, 0.005);
       if (source && !reduced) {
         this.tweens.add({
           targets: source,
