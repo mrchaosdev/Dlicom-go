@@ -28,6 +28,9 @@ const ENEMY_SPRITES: Record<string, string> = {
   fake_account: ASSETS.enemy_fake_account_idle,
   data_leech: ASSETS.enemy_data_leech_idle,
   corrupted_clip: ASSETS.enemy_corrupted_clip_idle,
+  toxic_reply: ASSETS.enemy_toxic_reply_idle,
+  popup: ASSETS.enemy_popup_idle,
+  null_fragment: ASSETS.enemy_null_fragment_idle,
 };
 const PARALLAX_COLORS: Record<string, number> = {
   chapter_feed: 0x46c5d9,

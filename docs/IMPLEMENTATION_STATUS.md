@@ -6,7 +6,7 @@ The complete four-chapter route is playable: The Feed / Spam King, DliClips / Lo
 
 The content set now contains 70 skills, 18 equipment items, and 20 events. Equipment chest drops roll by the included rarity categories; duplicate items convert to Bits. Event choices cover rewards, healing, shield, short-run buffs, skill drafts, and optional elite encounters.
 
-Each chapter now has its own low-detail procedural battle backdrop, two subtle accent-colored parallax grid layers, and original synthesized music loop. The parallax textures are generated once per scene and move at separate speeds; they pause with combat. The four bosses use original replaceable vector silhouettes through the centralized asset manifest. These are presentation placeholders; final animation and production art remain open.
+Each chapter now has its own low-detail procedural battle backdrop, two subtle accent-colored parallax grid layers, and original synthesized music loop. The parallax textures are generated once per scene and move at separate speeds; they pause with combat. All ten normal enemy kinds have distinct transparent sprites; Raid Master's summoned minions share Raid Bot art. The four bosses use original replaceable vector silhouettes through the centralized asset manifest. Boss art and final character-specific animation remain open.
 
 Skill drafts and the owned-skill list now use eight original 256px archetype icons, covering every current skill family: Packet, Hammer, Firewall, Moderation, Encryption, Viral, Rage, and Heal. Draft cards enter with a short stagger and the art lifts on hover or keyboard focus; the reduced-motion setting and system preference suppress these motions.
 
@@ -30,4 +30,4 @@ Burn ticks and reflected damage present their impacts without replaying the sour
 
 ## Remaining production work
 
-Final character/boss animation and production art, a chapter-specific audio and VFX pass, human balance and pacing playtests, physical mobile and cross-browser QA, worst-build performance profiling, release build, and Vercel deployment verification remain open.
+Final character/boss animation and boss production art, a chapter-specific audio and VFX pass, human balance and pacing playtests, physical mobile and cross-browser QA, worst-build performance profiling, release build, and Vercel deployment verification remain open.
