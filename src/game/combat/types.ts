@@ -178,6 +178,7 @@ export interface CombatEvent {
     | 'summon'
     | 'warning'
     | 'revive'
+    | 'shield_break'
     | 'rage';
   source: string;
   target: string;

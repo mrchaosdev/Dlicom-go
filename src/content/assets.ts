@@ -23,4 +23,6 @@ export const ASSETS = {
   sfx_defeat: asset('defeat.wav'),
   sfx_reward: asset('reward.wav'),
   sfx_legendary: asset('legendary.wav'),
+  sfx_hammer: asset('hammer.wav'),
+  sfx_shield_break: asset('shield-break.wav'),
 };

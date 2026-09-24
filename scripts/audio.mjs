@@ -65,6 +65,8 @@ wav('legendary', 0.82, (t) => {
   const sparkle = Math.sin(2 * Math.PI * (1320 + 440 * t) * t) * Math.exp(-t * 4) * 0.05;
   return notes.reduce((sum, note) => sum + Math.sin(2 * Math.PI * note * t), 0) * Math.sin(Math.PI * t / 0.82) * 0.055 + sparkle;
 });
+wav('hammer', 0.38, (t) => Math.sin(2 * Math.PI * (230 - 90 * t) * t) * Math.exp(-t * 7) * 0.42);
+wav('shield-break', 0.34, (t) => (Math.sin(2 * Math.PI * (680 - 900 * t) * t) + Math.sin(2 * Math.PI * 1360 * t) * Math.exp(-t * 14)) * Math.exp(-t * 8) * 0.22);
 const notes = [
   130.81, 196, 261.63, 196, 155.56, 233.08, 311.13, 233.08, 103.83, 155.56, 207.65, 155.56, 116.54,
   174.61, 233.08, 174.61,

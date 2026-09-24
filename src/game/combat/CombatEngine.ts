@@ -328,6 +328,14 @@ export class CombatEngine {
     target.hp = result.hp;
     target.shield = result.shield;
     this.emit({ type: 'damage', source: source.id, target: target.id, amount, label, crit, tag });
+    if (priorShield > 0 && result.shield === 0)
+      this.emit({
+        type: 'shield_break',
+        source: target.id,
+        target: target.id,
+        amount: result.absorbed,
+        label: 'SHIELD BREAK',
+      });
     if (fromHero && direct && this.dodgeDamage) this.dodgeDamage = 0;
     if (heroHit) this.stats.damageTaken += result.lostHp;
     else if (fromHero) {

@@ -234,7 +234,7 @@ class BattleScene extends Phaser.Scene {
     }
     if (!target) return;
     if (event.type === 'damage') {
-      playSound(event.crit ? 'crit' : 'attack');
+      playSound(event.label === 'Ban Hammer' ? 'hammer' : event.crit ? 'crit' : 'attack');
       this.tweens.killTweensOf(this.impactRing);
       this.impactRing
         .setPosition(target.x, target.y)
@@ -271,6 +271,33 @@ class BattleScene extends Phaser.Scene {
     } else if (event.type === 'dodge' || event.type === 'heal' || event.type === 'shield') {
       playSound(event.type);
       this.floating(target, event);
+    } else if (event.type === 'shield_break') {
+      playSound('shield_break');
+      this.tweens.killTweensOf(this.label);
+      this.label
+        .setText(event.label)
+        .setPosition(target.x, target.y - 105)
+        .setAlpha(1);
+      this.tweens.add({
+        targets: this.label,
+        alpha: 0,
+        y: target.y - (reduced ? 105 : 135),
+        duration: reduced ? 100 : 450,
+      });
+      this.tweens.killTweensOf(this.impactRing);
+      this.impactRing
+        .setPosition(target.x, target.y)
+        .setStrokeStyle(5, 0x72e5ff)
+        .setScale(0.5)
+        .setAlpha(0.95)
+        .setVisible(true);
+      this.tweens.add({
+        targets: this.impactRing,
+        scale: reduced ? 1.1 : 4,
+        alpha: 0,
+        duration: reduced ? 100 : 220,
+        onComplete: () => this.impactRing.setVisible(false),
+      });
     } else if (['status', 'revive'].includes(event.type))
       this.floating(target, event);
     else if (event.type === 'death') {

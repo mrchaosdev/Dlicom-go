@@ -27,6 +27,8 @@ for (const file of [
   'defeat.wav',
   'reward.wav',
   'legendary.wav',
+  'hammer.wav',
+  'shield-break.wav',
 ])
   if (!existsSync(`public/assets/${file}`)) throw new Error(`Asset missing: ${file}`);
 console.log(

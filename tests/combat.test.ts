@@ -27,6 +27,21 @@ describe('combat rules', () => {
   });
   it('absorbs shield before hp', () =>
     expect(absorbDamage(100, 40, 60)).toEqual({ hp: 80, shield: 0, absorbed: 40, lostHp: 20 }));
+  it('emits a shield-break event when an incoming hit drains the shield', () => {
+    const e = battle({ shield: 100, stats: { dodgeRate: 0 }, enemies: [dummy(1000)] });
+    const events = e.step();
+    const damage = events.findIndex((event) => event.type === 'damage' && event.target === 'dili');
+    const broken = events.findIndex((event) => event.type === 'shield_break');
+    expect(events[broken]).toMatchObject({
+      type: 'shield_break',
+      source: 'dili',
+      target: 'dili',
+      amount: 100,
+      label: 'SHIELD BREAK',
+    });
+    expect(broken).toBeGreaterThan(damage);
+    expect(e.hero.shield).toBe(0);
+  });
   it('caps combo at three extra attacks by default and five with Endless Feed', () => {
     const a = battle({ stats: { comboRate: 1 } });
     a.step();
