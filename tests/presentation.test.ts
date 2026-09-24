@@ -21,7 +21,7 @@ describe('combat presentation cues', () => {
     expect(queue[3]).toBe(events[2]);
     expect(eventDuration(queue[0])).toBe(70);
     expect(eventDuration(queue[2])).toBe(150);
-    expect(turnDuration(Array.from({ length: 12 }, () => events[1]))).toBe(4070);
+    expect(turnDuration(Array.from({ length: 12 }, () => events[1]))).toBe(5390);
   });
 
   it('keeps ordinary Rage gain out of the animation queue', () => {
@@ -30,5 +30,17 @@ describe('combat presentation cues', () => {
       { type: 'damage', source: 'dili', target: 'spam_bot_1', amount: 100, label: 'Packet' },
     ];
     expect(buildPresentationQueue(events)).toEqual([events[1]]);
+  });
+
+  it('keeps each damage cue open until its projectile and impact finish', () => {
+    const hit: CombatEvent = {
+      type: 'damage', source: 'dili', target: 'spam_bot_1', amount: 100, label: 'Packet',
+    };
+    expect(eventDuration(hit)).toBe(290);
+    expect(eventDuration({ ...hit, crit: true })).toBe(350);
+    expect(eventDuration({ ...hit, label: 'Ban Hammer' })).toBe(520);
+    expect(eventDuration({ ...hit, label: 'Viral Explosion' })).toBe(460);
+    expect(eventDuration({ ...hit, source: 'boss_spam_king' })).toBe(330);
+    expect(eventDuration({ ...hit, tag: 'status' })).toBe(220);
   });
 });

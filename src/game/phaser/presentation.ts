@@ -1,4 +1,6 @@
 import type { CombatEvent } from '../combat/types';
+export const BASIC_PROJECTILE_MS = 150;
+export const BOSS_PROJECTILE_MS = 190;
 export type PresentationCue =
   | CombatEvent
   | { type: 'crit_anticipation' | 'rage_burst'; source: string; target: string };
@@ -22,7 +24,14 @@ export const eventDuration = (event: PresentationCue): number => {
   if (event.type === 'rage_burst') return 150;
   if (event.type === 'warning') return 600;
   if (event.type === 'ultimate') return 800;
-  if (event.type === 'damage') return 240;
+  if (event.type === 'damage') {
+    if (event.tag === 'status' || event.tag === 'reflect') return 220;
+    const travel = event.source.startsWith('boss_') ? BOSS_PROJECTILE_MS : BASIC_PROJECTILE_MS;
+    const impact = event.label === 'Ban Hammer' ? 360
+      : event.label === 'Viral Explosion' ? 300
+        : event.crit ? 190 : 130;
+    return travel + impact + 10;
+  }
   if (event.type === 'summon' || event.type === 'death') return 300;
   return 150;
 };

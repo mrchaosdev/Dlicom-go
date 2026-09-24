@@ -59,15 +59,15 @@ Impact objects, skill-art overlay, projectiles, enemy pulse rings and damage num
 
 | Cue | Presentation time | Readability rule |
 | --- | --- | --- |
-| Basic projectile | 140 ms; boss projectile 190 ms | Cyan or boss color, one reused projectile object |
-| Basic impact | 130 ms | Reused spark and ring, damage number and a brief enemy flash/knockback |
+| Basic projectile | 150 ms; boss projectile 190 ms | Cyan or boss color, one reused projectile object; direct-hit effects wait for arrival |
+| Basic impact | 130 ms after arrival | Reused spark and ring, damage number and a brief enemy flash/knockback |
 | Crit anticipation / impact | 70 ms / 190 ms | Gold source ring before damage, larger number and restrained shake |
 | Ban Hammer | 360 ms | Hammer image descends, magenta ring and stronger shake |
 | Viral Explosion | 280-300 ms | Viral image expands and impact ring covers a wider area |
 | Rage burst / Ultimate | 150 ms / 700-800 ms | Rage icon flashes before Dili's network wave; no long cinematic |
 | Boss warning | 600 ms | Source ring, flash and label before the major move |
 
-Normal Rage gain has no floating text because it happens repeatedly; the HUD bar communicates progress. Reduced-motion mode keeps the meaningful pose, color, label and damage number but replaces travel, bounce and shake with short fades. Combat events always resolve before any of these effects, so a slow or skipped tween cannot change the battle result.
+Normal Rage gain has no floating text because it happens repeatedly; the HUD bar communicates progress. Direct damage cues present launch, projectile arrival, then impact and number in that order. Status and reflected damage impact immediately at the target. Each cue lasts through its projectile and main impact, including Ban Hammer and Viral Explosion, so later hits do not cut off their main effect. Reduced-motion mode keeps the meaningful pose, color, label and damage number but replaces travel, bounce and shake with short fades. Combat events always resolve before any of these effects, so a slow or skipped tween cannot change the battle result.
 
 ## Enemy and boss art
 

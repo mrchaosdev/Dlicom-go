@@ -6,7 +6,13 @@ import { useGame } from '../../stores/gameStore';
 import { playBossAttackSound, playSound } from '../../services/audio';
 import type { Actor, CombatEvent } from '../combat/types';
 import type { BattleSnapshot } from '../combat/CombatEngine';
-import { buildPresentationQueue, eventDuration, type PresentationCue } from './presentation';
+import {
+  BASIC_PROJECTILE_MS,
+  BOSS_PROJECTILE_MS,
+  buildPresentationQueue,
+  eventDuration,
+  type PresentationCue,
+} from './presentation';
 
 const BACKGROUND_PALETTES: Record<string, [number, number, number, number]> = {
   chapter_feed: [0x0d203c, 0x102947, 0x081321, 0x101525],
@@ -592,107 +598,116 @@ class BattleScene extends Phaser.Scene {
       const indirectDamage = event.tag === 'status' || event.tag === 'reflect';
       const bossAttack = event.source.startsWith('boss_') && !indirectDamage;
       if (event.source === 'dili' && !indirectDamage)
-        this.showHeroPose('dili_attack', event.crit ? 210 : 150);
-      else if (event.target === 'dili' && event.source !== 'dili')
-        this.showHeroPose('dili_hurt', 220);
-      if (!indirectDamage) {
-        if (event.label === 'Ban Hammer') playSound('hammer');
-        else if (bossAttack) playBossAttackSound(event.source);
-        else playSound(event.crit ? 'crit' : 'attack');
-      }
-      const hammer = event.label === 'Ban Hammer';
-      const viralExplosion = event.label === 'Viral Explosion';
-      const statusColor = event.tag === 'status' ? STATUS_COLORS[event.label.toLowerCase()] : undefined;
-      const impactColor = hammer
-        ? 0xff78c8
-        : viralExplosion
-          ? 0xc879ff
-          : statusColor ?? (bossAttack
-            ? BOSS_ATTACK_COLORS[event.source] ?? 0x76f5ff
-            : event.crit ? 0xffd773 : 0x76f5ff);
-      const reducedScale = reduced && (hammer || viralExplosion);
-      this.tweens.killTweensOf(this.impactRing);
-      this.impactRing
-        .setPosition(target.x, target.y)
-        .setStrokeStyle(hammer || viralExplosion || event.crit || statusColor ? 5 : 3, impactColor)
-        .setScale(0.35)
-        .setAlpha(0.95)
-        .setVisible(true);
-      this.tweens.add({
-        targets: this.impactRing,
-        scale: reducedScale
-          ? 2.5
-          : hammer
-            ? 4.6
-            : viralExplosion
-              ? 5.2
-              : statusColor
-                ? 2.9
-                : event.crit
-                  ? 3.2
-                  : 2.4,
-        alpha: 0,
-        duration: reduced
-          ? 100
-          : hammer
-            ? 360
-            : viralExplosion
-              ? 280
-              : statusColor
-                ? 210
-                : event.crit
-                  ? 190
-                  : 130,
-        onComplete: () => this.impactRing.setVisible(false),
-      });
-      this.tweens.killTweensOf(this.impactSpark);
-      this.impactSpark
-        .setPosition(target.x, target.y)
-        .setTint(impactColor)
-        .setScale(reduced ? 0.75 : 0.4)
-        .setAlpha(0.95)
-        .setVisible(true);
-      this.tweens.add({
-        targets: this.impactSpark,
-        scale: reduced ? 0.75 : event.crit ? 1.25 : 1,
-        alpha: 0,
-        duration: reduced ? 90 : 130,
-        onComplete: () => this.impactSpark.setVisible(false),
-      });
-      if (hammer || viralExplosion) {
-        this.tweens.killTweensOf(this.skillImpact);
-        this.skillImpact
-          .setTexture(hammer ? 'skill_hammer' : 'skill_viral')
-          .setPosition(target.x, target.y - (hammer && !reduced ? 34 : 0))
-          .setScale(hammer ? 0.35 : 0.22)
-          .setAngle(0)
-          .setAlpha(0.85)
+        this.showHeroPose('dili_attack', event.crit ? 300 : 230);
+      const impact = () => {
+        if (!target.active) return;
+        if (event.target === 'dili' && event.source !== 'dili')
+          this.showHeroPose('dili_hurt', 220);
+        if (!indirectDamage) {
+          if (event.label === 'Ban Hammer') playSound('hammer');
+          else if (bossAttack) playBossAttackSound(event.source);
+          else playSound(event.crit ? 'crit' : 'attack');
+        }
+        const hammer = event.label === 'Ban Hammer';
+        const viralExplosion = event.label === 'Viral Explosion';
+        const statusColor = event.tag === 'status' ? STATUS_COLORS[event.label.toLowerCase()] : undefined;
+        const impactColor = hammer
+          ? 0xff78c8
+          : viralExplosion
+            ? 0xc879ff
+            : statusColor ?? (bossAttack
+              ? BOSS_ATTACK_COLORS[event.source] ?? 0x76f5ff
+              : event.crit ? 0xffd773 : 0x76f5ff);
+        const reducedScale = reduced && (hammer || viralExplosion);
+        this.tweens.killTweensOf(this.impactRing);
+        this.impactRing
+          .setPosition(target.x, target.y)
+          .setStrokeStyle(hammer || viralExplosion || event.crit || statusColor ? 5 : 3, impactColor)
+          .setScale(0.35)
+          .setAlpha(0.95)
           .setVisible(true);
         this.tweens.add({
-          targets: this.skillImpact,
-          alpha: 0,
-          ...(reduced
-            ? {}
+          targets: this.impactRing,
+          scale: reducedScale
+            ? 2.5
             : hammer
-              ? { y: target.y - 4, scale: 0.5, angle: -10 }
-              : { scale: 0.72, angle: 18 }),
-          duration: reduced ? 100 : hammer ? 360 : 300,
-          onComplete: () => this.skillImpact.setVisible(false),
+              ? 4.6
+              : viralExplosion
+                ? 5.2
+                : statusColor
+                  ? 2.9
+                  : event.crit
+                    ? 3.2
+                    : 2.4,
+          alpha: 0,
+          duration: reduced
+            ? 100
+            : hammer
+              ? 360
+              : viralExplosion
+                ? 280
+                : statusColor
+                  ? 210
+                  : event.crit
+                    ? 190
+                    : 130,
+          onComplete: () => this.impactRing.setVisible(false),
         });
-      }
-      if (!reduced && bossAttack) this.cameras.main.shake(100, 0.0025);
-      else if (!reduced && hammer) this.cameras.main.shake(120, 0.009);
-      else if (event.crit && !reduced) this.cameras.main.shake(90, 0.005);
-      if (event.target === 'dili' && event.source !== 'dili' && !reduced) {
-        target.setTint(0xff607c);
+        this.tweens.killTweensOf(this.impactSpark);
+        this.impactSpark
+          .setPosition(target.x, target.y)
+          .setTint(impactColor)
+          .setScale(reduced ? 0.75 : 0.4)
+          .setAlpha(0.95)
+          .setVisible(true);
         this.tweens.add({
-          targets: target,
-          alpha: 0.7,
-          duration: 70,
-          yoyo: true,
-          onComplete: () => target.clearTint().setAlpha(1),
+          targets: this.impactSpark,
+          scale: reduced ? 0.75 : event.crit ? 1.25 : 1,
+          alpha: 0,
+          duration: reduced ? 90 : 130,
+          onComplete: () => this.impactSpark.setVisible(false),
         });
-      }
+        if (hammer || viralExplosion) {
+          this.tweens.killTweensOf(this.skillImpact);
+          this.skillImpact
+            .setTexture(hammer ? 'skill_hammer' : 'skill_viral')
+            .setPosition(target.x, target.y - (hammer && !reduced ? 34 : 0))
+            .setScale(hammer ? 0.35 : 0.22)
+            .setAngle(0)
+            .setAlpha(0.85)
+            .setVisible(true);
+          this.tweens.add({
+            targets: this.skillImpact,
+            alpha: 0,
+            ...(reduced
+              ? {}
+              : hammer
+                ? { y: target.y - 4, scale: 0.5, angle: -10 }
+                : { scale: 0.72, angle: 18 }),
+            duration: reduced ? 100 : hammer ? 360 : 300,
+            onComplete: () => this.skillImpact.setVisible(false),
+          });
+        }
+        if (!reduced && bossAttack) this.cameras.main.shake(100, 0.0025);
+        else if (!reduced && hammer) this.cameras.main.shake(120, 0.009);
+        else if (event.crit && !reduced) this.cameras.main.shake(90, 0.005);
+        if (event.target === 'dili' && event.source !== 'dili' && !reduced) {
+          target.setTint(0xff607c);
+          this.tweens.add({
+            targets: target,
+            alpha: 0.7,
+            duration: 70,
+            yoyo: true,
+            onComplete: () => target.clearTint().setAlpha(1),
+          });
+        }
+        if (event.target === 'dili') {
+          if (!reduced) this.tweens.add({ targets: target, angle: 5, duration: 70, yoyo: true });
+        } else {
+          this.flashEnemy(target, event.target, event.crit ? 0xffe2a8 : 0xd4faff, reduced);
+        }
+        this.floating(target, event);
+      };
       if (source && !reduced && !indirectDamage) {
         this.tweens.add({
           targets: source,
@@ -700,6 +715,7 @@ class BattleScene extends Phaser.Scene {
           duration: bossAttack ? 95 : 65,
           yoyo: true,
         });
+        this.tweens.killTweensOf(this.projectile);
         this.projectile
           .setFillStyle(
             event.label.startsWith('DliClip')
@@ -715,16 +731,13 @@ class BattleScene extends Phaser.Scene {
           targets: this.projectile,
           x: target.x,
           y: target.y,
-          duration: bossAttack ? 190 : 140,
-          onComplete: () => this.projectile.setVisible(false),
+          duration: bossAttack ? BOSS_PROJECTILE_MS : BASIC_PROJECTILE_MS,
+          onComplete: () => {
+            this.projectile.setVisible(false);
+            impact();
+          },
         });
-      }
-      if (event.target === 'dili') {
-        if (!reduced) this.tweens.add({ targets: target, angle: 5, duration: 70, yoyo: true });
-      } else {
-        this.flashEnemy(target, event.target, event.crit ? 0xffe2a8 : 0xd4faff, reduced);
-      }
-      this.floating(target, event);
+      } else impact();
     } else if (event.type === 'dodge' || event.type === 'heal' || event.type === 'shield') {
       if (event.type === 'dodge' && event.target === 'dili') this.showHeroPose('dili_idle', 0);
       playSound(event.type);
