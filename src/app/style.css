@@ -1064,17 +1064,17 @@ footer i {
   padding: 0;
   position: relative;
 }
-.battle-app {
+.run-app {
   height: 100dvh;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
-.battle-app .site-header {
+.run-app .site-header {
   width: 100%;
   flex-shrink: 0;
 }
-.battle-app main {
+.run-app main {
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -1082,9 +1082,15 @@ footer i {
   display: flex;
   flex-direction: column;
 }
-.battle-app .run-heading {
+.run-app .run-heading {
   flex-shrink: 0;
   padding: 12px 0;
+}
+.run-app .play-layout {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 4px;
 }
 .battle-app .battle-layout {
   display: flex;
@@ -1092,6 +1098,7 @@ footer i {
   min-height: 0;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 .battle-app .phase-battle {
   width: min(100%, calc((100dvh - 416px) * 760 / 510));
@@ -1116,7 +1123,7 @@ footer i {
   max-height: 28dvh;
   overflow-y: auto;
 }
-.battle-app footer {
+.run-app footer {
   display: none;
 }
 .battle-toolbar {

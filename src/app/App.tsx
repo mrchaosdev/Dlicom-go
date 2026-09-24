@@ -945,7 +945,7 @@ export default function App() {
   }, []);
   const inRun = screen === 'play' && run?.phase !== 'summary';
   return (
-    <div className={`app${save.settings.reducedMotion ? ' reduced-motion' : ''}${screen === 'play' && run?.phase === 'battle' ? ' battle-app' : ''}`}>
+    <div className={`app${save.settings.reducedMotion ? ' reduced-motion' : ''}${screen === 'play' && run && run.phase !== 'summary' ? ' run-app' : ''}${screen === 'play' && run?.phase === 'battle' ? ' battle-app' : ''}`}>
       <header className="site-header">
         <button className="brand" onClick={() => navigate('home')} aria-label="Dlicom Attack home">
           <span className="brand-symbol">

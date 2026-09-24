@@ -32,6 +32,7 @@ test('automatic battle pauses, changes speed and reaches a three-choice draft', 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
   await page.getByRole('button', { name: /Data lane/ }).click();
   await expect(page.locator('canvas')).toBeVisible();
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
@@ -57,6 +58,7 @@ test('automatic battle pauses, changes speed and reaches a three-choice draft', 
   await expect(page.getByRole('heading', { name: 'A little more unreasonable.' })).toBeVisible({
     timeout: 30000,
   });
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
   await expect(page.locator('.skill-card')).toHaveCount(3);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole('button', { name: /Reroll/ }).click();
