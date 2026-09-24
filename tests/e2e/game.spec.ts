@@ -36,6 +36,22 @@ test('automatic battle pauses, changes speed and reaches a three-choice draft', 
   await expect(page.locator('canvas')).toBeVisible();
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await expect(page.getByText('Connection paused')).toBeVisible();
+  for (const [width, height] of [[360, 800], [390, 844], [412, 915], [768, 1024], [1366, 768]]) {
+    await page.setViewportSize({ width, height });
+    await expect.poll(() => page.evaluate(() => {
+      const battle = document.querySelector('.phase-battle')!.getBoundingClientRect();
+      const canvas = document.querySelector('.battle-canvas canvas')!.getBoundingClientRect();
+      const bottomNav = innerWidth <= 480 ? 62 : 0;
+      return document.documentElement.scrollHeight <= innerHeight
+        && document.documentElement.scrollWidth <= innerWidth
+        && battle.bottom <= innerHeight - bottomNav
+        && canvas.top >= battle.top
+        && canvas.bottom <= battle.bottom;
+    })).toBe(true);
+  }
+  await page.locator('.battle-build-toggle summary').click();
+  await expect(page.locator('.battle-build-popover')).toBeVisible();
+  await page.locator('.battle-build-toggle summary').click();
   await page.getByRole('button', { name: '×1', exact: true }).click();
   await page.getByRole('button', { name: 'Resume', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'A little more unreasonable.' })).toBeVisible({

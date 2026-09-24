@@ -613,6 +613,12 @@ function BattleScreen() {
           <small>TURN {snapshot.turn}</small>
         </div>
         <div>
+          <details className="battle-build-toggle">
+            <summary>
+              <Sparkles size={14} /> Build <small>{Object.keys(run.skills).length}</small>
+            </summary>
+            <div className="battle-build-popover"><BuildPanel /></div>
+          </details>
           <Button onClick={toggleSpeed} className="compact">
             <Gauge size={16} /> ×{speed}
           </Button>
@@ -886,7 +892,7 @@ function PlayScreen() {
         </span>
         <span className="chip">{run.bits} BITS</span>
       </div>
-      <div className="play-layout">
+      <div className={`play-layout${run.phase === 'battle' ? ' battle-layout' : ''}`}>
         <section className={`panel play-panel phase-${run.phase}`}>
           {run.phase === 'route' ? (
             <RouteScreen />
@@ -898,7 +904,7 @@ function PlayScreen() {
             <ChoiceScreen />
           )}
         </section>
-        <BuildPanel />
+        {run.phase !== 'battle' && <BuildPanel />}
       </div>
     </>
   );
@@ -939,7 +945,7 @@ export default function App() {
   }, []);
   const inRun = screen === 'play' && run?.phase !== 'summary';
   return (
-    <div className={save.settings.reducedMotion ? 'app reduced-motion' : 'app'}>
+    <div className={`app${save.settings.reducedMotion ? ' reduced-motion' : ''}${screen === 'play' && run?.phase === 'battle' ? ' battle-app' : ''}`}>
       <header className="site-header">
         <button className="brand" onClick={() => navigate('home')} aria-label="Dlicom Attack home">
           <span className="brand-symbol">

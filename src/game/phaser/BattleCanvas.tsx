@@ -722,7 +722,7 @@ export default function BattleCanvas() {
       height: 510,
       transparent: true,
       scene: current,
-      scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+      scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_HORIZONTALLY },
       render: { antialias: true },
       audio: { noAudio: true },
       banner: false,
