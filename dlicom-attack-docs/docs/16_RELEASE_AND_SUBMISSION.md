@@ -67,7 +67,7 @@ Prepare:
 - known limitations
 - version number
 
-The current media set is checked in under `artifacts/`: desktop home, mobile home, mobile battle, desktop skill draft, and a 20–40 second gameplay WebM. Start Vite and run `npm run capture:release` to refresh it from the current UI with a fixed demo seed. The browser-recorded clip is silent and still needs a soundtrack mix and human edit before submission; the deployed game URL is also pending.
+The current media set is checked in under `artifacts/`: desktop home, mobile home, mobile battle, desktop skill draft, and a 26-second gameplay WebM with the existing Feed soundtrack. Start Vite and run `npm run capture:release` to refresh it from the current UI with a fixed demo seed; FFmpeg must be available via `PATH` or `FFMPEG_PATH` to mux the soundtrack. Review the clip manually before submission; the deployed game URL is also pending.
 
 ---
 

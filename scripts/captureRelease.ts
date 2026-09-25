@@ -1,5 +1,5 @@
-import { mkdir } from 'node:fs/promises';
-import { readFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, unlink } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { chromium, expect } from '@playwright/test';
 
@@ -64,6 +64,23 @@ try {
   await clipContext.close();
   const clipPath = resolve(output, 'gameplay-clip.webm');
   await video.saveAs(clipPath);
+  const muxedClipPath = resolve(output, '.capture', 'gameplay-clip-muxed.webm');
+  const ffmpegPath = process.env.FFMPEG_PATH ?? 'ffmpeg';
+  let hasSoundtrack = false;
+  try {
+    execFileSync(ffmpegPath, [
+      '-hide_banner', '-loglevel', 'error', '-y',
+      '-i', clipPath,
+      '-stream_loop', '-1', '-i', 'public/assets/feed-loop.mp3',
+      '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy', '-c:a', 'libopus', '-b:a', '96k',
+      '-shortest', '-map_metadata', '-1', muxedClipPath,
+    ], { stdio: 'ignore' });
+    await copyFile(muxedClipPath, clipPath);
+    await unlink(muxedClipPath);
+    hasSoundtrack = true;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+  }
   const metadataPage = await browser.newPage();
   const encodedClip = (await readFile(clipPath)).toString('base64');
   const duration = await metadataPage.evaluate(async (base64) => {
@@ -83,7 +100,8 @@ try {
     throw new Error(`Gameplay clip duration ${duration.toFixed(1)}s is outside 20–40s.`);
   expect(errors).toEqual([]);
 
-  console.log(`Captured screenshots and a ${duration.toFixed(1)}s silent gameplay clip in artifacts/.`);
+  const audioStatus = hasSoundtrack ? 'with the Feed soundtrack' : 'silent (install FFmpeg to mix sound)';
+  console.log(`Captured screenshots and a ${duration.toFixed(1)}s gameplay clip ${audioStatus}.`);
 } finally {
   await browser.close();
 }
