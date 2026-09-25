@@ -67,6 +67,8 @@ Prepare:
 - known limitations
 - version number
 
+The current screenshot set is checked in under `artifacts/`: desktop home, mobile home, mobile battle, and desktop skill draft. Start Vite and run `npm run capture:release` to refresh them from the current UI with a fixed demo seed. The 20–40 second gameplay clip and deployed game URL are still pending.
+
 ---
 
 ## 6. Suggested submission copy

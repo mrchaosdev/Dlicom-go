@@ -13,6 +13,7 @@
     "lint": "eslint src tests scripts",
     "validate:content": "tsx scripts/validate.ts",
     "simulate": "tsx scripts/simulate.ts",
+    "capture:release": "tsx scripts/captureRelease.ts",
     "simulate:balance": "tsx scripts/verifyBalance.ts"
   },
   "dependencies": {

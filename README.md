@@ -6,6 +6,8 @@ Build an overpowered Dili, chain Dlicom-themed skills, and fight through a corru
 
 ![Dlicom Attack home](artifacts/home-desktop.png)
 
+Current release captures: [mobile home](artifacts/home-mobile.png), [mobile battle](artifacts/battle-mobile.png), and [desktop skill draft](artifacts/skill-draft-desktop.png). With the Vite dev server running, `npm run capture:release` regenerates these four screenshots in `artifacts/` using a fixed demo seed.
+
 ## Play locally
 
 Use Node.js 22 or newer.
