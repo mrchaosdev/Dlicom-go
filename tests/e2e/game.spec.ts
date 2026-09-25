@@ -180,7 +180,7 @@ test('status chips stay color coded and compact on a phone screen', async ({ pag
   });
   expect(layout).toMatchObject({ documentFits: true, panelFits: true, scrollbar: 'none' });
 });
-test('unlocked chapters load their own backdrop, boss art and soundtrack', async ({ page }) => {
+test('unlocked chapters load their own backdrop, boss art and soundtrack', async ({ page, browserName }) => {
   await page.goto('/');
   await page.evaluate(async () => {
     const path = performance.getEntriesByType('resource').map((e) => e.name)
@@ -192,10 +192,10 @@ test('unlocked chapters load their own backdrop, boss art and soundtrack', async
   });
   await page.reload();
   for (const chapter of [
-    ['The Feed', 'spam-king.png', 'feed-loop.wav', ['spam-bot.png', 'scam-link.png', 'bug.png'], 'background-feed-city.png'],
-    ['DliClips', 'loop-phantom.png', 'dliclips-loop.wav', ['fake-account.png', 'data-leech.png', 'corrupted-clip.png'], 'background-dliclip-stream.png'],
-    ['Dili Rooms', 'raid-master.png', 'rooms-loop.wav', ['toxic-reply.png', 'popup.png', 'raid-bot.png'], 'background-dili-rooms.png'],
-    ['Core Network', 'null-exe.png', 'core-loop.wav', ['null-fragment.png', 'data-leech.png', 'corrupted-clip.png'], 'background-core-network.png'],
+    ['The Feed', 'spam-king.png', 'feed-loop.mp3', ['spam-bot.png', 'scam-link.png', 'bug.png'], 'background-feed-city.webp'],
+    ['DliClips', 'loop-phantom.png', 'dliclips-loop.mp3', ['fake-account.png', 'data-leech.png', 'corrupted-clip.png'], 'background-dliclip-stream.webp'],
+    ['Dili Rooms', 'raid-master.png', 'rooms-loop.mp3', ['toxic-reply.png', 'popup.png', 'raid-bot.png'], 'background-dili-rooms.webp'],
+    ['Core Network', 'null-exe.png', 'core-loop.mp3', ['null-fragment.png', 'data-leech.png', 'corrupted-clip.png'], 'background-core-network.webp'],
   ] as const) {
     await page.getByRole('button', { name: new RegExp(chapter[0]) }).click();
     await page.getByRole('button', { name: /Data lane/ }).click();
@@ -209,6 +209,25 @@ test('unlocked chapters load their own backdrop, boss art and soundtrack', async
     chapter[1])).toBe(true);
     const soundtrack = await page.request.get(`/assets/${chapter[2]}`);
     expect(soundtrack.ok()).toBe(true);
+    const decoded = await page.evaluate(async ({ asset, browserName }) => {
+      const element = document.createElement('audio');
+      if (browserName === 'webkit' && !window.AudioContext)
+        return { format: element.canPlayType('audio/mpeg'), duration: null, channels: null };
+      const response = await fetch(`/assets/${asset}`);
+      const context = new AudioContext();
+      try {
+        const audio = await context.decodeAudioData(await response.arrayBuffer());
+        return { format: 'decoded', duration: audio.duration, channels: audio.numberOfChannels };
+      } finally {
+        await context.close();
+      }
+    }, { asset: chapter[2], browserName });
+    expect(decoded.format).not.toBe('');
+    if (decoded.duration !== null) {
+      expect(decoded.channels).toBe(1);
+      expect(decoded.duration).toBeGreaterThan(7.9);
+      expect(decoded.duration).toBeLessThan(8.1);
+    }
     await expect.poll(() => page.evaluate((asset) =>
       performance.getEntriesByType('resource').some((entry) => entry.name.includes(asset)),
     chapter[4])).toBe(true);

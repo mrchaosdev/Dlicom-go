@@ -1,4 +1,7 @@
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+const sourceAudioDirectory = 'dlicom-attack-docs/assets/audio-source';
+mkdirSync(sourceAudioDirectory, { recursive: true });
 function wav(file, duration, sample) {
   const rate = 22050,
     count = Math.floor(duration * rate),
@@ -18,7 +21,7 @@ function wav(file, duration, sample) {
   out.writeUInt32LE(count * 2, 40);
   for (let i = 0; i < count; i++)
     out.writeInt16LE(Math.round(Math.max(-1, Math.min(1, sample(i / rate))) * 32767), 44 + i * 2);
-  writeFileSync(`public/assets/${file}.wav`, out);
+  writeFileSync(`${sourceAudioDirectory}/${file}.wav`, out);
 }
 wav(
   'attack',
@@ -108,3 +111,19 @@ loop('core-loop',
   [110, 130.81, 146.83, 164.81, 123.47, 146.83, 164.81, 220, 110, 130.81, 155.56, 164.81, 103.83, 123.47, 146.83, 196],
   { bass: [55, 65.41, 51.91, 61.74], pluck: 0.08, overtone: 0.045, low: 0.095, decay: 5, kick: 42, pulse: 0.055 },
 );
+
+const audioFiles = [
+  'attack', 'crit', 'ultimate', 'select', 'dodge', 'heal', 'shield', 'death', 'boss-intro',
+  'victory', 'defeat', 'reward', 'legendary', 'hammer', 'shield-break', 'boss-king-attack',
+  'boss-phantom-attack', 'boss-raid-attack', 'boss-null-attack', 'feed-loop', 'dliclips-loop',
+  'rooms-loop', 'core-loop',
+];
+const ffmpeg = process.env.FFMPEG_PATH ?? 'ffmpeg';
+for (const file of audioFiles) {
+  execFileSync(ffmpeg, [
+    '-hide_banner', '-loglevel', 'error', '-y',
+    '-i', `${sourceAudioDirectory}/${file}.wav`,
+    '-map_metadata', '-1', '-codec:a', 'libmp3lame', '-b:a', '96k', '-ar', '22050', '-ac', '1',
+    `public/assets/${file}.mp3`,
+  ]);
+}

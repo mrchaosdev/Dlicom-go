@@ -1,13 +1,13 @@
 import { SKILLS } from '../src/content/skills';
 import { EQUIPMENT } from '../src/content/equipment';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync, statSync } from 'node:fs';
 import { validateContent } from '../src/content/validate';
 validateContent();
 for (const file of [
-  'background-feed-city.png',
-  'background-dliclip-stream.png',
-  'background-dili-rooms.png',
-  'background-core-network.png',
+  'background-feed-city.webp',
+  'background-dliclip-stream.webp',
+  'background-dili-rooms.webp',
+  'background-core-network.webp',
   'dili-idle.png',
   'dili-attack.png',
   'dili-hurt.png',
@@ -39,31 +39,53 @@ for (const file of [
   'loop-phantom.png',
   'raid-master.png',
   'null-exe.png',
-  'dliclips-loop.wav',
-  'rooms-loop.wav',
-  'core-loop.wav',
-  'feed-loop.wav',
-  'attack.wav',
-  'crit.wav',
-  'ultimate.wav',
-  'select.wav',
-  'dodge.wav',
-  'heal.wav',
-  'shield.wav',
-  'death.wav',
-  'boss-intro.wav',
-  'victory.wav',
-  'defeat.wav',
-  'reward.wav',
-  'legendary.wav',
-  'hammer.wav',
-  'shield-break.wav',
-  'boss-king-attack.wav',
-  'boss-phantom-attack.wav',
-  'boss-raid-attack.wav',
-  'boss-null-attack.wav',
+  'dliclips-loop.mp3',
+  'rooms-loop.mp3',
+  'core-loop.mp3',
+  'feed-loop.mp3',
+  'attack.mp3',
+  'crit.mp3',
+  'ultimate.mp3',
+  'select.mp3',
+  'dodge.mp3',
+  'heal.mp3',
+  'shield.mp3',
+  'death.mp3',
+  'boss-intro.mp3',
+  'victory.mp3',
+  'defeat.mp3',
+  'reward.mp3',
+  'legendary.mp3',
+  'hammer.mp3',
+  'shield-break.mp3',
+  'boss-king-attack.mp3',
+  'boss-phantom-attack.mp3',
+  'boss-raid-attack.mp3',
+  'boss-null-attack.mp3',
 ])
   if (!existsSync(`public/assets/${file}`)) throw new Error(`Asset missing: ${file}`);
+for (const file of [
+  'background-feed-city.webp',
+  'background-dliclip-stream.webp',
+  'background-dili-rooms.webp',
+  'background-core-network.webp',
+]) {
+  const bytes = statSync(`public/assets/${file}`).size;
+  if (bytes > 200_000) throw new Error(`Compressed background too large: ${file} (${bytes} > 200000)`);
+}
+for (const file of [
+  'dliclips-loop.mp3', 'rooms-loop.mp3', 'core-loop.mp3', 'feed-loop.mp3',
+  'attack.mp3', 'crit.mp3', 'ultimate.mp3', 'select.mp3', 'dodge.mp3', 'heal.mp3',
+  'shield.mp3', 'death.mp3', 'boss-intro.mp3', 'victory.mp3', 'defeat.mp3', 'reward.mp3',
+  'legendary.mp3', 'hammer.mp3', 'shield-break.mp3', 'boss-king-attack.mp3',
+  'boss-phantom-attack.mp3', 'boss-raid-attack.mp3', 'boss-null-attack.mp3',
+]) {
+  const bytes = statSync(`public/assets/${file}`).size;
+  if (bytes > 120_000) throw new Error(`Compressed audio too large: ${file} (${bytes} > 120000)`);
+}
+for (const file of readdirSync('public/assets'))
+  if (file.endsWith('.wav') || /^background-.*\.png$/i.test(file))
+    throw new Error(`Source-only media must stay outside public/assets: ${file}`);
 console.log(
   `Validated ${SKILLS.length} skills, ${EQUIPMENT.length} equipment definitions and all runtime assets.`,
 );

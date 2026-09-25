@@ -35,10 +35,10 @@ Dili:
 
 ## Backgrounds
 
-- [ ] Feed City
-- [ ] DliClip Stream
-- [ ] Dili Rooms
-- [ ] Core Network
+- [x] Feed City
+- [x] DliClip Stream
+- [x] Dili Rooms
+- [x] Core Network
 
 ## VFX
 
@@ -82,19 +82,19 @@ At least:
 
 ## Audio
 
-- [ ] 4 music loops or 1 strong reusable loop
-- [ ] attack
-- [ ] crit
-- [ ] hammer
-- [ ] ultimate
-- [ ] shield
-- [ ] break
-- [ ] enemy death
-- [ ] boss intro
-- [ ] victory
-- [ ] defeat
-- [ ] skill select
-- [ ] legendary
+- [x] 4 music loops or 1 strong reusable loop
+- [x] attack
+- [x] crit
+- [x] hammer
+- [x] ultimate
+- [x] shield
+- [x] break
+- [x] enemy death
+- [x] boss intro
+- [x] victory
+- [x] defeat
+- [x] skill select
+- [x] legendary
 
 ## Text content
 

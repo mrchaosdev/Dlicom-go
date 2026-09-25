@@ -31,7 +31,7 @@ Targets:
 - initial bundle reasonable
 - lazy load later chapter assets
 - preload only current chapter
-- compressed audio
+- compressed MP3 music and SFX, generated from reproducible WAV masters
 - WebP/AVIF backgrounds where practical
 
 ---

@@ -12,7 +12,7 @@ The visual anchor is the supplied Dili mascot: rounded helmet and speech-bubble 
 | Normal enemies | Transparent 512 x 512 PNGs | 155 logical px wide, including elites |
 | Bosses | Transparent 768 x 768 PNGs | 245 logical px wide, larger than Dili |
 | Skill archetype icons | Transparent 256 x 256 PNGs | Draft cards, owned-skill list and selected battle effects |
-| Battle backgrounds | Four 1024 x 680 PNGs with procedural fallback | One environment per chapter, clear center floor behind fighters, two subtle moving parallax grids |
+| Battle backgrounds | Four 1024 x 680 WebPs with original PNG masters outside `public` and procedural fallback | One environment per chapter, clear center floor behind fighters, two subtle moving parallax grids |
 
 The battle canvas scales as one unit for desktop and mobile. At a 390 px phone width, the normal enemy silhouette is about 70 px wide and a boss about 110 px. Art is loaded per chapter through the central asset manifest rather than hardcoded URLs. Source and attribution are recorded in [asset credits](ASSET_CREDITS.md).
 
@@ -73,6 +73,8 @@ Normal Rage gain has no floating text because it happens repeatedly; the HUD bar
 ## Enemy and boss art
 
 All ten normal enemy kinds and four bosses now have distinct original transparent sprites. Raid Master's summoned Raid Minions share Raid Bot art. Existing enemies have idle breathing, attack lunge, colored hurt flash with short knockback, and defeat collapse; character-specific attack and hurt poses remain open. Elite tint returns after a hit. Reduced-motion mode keeps the flash without the knockback. Summoned minions stay hidden until their combat cue, enter with a colored pulse, and occupy separate positions around the boss instead of covering it. Defeated sprites and their idle tweens are released after the fade. The battle scene loads only the enemy art needed for its chapter, plus Spam Bot for Spam King's summons and Raid Bot for elites.
+
+Runtime audio uses 23 generated mono MP3s at 96 kbps. Reproducible WAV masters live outside `public`; content validation enforces a 120 KB audio and 200 KB background maximum and rejects source WAVs or original background PNGs inside the runtime asset folder.
 
 Bosses enter with a short sprite reveal and chapter-colored name banner before the first attack. Major moves show a warning icon above the boss during the existing 600 ms telegraph. Both cues use Phaser presentation objects and respect reduced motion, pause and battle speed; neither changes combat timing or results.
 
