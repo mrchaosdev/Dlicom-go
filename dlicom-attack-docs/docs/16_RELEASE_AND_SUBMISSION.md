@@ -67,7 +67,7 @@ Prepare:
 - known limitations
 - version number
 
-The current screenshot set is checked in under `artifacts/`: desktop home, mobile home, mobile battle, and desktop skill draft. Start Vite and run `npm run capture:release` to refresh them from the current UI with a fixed demo seed. The 20–40 second gameplay clip and deployed game URL are still pending.
+The current media set is checked in under `artifacts/`: desktop home, mobile home, mobile battle, desktop skill draft, and a 20–40 second gameplay WebM. Start Vite and run `npm run capture:release` to refresh it from the current UI with a fixed demo seed. The browser-recorded clip is silent and still needs a soundtrack mix and human edit before submission; the deployed game URL is also pending.
 
 ---
 

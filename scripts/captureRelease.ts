@@ -1,4 +1,6 @@
 import { mkdir } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { chromium, expect } from '@playwright/test';
 
 const output = 'artifacts';
@@ -14,7 +16,7 @@ try {
     + "{ configurable: true, value: () => 'release-capture-seed-2026' });",
   );
   await page.goto(process.env.RELEASE_CAPTURE_URL ?? 'http://127.0.0.1:5173');
-  await expect(page.getByRole('heading', { name: /Small hero/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /small hero/i })).toBeVisible();
   await page.screenshot({ path: `${output}/home-desktop.png`, fullPage: true });
 
   await page.setViewportSize({ width: 390, height: 844 });
@@ -34,7 +36,54 @@ try {
   await page.screenshot({ path: `${output}/skill-draft-desktop.png`, fullPage: true });
 
   expect(errors).toEqual([]);
-  console.log('Captured current release screenshots in artifacts/.');
+
+  const clipContext = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    recordVideo: { dir: `${output}/.capture`, size: { width: 1440, height: 900 } },
+  });
+  const clipPage = await clipContext.newPage();
+  clipPage.on('pageerror', (error) => errors.push(error.message));
+  await clipPage.addInitScript(
+    "Object.defineProperty(crypto, 'randomUUID', "
+    + "{ configurable: true, value: () => 'release-capture-seed-2026' });",
+  );
+  await clipPage.goto(process.env.RELEASE_CAPTURE_URL ?? 'http://127.0.0.1:5173');
+  await clipPage.waitForTimeout(2200);
+  await clipPage.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
+  await clipPage.getByRole('button', { name: /Data lane/ }).click();
+  await expect(clipPage.locator('.battle-canvas canvas').first()).toBeVisible();
+  await expect(clipPage.getByRole('heading', { name: 'A little more unreasonable.' }))
+    .toBeVisible({ timeout: 45000 });
+  await clipPage.waitForTimeout(4000);
+  await clipPage.locator('.skill-card').first().click();
+  await clipPage.locator('.route-card').first().click();
+  await expect(clipPage.locator('.battle-canvas canvas').first()).toBeVisible();
+  await clipPage.waitForTimeout(9000);
+  const video = clipPage.video();
+  if (!video) throw new Error('Playwright did not create the gameplay video.');
+  await clipContext.close();
+  const clipPath = resolve(output, 'gameplay-clip.webm');
+  await video.saveAs(clipPath);
+  const metadataPage = await browser.newPage();
+  const encodedClip = (await readFile(clipPath)).toString('base64');
+  const duration = await metadataPage.evaluate(async (base64) => {
+    const binary = atob(base64);
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    const videoElement = document.createElement('video');
+    videoElement.src = URL.createObjectURL(new Blob([bytes], { type: 'video/webm' }));
+    document.body.append(videoElement);
+    await new Promise<void>((resolve, reject) => {
+      videoElement.onloadedmetadata = () => resolve();
+      videoElement.onerror = () => reject(new Error('Could not read captured clip metadata.'));
+    });
+    return videoElement.duration;
+  }, encodedClip);
+  await metadataPage.close();
+  if (duration < 20 || duration > 40)
+    throw new Error(`Gameplay clip duration ${duration.toFixed(1)}s is outside 20–40s.`);
+  expect(errors).toEqual([]);
+
+  console.log(`Captured screenshots and a ${duration.toFixed(1)}s silent gameplay clip in artifacts/.`);
 } finally {
   await browser.close();
 }

@@ -8,3 +8,4 @@ playwright-report/
 *.log
 .vercel/
 artifacts/*-trace.zip
+artifacts/.capture/
