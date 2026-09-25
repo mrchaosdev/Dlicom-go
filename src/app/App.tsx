@@ -648,15 +648,18 @@ function BattleScreen() {
                   <small>{enemy.modifier}</small>
                 </span>
                 <Meter value={presentedVitals[enemy.id]?.hp ?? enemy.hp} max={enemy.stats.maxHp} label={enemy.name} />
-                {enemy.statuses.map((s) => (
-                  <button
-                    className="status-chip"
-                    key={s.id}
-                    onClick={() => setInspected(`${title(s.id)} · ${s.turns} turn(s) remaining`)}
-                  >
-                    {s.id} {s.turns}
-                  </button>
-                ))}
+                <div className="status-row">
+                  {enemy.statuses.map((s) => (
+                    <button
+                      className="status-chip"
+                      data-status={s.id}
+                      key={s.id}
+                      onClick={() => setInspected(`${title(s.id)} · ${s.turns} turn(s) remaining`)}
+                    >
+                      {s.id} {s.turns}
+                    </button>
+                  ))}
+                </div>
               </div>
             ))}
         </div>
@@ -678,15 +681,18 @@ function BattleScreen() {
           </div>
           <Meter value={presentedVitals.dili?.hp ?? snapshot.hero.hp} max={snapshot.hero.stats.maxHp} label="INTEGRITY" />
           <Meter value={snapshot.rage} max={100} label="DLI OVERDRIVE" kind="rage" />
-          {snapshot.hero.statuses.map((s) => (
-            <button
-              className="status-chip"
-              key={s.id}
-              onClick={() => setInspected(`${title(s.id)} · ${s.turns} turn(s) remaining`)}
-            >
-              {s.id} {s.turns}
-            </button>
-          ))}
+          <div className="status-row">
+            {snapshot.hero.statuses.map((s) => (
+              <button
+                className="status-chip"
+                data-status={s.id}
+                key={s.id}
+                onClick={() => setInspected(`${title(s.id)} · ${s.turns} turn(s) remaining`)}
+              >
+                {s.id} {s.turns}
+              </button>
+            ))}
+          </div>
           {inspected && (
             <p className="status-info" role="status">
               {inspected}

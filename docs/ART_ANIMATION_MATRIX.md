@@ -49,6 +49,7 @@ All eight skill archetypes now have original 256 × 256 transparent icons in the
 | Firewall / Shield | Cyan shield pulse and separate shield-break cue |
 | Heal | Green pulse and heal sound |
 | Status damage | Status-colored impact without replaying attack motion or sound |
+| Active statuses | Burn, Glitch, Vulnerable, Silence, Slow, Corrupted and Marked chips use matching colors and a short entry cue; mobile status rows scroll horizontally without adding page height |
 | Ultimate | Dili charge pose, network wave, screen feedback and sound |
 | Rage full | 150 ms Rage-art burst immediately before Ultimate; ordinary Rage gains stay unobtrusive |
 | Dodge | Ghost fade and sidestep |

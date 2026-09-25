@@ -1128,6 +1128,13 @@ footer i {
 .battle-app .player-hud::-webkit-scrollbar {
   display: none;
 }
+.battle-app .player-hud .status-row,
+.battle-app .enemy-hud .status-row {
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
 .run-app footer {
   display: none;
 }
@@ -1234,6 +1241,18 @@ footer i {
 .enemy-hud .status-chip {
   pointer-events: all;
 }
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.status-row:empty {
+  display: none;
+}
+.status-row::-webkit-scrollbar {
+  display: none;
+}
 .battle-canvas {
   width: 100%;
   aspect-ratio: 760/510;
@@ -1291,6 +1310,52 @@ footer i {
   border-radius: 4px;
   min-height: 44px;
   margin: 4px 4px 0 0;
+}
+.status-row .status-chip {
+  flex: 0 0 auto;
+  margin: 0;
+}
+.status-chip[data-status] {
+  animation: status-applied 180ms ease-out both;
+}
+.status-chip[data-status='burn'] {
+  color: #ffbd82;
+  border-color: #a95c38;
+  background: #38251f;
+}
+.status-chip[data-status='glitch'] {
+  color: #d5a7ff;
+  border-color: #8058af;
+  background: #2b2140;
+}
+.status-chip[data-status='vulnerable'] {
+  color: #ff9dd1;
+  border-color: #b8538d;
+  background: #3a2035;
+}
+.status-chip[data-status='silence'] {
+  color: #a6d0ff;
+  border-color: #547bb4;
+  background: #202b43;
+}
+.status-chip[data-status='slow'] {
+  color: #8debe1;
+  border-color: #3e918d;
+  background: #1d3338;
+}
+.status-chip[data-status='corrupted'] {
+  color: #dda9ff;
+  border-color: #8754b0;
+  background: #30213f;
+}
+.status-chip[data-status='marked'] {
+  color: #ffe58b;
+  border-color: #a28538;
+  background: #37301d;
+}
+@keyframes status-applied {
+  from { transform: translateY(3px); filter: brightness(1.6); }
+  to { transform: translateY(0); filter: brightness(1); }
 }
 .status-info {
   font-size: 11px;
@@ -1615,6 +1680,7 @@ footer i {
 }
 @media (prefers-reduced-motion: reduce) {
   .skill-card { animation: none; }
+  .status-chip[data-status] { animation: none; }
   .skill-card:is(:hover, :focus-visible) .skill-art img { transform: none; }
 }
 .reduced-motion .skill-card:is(:hover, :focus-visible) .skill-art img {

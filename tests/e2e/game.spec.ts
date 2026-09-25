@@ -135,6 +135,46 @@ test('late-run desktop battle keeps the arena and build visible without a scroll
       && getComputedStyle(document.querySelector('.battle-side-build')!).scrollbarWidth === 'none';
   })).toBe(true);
 });
+test('status chips stay color coded and compact on a phone screen', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
+  await page.getByRole('button', { name: /Data lane/ }).click();
+  await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  await expect(page.locator('.battle-canvas canvas').first()).toBeVisible();
+  await page.waitForTimeout(300);
+  await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    const { useGame } = await import(path);
+    const engine = useGame.getState().run!.engine!;
+    const statuses = ['burn', 'glitch', 'vulnerable', 'silence', 'slow', 'corrupted', 'marked'] as const;
+    engine.hero.statuses = statuses.map((id) => ({
+      id, turns: 2, stacks: 1, power: 0.1, source: 'spam_bot_0',
+    }));
+    engine.enemies[0].statuses = statuses.slice(0, 4).map((id) => ({
+      id, turns: 2, stacks: 1, power: 0.1, source: 'dili',
+    }));
+    useGame.setState({ snapshot: engine.snapshot() });
+  });
+  await expect(page.locator('.player-hud .status-chip')).toHaveCount(7);
+  await expect(page.locator('.enemy-hud .status-chip')).toHaveCount(4);
+  expect(await page.locator('.player-hud .status-chip[data-status="burn"]').evaluate((element) =>
+    getComputedStyle(element).color)).toBe('rgb(255, 189, 130)');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  expect(await page.locator('.player-hud .status-chip[data-status="burn"]').evaluate((element) =>
+    getComputedStyle(element).animationName)).toBe('none');
+  const layout = await page.evaluate(() => {
+    const panel = document.querySelector('.phase-battle')!;
+    const statusRow = document.querySelector('.player-hud .status-row')!;
+    return {
+      documentFits: document.documentElement.scrollHeight <= innerHeight,
+      panelFits: panel.scrollHeight <= panel.clientHeight,
+      scrollbar: getComputedStyle(statusRow).scrollbarWidth,
+    };
+  });
+  expect(layout).toMatchObject({ documentFits: true, panelFits: true, scrollbar: 'none' });
+});
 test('unlocked chapters load their own backdrop, boss art and soundtrack', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(async () => {
