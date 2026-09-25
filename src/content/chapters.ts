@@ -44,7 +44,7 @@ export const CHAPTERS: ChapterDefinition[] = [
   },
   {
     id: 'chapter_core', name: 'Core Network', theme: 'A corrupted cyber infrastructure surrounding the system core.', order: 4,
-    bossId: 'boss_null_exe', bossName: 'Null.exe', bossDescription: 'Glitch field at 60%, overclock below 25%, and an unavoidable NULL PULSE.', bossHp: 540, bossAtk: 12, multiplier: 2.4, eliteHp: 295, eliteAtk: 23,
+    bossId: 'boss_null_exe', bossName: 'Null.exe', bossDescription: 'Glitch field at 60%, overclock below 25%, and an unavoidable NULL PULSE.', bossHp: 940, bossAtk: 12, multiplier: 2.4, eliteHp: 295, eliteAtk: 23,
     enemyPool: [
       { id: 'null_fragment', name: 'Null Fragment', hp: 230, atk: 20, def: 45 },
       { id: 'data_leech', name: 'Data Leech', hp: 270, atk: 18, def: 28 },

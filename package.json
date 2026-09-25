@@ -12,7 +12,8 @@
     "test:e2e": "playwright test",
     "lint": "eslint src tests scripts",
     "validate:content": "tsx scripts/validate.ts",
-    "simulate": "tsx scripts/simulate.ts"
+    "simulate": "tsx scripts/simulate.ts",
+    "simulate:balance": "tsx scripts/verifyBalance.ts"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.3.0",

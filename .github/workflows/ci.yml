@@ -18,6 +18,7 @@ jobs:
       - run: npm run lint
       - run: npm run validate:content
       - run: npm test
+      - run: npm run simulate:balance
       - run: npm run build
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e

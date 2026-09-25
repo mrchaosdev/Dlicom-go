@@ -116,7 +116,7 @@ PLAY DLICOM ATTACK.
 - [x] save works (settings and upgraded equipment survive page reload)
 - [x] fresh isolated browser-context test (equivalent storage isolation; physical incognito check remains useful)
 - [x] chapter progression unlock behavior passes deterministic unit tests; all four chapter battle screens, chapter art, boss art and soundtracks load when unlocked
-- [x] all four bosses are killable in deterministic simulations (each chapter has recorded wins)
+- [x] all four bosses are killable in deterministic simulations; CI now checks each chapter's median winning TTK target
 - [x] runtime asset validator finds no missing or disallowed production assets; browser tests load each chapter's battle assets
 - [x] music and SFX settings controls are present; music-volume setting persists across reload
 - [x] mobile layouts fit documented phone viewports without page overflow

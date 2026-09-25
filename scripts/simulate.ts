@@ -13,6 +13,8 @@ let wins = 0,
   seconds = 0,
   spacingSeconds = 0;
 const combatSecondsPerRun: number[] = [];
+const bossVictorySeconds: number[] = [];
+const bossDefeatSeconds: number[] = [];
 const timings: Record<string, { battles: number; seconds: number }> = {};
 const reached: Record<number, number> = {};
 const defeatsByNode: Record<number, number> = {};
@@ -41,10 +43,12 @@ for (let i = 0; i < runs; i++) {
       const kind = NODES[run.node];
       timings[kind] ??= { battles: 0, seconds: 0 };
       timings[kind].battles++;
+      let encounterSeconds = 0;
       while (!run.engine!.outcome) {
         const events = run.engine!.step();
         const duration = turnDuration(events) / 1000;
         seconds += duration;
+        encounterSeconds += duration;
         runCombatSeconds += duration;
         spacingSeconds += duration - events.reduce((total, event) => total + eventDuration(event), 0) / 1000;
         timings[kind].seconds += duration;
@@ -53,6 +57,10 @@ for (let i = 0; i < runs; i++) {
       const battleNode = run.node + 1;
       const battleResults = run.engine!.outcome === 'victory' ? victoriesByNode : defeatsByNode;
       battleResults[battleNode] = (battleResults[battleNode] ?? 0) + 1;
+      if (kind === 'boss') {
+        const bossTimes = run.engine!.outcome === 'victory' ? bossVictorySeconds : bossDefeatSeconds;
+        bossTimes.push(encounterSeconds);
+      }
       damage += run.engine!.stats.damageDealt;
       run.finishBattle();
     } else if (run.phase === 'draft') {
@@ -79,6 +87,11 @@ for (let i = 0; i < runs; i++) {
 combatSecondsPerRun.sort((a, b) => a - b);
 const combatPercentile = (percent: number) =>
   Math.round(combatSecondsPerRun[Math.ceil((percent / 100) * combatSecondsPerRun.length) - 1]);
+const percentile = (values: number[], percent: number) => {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  return Math.round(sorted[Math.ceil((percent / 100) * sorted.length) - 1]);
+};
 console.log(
   JSON.stringify(
     {
@@ -93,6 +106,11 @@ console.log(
       p90CombatSecondsPerRun: combatPercentile(90),
       averageTurnSpacingSecondsPerRun: Math.round(spacingSeconds / runs),
       turnSpacingPercent: Math.round((spacingSeconds / seconds) * 100),
+      bossVictories: bossVictorySeconds.length,
+      bossDefeats: bossDefeatSeconds.length,
+      medianBossVictorySeconds: percentile(bossVictorySeconds, 50),
+      p90BossVictorySeconds: percentile(bossVictorySeconds, 90),
+      medianBossDefeatSeconds: percentile(bossDefeatSeconds, 50),
       averageSecondsByKind: Object.fromEntries(
         Object.entries(timings).map(([kind, value]) => [
           kind,
