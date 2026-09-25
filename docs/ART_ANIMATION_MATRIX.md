@@ -102,4 +102,4 @@ Bosses enter with a short sprite reveal and chapter-colored name banner before t
 2. Review Dili pose alignment, enemy silhouettes and boss scale on physical Android/iOS devices.
 3. Run human pacing, readability and worst-build performance playtests before calling art final.
 
-Automated validation checks that all runtime assets exist. Local verification covers typecheck, lint, unit tests, build and Chromium end-to-end flows; physical mobile and cross-browser art QA remain outstanding.
+Automated validation checks that all runtime assets exist. Local and CI verification covers typecheck, lint, unit tests, build and the full end-to-end suite on Chromium, Firefox and WebKit, including the documented mobile viewport sizes. Physical Android/iOS sprite-alignment review and human readability/performance playtests remain outstanding; the browser suite cannot substitute for those checks.

@@ -24,12 +24,12 @@ Boss attacks use chapter-colored impact sparks and projectiles so each boss has 
 
 Burn ticks and reflected damage present their impacts without replaying the source's attack sound, lunge, or projectile.
 
-- 52 unit/integration tests and 4 Chromium end-to-end tests pass, including deterministic chapter encounters, complete runs through all four bosses, chapter unlocking, chapter-specific battle and audio assets, save compatibility, shield-break feedback, and Null Pulse damage.
+- 57 unit/integration tests and 21 end-to-end tests pass. The browser suite runs all 7 flows on Chromium, Firefox, and WebKit, including responsive battle layouts, pause/speed/draft, impact-synchronized HUD, status readability, chapter assets, complete run screens, boss rewards, and save reload.
 - ESLint, TypeScript, production build, and content validation pass.
 - Deterministic balance simulations exercised 500 full runs for each chapter with level-6 unlocks and max-level equipment. The heuristic produced 78.8% wins for The Feed, 38.8% for DliClips, 27.0% for Dili Rooms, and 36.0% for Core Network. Core Network tuning reduced early-route attrition: all but 16 of 500 runs reached Null.exe, and the boss remained the main win gate. This is a stress/balance signal, not a human-playtest estimate; optimal build selection is not modeled.
 - A separate 100-seed pacing sample with unlocked equipment measured average combat time per run of 163s (Feed), 180s (DliClips), 157s (Rooms), and 143s (Core). The respective 90th-percentile times were 188s, 210s, 192s, and 166s. About 63–66% of modeled combat time is spacing between queued events. These figures exclude the first-battle delay, route transitions, player decisions, and menus; they cannot establish full run length or justify a timing change without playtesting.
-- The 8–15 minute session target, human balance, and actual mobile/browser coverage still require playtesting.
+- The 8–15 minute session target, human balance/readability, and actual physical mobile-device coverage still require playtesting. Automated browser coverage uses desktop Chromium, Firefox and WebKit with mobile viewport checks; it does not replace Android Chrome or iOS Safari devices.
 
 ## Remaining production work
 
-Final character/boss animation polish, a chapter-specific audio and VFX pass, human balance and pacing playtests, physical mobile and cross-browser QA, worst-build performance profiling, release build, and Vercel deployment verification remain open.
+Remaining external production checks are human balance/pacing/readability playtests, physical Android/iOS device review of sprite alignment and motion, worst-build performance profiling on target hardware, and Vercel production deployment verification. Add character-specific attack/hurt poses only if those playtests show the current reusable pose motion is unclear. The production build, content validation, unit suite, and Chromium/Firefox/WebKit browser suite are automated locally and in CI.

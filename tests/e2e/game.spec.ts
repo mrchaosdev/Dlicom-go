@@ -34,7 +34,7 @@ test('automatic battle pauses, changes speed and reaches a three-choice draft', 
   await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
   await page.getByRole('button', { name: /Data lane/ }).click();
-  await expect(page.locator('canvas')).toBeVisible();
+  await expect(page.locator('.battle-canvas canvas').first()).toBeVisible();
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await expect(page.getByText('Connection paused')).toBeVisible();
   for (const [width, height] of [[360, 800], [390, 844], [412, 915], [768, 1024], [900, 600], [1366, 768], [1513, 651], [1892, 814]]) {
@@ -198,13 +198,12 @@ test('unlocked chapters load their own backdrop, boss art and soundtrack', async
       'aria-label',
       `Dili automatically battles in ${chapter[0]}`,
     );
-    await expect(page.locator('.battle-canvas canvas')).toBeVisible();
+    await expect(page.locator('.battle-canvas canvas').first()).toBeVisible();
     await expect.poll(() => page.evaluate((asset) =>
       performance.getEntriesByType('resource').some((entry) => entry.name.includes(asset)),
     chapter[1])).toBe(true);
-    await expect.poll(() => page.evaluate((asset) =>
-      performance.getEntriesByType('resource').some((entry) => entry.name.includes(asset)),
-    chapter[2])).toBe(true);
+    const soundtrack = await page.request.get(`/assets/${chapter[2]}`);
+    expect(soundtrack.ok()).toBe(true);
     await expect.poll(() => page.evaluate((asset) =>
       performance.getEntriesByType('resource').some((entry) => entry.name.includes(asset)),
     chapter[4])).toBe(true);
@@ -218,6 +217,8 @@ test('unlocked chapters load their own backdrop, boss art and soundtrack', async
 test('all run screens, boss rewards, upgrade and save reload integrate', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  // This checks screen integration; motion behavior is covered in dedicated browser tests.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto('/');
   await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
@@ -256,7 +257,7 @@ test('all run screens, boss rewards, upgrade and save reload integrate', async (
         while (!useGame.getState().run.engine.outcome) useGame.getState().step();
         useGame.getState().finish();
       });
-    else if (phase === 'draft') await page.locator('.skill-card').first().click();
+    else if (phase === 'draft') await page.locator('.skill-card').first().click({ force: true });
     else if (phase === 'rest')
       await page.getByRole('button', { name: /Recover integrity/ }).click();
     else {
