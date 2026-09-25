@@ -38,7 +38,7 @@ Idle has a different source resolution from the other poses. Breathing now anima
 
 ## Skill art and effects
 
-All eight skill archetypes now have original 256 × 256 transparent icons in the central manifest: Packet, Hammer, Firewall, Moderation, Encryption, Viral, Rage, and Heal. The draft and owned-skill UI share these assets. Draft entry is staggered; keyboard focus and hover lift the art. Both the game setting and system reduced-motion preference suppress those animations.
+All eight skill archetypes have original 256 × 256 transparent icons in the central manifest: Packet, Hammer, Firewall, Moderation, Encryption, Viral, Rage, and Heal. Each of the 70 skill definitions also has a distinct semantic glyph layered over its archetype artwork in both draft cards and the owned-skill list. A content test requires exact skill coverage and 70 unique glyphs. Draft entry is staggered; keyboard focus and hover lift the art. Both the game setting and system reduced-motion preference suppress those animations.
 
 | Effect family | Current battle presentation |
 | --- | --- |
@@ -49,7 +49,7 @@ All eight skill archetypes now have original 256 × 256 transparent icons in the
 | Firewall / Shield | Cyan shield pulse and separate shield-break cue |
 | Heal | Green pulse and heal sound |
 | Status damage | Status-colored impact without replaying attack motion or sound |
-| Active statuses | Burn, Glitch, Vulnerable, Silence, Slow, Corrupted and Marked chips use matching colors and a short entry cue; mobile status rows scroll horizontally without adding page height |
+| Active statuses | Burn, Glitch, Vulnerable, Silence, Slow, Corrupted and Marked chips pair distinct symbols and readable labels with matching colors and a short entry cue; mobile status rows scroll horizontally without adding page height |
 | Ultimate | Dili charge pose, network wave, screen feedback and sound |
 | Rage full | 150 ms Rage-art burst immediately before Ultimate; ordinary Rage gains stay unobtrusive |
 | Dodge | Ghost fade and sidestep |

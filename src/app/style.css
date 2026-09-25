@@ -870,6 +870,10 @@ footer i {
   height: 25px;
   object-fit: contain;
 }
+.mini-icon .skill-icon {
+  width: 100%;
+  height: 100%;
+}
 .owned-skill p {
   padding: 4px 12px 12px;
   font-size: 11px;
@@ -1302,6 +1306,10 @@ footer i {
   letter-spacing: 0;
 }
 .status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   background: #2a2447;
   border: 1px solid #755b99;
   color: #d9b7f3;
@@ -1310,6 +1318,9 @@ footer i {
   border-radius: 4px;
   min-height: 44px;
   margin: 4px 4px 0 0;
+}
+.status-icon {
+  flex: 0 0 auto;
 }
 .status-row .status-chip {
   flex: 0 0 auto;
@@ -1470,6 +1481,49 @@ footer i {
   object-fit: contain;
   filter: drop-shadow(0 0 13px color-mix(in srgb, var(--rarity) 34%, transparent));
   transition: transform 200ms ease, filter 200ms ease;
+}
+.skill-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 108px;
+  color: var(--skill-glyph-color, #77e7eb);
+}
+.skill-icon[data-archetype='packet'] { --skill-glyph-color: #72e7ee; }
+.skill-icon[data-archetype='hammer'] { --skill-glyph-color: #ff88d0; }
+.skill-icon[data-archetype='firewall'] { --skill-glyph-color: #70e5de; }
+.skill-icon[data-archetype='viral'] { --skill-glyph-color: #e98bff; }
+.skill-icon[data-archetype='moderation'] { --skill-glyph-color: #ffcf72; }
+.skill-icon[data-archetype='encryption'] { --skill-glyph-color: #9db7ff; }
+.skill-icon[data-archetype='rage'] { --skill-glyph-color: #ff9d75; }
+.skill-icon[data-archetype='heal'] { --skill-glyph-color: #8aebbd; }
+.skill-icon > img {
+  width: 100%;
+  height: 100%;
+}
+.skill-icon-glyph {
+  position: absolute;
+  right: 1%;
+  bottom: 1%;
+  display: grid;
+  place-items: center;
+  width: 43%;
+  aspect-ratio: 1;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: #071421ee;
+  box-shadow: 0 0 12px #06101bcc;
+  color: inherit;
+}
+.skill-icon-glyph svg {
+  width: 62%;
+  height: 62%;
+  stroke-width: 2.4;
+}
+.skill-card:is(:hover, :focus-visible) .skill-icon-glyph {
+  transform: translateY(-3px) scale(1.06);
+  transition: transform 200ms ease;
 }
 .skill-card:is(:hover, :focus-visible) .skill-art img {
   transform: translateY(-4px) scale(1.08);
@@ -2554,6 +2608,18 @@ footer i {
   .skill-art img {
     width: 65px;
     height: 65px;
+  }
+  .skill-art .skill-icon {
+    width: 65px;
+    height: 65px;
+  }
+  .mini-icon .skill-icon {
+    width: 100%;
+    height: 100%;
+  }
+  .skill-icon-glyph svg {
+    width: 62%;
+    height: 62%;
   }
   .skill-card h3 {
     font-size: 26px;

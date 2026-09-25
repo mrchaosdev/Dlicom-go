@@ -8,7 +8,7 @@ The content set now contains 70 skills, 18 equipment items, and 20 events. Equip
 
 Each chapter now has its own low-detail procedural battle backdrop, two subtle accent-colored parallax grid layers, and original synthesized music loop. The parallax textures are generated once per scene and move at separate speeds; they pause with combat. All ten normal enemy kinds and four bosses have distinct transparent sprites; Raid Master's summoned minions share Raid Bot art. Character-specific attack and hurt pose polish remains open.
 
-Skill drafts and the owned-skill list now use eight original 256px archetype icons, covering every current skill family: Packet, Hammer, Firewall, Moderation, Encryption, Viral, Rage, and Heal. Draft cards enter with a short stagger and the art lifts on hover or keyboard focus; the reduced-motion setting and system preference suppress these motions.
+Skill drafts and the owned-skill list use eight original archetype artworks plus 70 distinct semantic skill glyphs, one for every definition. Seven status conditions also have distinct symbols alongside readable labels and color. Draft cards enter with a short stagger and the art lifts on hover or keyboard focus; the reduced-motion setting and system preference suppress these motions.
 
 Dili now has dedicated Attack, Hurt and Ultimate pose sprites in addition to Idle. Combat events switch poses and return to Idle on the pause/speed-aware presentation clock; Crit, Dodge and Low HP build on those poses with existing impact effects. Victory and Defeat receive short end-of-battle reactions. The [art and animation matrix](ART_ANIMATION_MATRIX.md) records all nine required states, effect coverage and remaining art work.
 

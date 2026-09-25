@@ -65,6 +65,9 @@ test('automatic battle pauses, changes speed and reaches a three-choice draft', 
   });
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
   await expect(page.locator('.skill-card')).toHaveCount(3);
+  expect(await page.locator('.skill-card .skill-icon').evaluateAll((icons) =>
+    new Set(icons.map((icon) => icon.getAttribute('data-skill-icon'))).size)).toBe(3);
+  await expect(page.locator('.skill-card .skill-icon-glyph svg')).toHaveCount(3);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole('button', { name: /Reroll/ }).click();
   await expect(page.getByRole('button', { name: /Reroll/ })).toBeDisabled();
@@ -159,6 +162,8 @@ test('status chips stay color coded and compact on a phone screen', async ({ pag
   });
   await expect(page.locator('.player-hud .status-chip')).toHaveCount(7);
   await expect(page.locator('.enemy-hud .status-chip')).toHaveCount(4);
+  await expect(page.locator('.player-hud .status-chip svg')).toHaveCount(7);
+  await expect(page.locator('.enemy-hud .status-chip svg')).toHaveCount(4);
   expect(await page.locator('.player-hud .status-chip[data-status="burn"]').evaluate((element) =>
     getComputedStyle(element).color)).toBe('rgb(255, 189, 130)');
   await page.emulateMedia({ reducedMotion: 'reduce' });

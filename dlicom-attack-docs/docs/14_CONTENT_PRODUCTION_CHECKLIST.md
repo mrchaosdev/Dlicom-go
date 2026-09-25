@@ -60,8 +60,8 @@ Dili:
 ## Icons
 
 At least:
-- [ ] 70 skill icons
-- [ ] status icons
+- [x] 70 skill icons (archetype artwork with a distinct semantic glyph per skill)
+- [x] status icons
 - [ ] equipment icons
 - [ ] node icons
 - [ ] currency icon

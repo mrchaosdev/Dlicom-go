@@ -37,6 +37,7 @@ import { EQUIPMENT, GEAR, UPGRADE_COSTS, loadoutStats, type Slot } from '../cont
 import { SKILLS, SKILL_BY_ID } from '../content/skills';
 import { NODES, generateEncounter } from '../content/encounters';
 import { CHAPTERS } from '../content/chapters';
+import { SKILL_GLYPHS, STATUS_GLYPHS } from '../content/skillGlyphs';
 import { accountLevel } from '../services/save';
 import { playSound, startAudio, suspendAudio, updateAudio } from '../services/audio';
 import { applyCueVitals, snapshotVitals, turnDuration, type PresentedVitals } from '../game/phaser/presentation';
@@ -62,8 +63,23 @@ const iconFor = (tag: string, size = 22) => {
     )[tag] ?? Hexagon;
   return <Icon size={size} />;
 };
-function SkillIcon({ tag }: { tag: Archetype }) {
-  return <img src={SKILL_ART[tag]} alt="" draggable={false} />;
+function SkillIcon({ skillId, tag }: { skillId: string; tag: Archetype }) {
+  const Glyph = SKILL_GLYPHS[skillId as keyof typeof SKILL_GLYPHS] ?? Hexagon;
+  return (
+    <span
+      className="skill-icon"
+      data-skill-icon={skillId}
+      data-archetype={tag}
+      aria-hidden="true"
+    >
+      <img src={SKILL_ART[tag]} alt="" draggable={false} />
+      <span className="skill-icon-glyph"><Glyph /></span>
+    </span>
+  );
+}
+function StatusIcon({ status }: { status: string }) {
+  const Glyph = STATUS_GLYPHS[status as keyof typeof STATUS_GLYPHS] ?? Sparkles;
+  return <Glyph className="status-icon" size={12} aria-hidden="true" />;
 }
 const title = (text: string) => text.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 function Button({
@@ -464,7 +480,7 @@ function BuildPanel() {
           return (
             <details className={`owned-skill ${skill.rarity}`} key={id}>
               <summary>
-                <span className="mini-icon"><SkillIcon tag={skill.tags[0]} /></span>
+                <span className="mini-icon"><SkillIcon skillId={skill.id} tag={skill.tags[0]} /></span>
                 <span>{skill.name}</span>
                 <small>{rank > 1 ? `R${rank}` : '+'}</small>
               </summary>
@@ -656,7 +672,7 @@ function BattleScreen() {
                       key={s.id}
                       onClick={() => setInspected(`${title(s.id)} · ${s.turns} turn(s) remaining`)}
                     >
-                      {s.id} {s.turns}
+                      <StatusIcon status={s.id} /> {s.id} {s.turns}
                     </button>
                   ))}
                 </div>
@@ -689,7 +705,7 @@ function BattleScreen() {
                 key={s.id}
                 onClick={() => setInspected(`${title(s.id)} · ${s.turns} turn(s) remaining`)}
               >
-                {s.id} {s.turns}
+                <StatusIcon status={s.id} /> {s.id} {s.turns}
               </button>
             ))}
           </div>
@@ -743,7 +759,7 @@ function DraftScreen() {
                 <span>{skill.rarity.toUpperCase()}</span>
                 <small>{run.skills[id] ? `UPGRADE → R${run.skills[id] + 1}` : 'NEW'}</small>
               </div>
-              <div className="skill-art"><SkillIcon tag={skill.tags[0]} /></div>
+              <div className="skill-art"><SkillIcon skillId={skill.id} tag={skill.tags[0]} /></div>
               <h3>{skill.name}</h3>
               <p>{skill.description}</p>
               <div className="skill-tags">

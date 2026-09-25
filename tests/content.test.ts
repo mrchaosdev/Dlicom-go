@@ -5,7 +5,16 @@ import { CHAPTERS } from '../src/content/chapters';
 import { EVENTS, eventsForChapter } from '../src/content/events';
 import { EQUIPMENT } from '../src/content/equipment';
 import { generateEncounter } from '../src/content/encounters';
+import { SKILL_GLYPHS, STATUS_GLYPHS } from '../src/content/skillGlyphs';
 it('validates every definition', () => expect(() => validateContent()).not.toThrow());
+it('provides a distinct art glyph for all 70 skills and each combat status', () => {
+  expect(Object.keys(SKILL_GLYPHS).sort()).toEqual(SKILLS.map(({ id }) => id).sort());
+  expect(new Set(Object.values(SKILL_GLYPHS)).size).toBe(SKILLS.length);
+  expect(Object.keys(STATUS_GLYPHS).sort()).toEqual([
+    'burn', 'corrupted', 'glitch', 'marked', 'silence', 'slow', 'vulnerable',
+  ]);
+  expect(new Set(Object.values(STATUS_GLYPHS)).size).toBe(Object.keys(STATUS_GLYPHS).length);
+});
 it('ships four deterministic chapters, twenty events and eighteen equipment items', () => {
   expect(CHAPTERS).toHaveLength(4);
   expect(EVENTS).toHaveLength(20);
