@@ -112,14 +112,16 @@ PLAY DLICOM ATTACK.
 ## 8. Final release checklist
 
 - [ ] production build deployed
-- [ ] no console errors
-- [ ] save works
-- [ ] fresh incognito test
-- [ ] all chapters reachable
-- [ ] all bosses killable
-- [ ] no broken asset URLs
-- [ ] audio controls
-- [ ] mobile readable
-- [ ] share/result works
-- [ ] version displayed
+- [x] no browser console errors in the automated Chromium, Firefox and WebKit user-flow suite
+- [x] save works (settings and upgraded equipment survive page reload)
+- [x] fresh isolated browser-context test (equivalent storage isolation; physical incognito check remains useful)
+- [x] chapter progression unlock behavior passes deterministic unit tests; all four chapter battle screens, chapter art, boss art and soundtracks load when unlocked
+- [x] all four bosses are killable in deterministic simulations (each chapter has recorded wins)
+- [x] runtime asset validator finds no missing or disallowed production assets; browser tests load each chapter's battle assets
+- [x] music and SFX settings controls are present; music-volume setting persists across reload
+- [x] mobile layouts fit documented phone viewports without page overflow
+- [x] result screen and text/seed copy action work in the browser flow (clipboard is isolated by the test harness)
+- [x] version `v0.2.0` is displayed in the game UI
 - [ ] submission posted before deadline
+
+The automated checks above verify the repository build and browser contexts. They do not substitute for production URL smoke testing, physical Android/iOS checks, human readability and pacing playtests, or posting the submission package.

@@ -61,7 +61,7 @@ npm run test:e2e
 npm run simulate
 ```
 
-CI runs types, lint, validation, unit/integration tests, build and Chromium browser tests. Simulations use a deterministic bot with a simple damage-oriented draft heuristic; they are not human playtests. Set `SIM_RUNS`, `SIM_CHAPTER`, and `SIM_UNLOCKED=1` to sample a particular chapter with unlocked equipment. The output includes median and 90th-percentile combat time, plus the share spent between presented events; menu and decision time is excluded.
+CI runs types, lint, content validation, unit/integration tests, a production build, and all seven browser flows on Chromium, Firefox and WebKit. The browser tests cover isolated fresh profiles, local save reload, all four chapter battle assets, mobile/desktop viewport layouts, settings, result sharing (with clipboard isolated in the test context), combat timing and a complete first-chapter run. The recorded deterministic balance sample covers 10,000 full runs, 2,500 per chapter, with a simple damage-priority draft bot; it is not a human playtest. Set `SIM_RUNS`, `SIM_CHAPTER`, and `SIM_UNLOCKED=1` to sample a particular chapter with unlocked equipment. The output includes median and 90th-percentile combat time, plus the share spent between presented events; menu and decision time is excluded.
 
 See [verification and balance report](docs/IMPLEMENTATION_STATUS.md) for measured results and limitations.
 
@@ -73,8 +73,8 @@ Import `mrchaosdev/Dlicom-go` into Vercel. Root directory: repository root. Buil
 
 - Character pose polish and expanded SFX. The [art and animation matrix](docs/ART_ANIMATION_MATRIX.md) tracks state coverage and remaining physical-device QA.
 - Human balance/pacing pass: a deterministic 500-run stress bot with max-level gear won 38.8% of DliClips, 27.0% of Dili Rooms, and 36.0% of Core Network runs; it does not model human build choices. Core tuning now gets nearly every run to Null.exe, where the boss remains the main win gate. The overall 8–15 minute target has **not** been met or verified; human playtesting and a deliberate pacing pass remain necessary.
-- Real Android/iOS device testing, Firefox/Edge QA, long-session performance profiling, deployed smoke test, trailer and final submission.
-- Share result currently copies text and seed; graphical share-card export remains future work.
+- Human pacing, balance and readability playtests; physical Android/iOS device testing; Edge and long-session performance checks; deployed smoke test, trailer and final submission. The 10,000-run simulation's combat-only medians are 145–181 seconds; the 8–15 minute full-session target is not verified.
+- Share result copies the score, build and seed as text. A graphical share-card export is not implemented.
 
 ## Specification and provenance
 

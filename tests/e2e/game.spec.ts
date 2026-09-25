@@ -1,9 +1,27 @@
 import { test, expect } from '@playwright/test';
-test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => {
+test.beforeEach(async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(message.text());
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async (text: string) => localStorage.setItem('dlicom-test-clipboard', text) },
+    });
+  });
+  (page as typeof page & { __browserErrors?: string[] }).__browserErrors = errors;
+});
+
+test.afterEach(async ({ page }) => {
+  expect((page as typeof page & { __browserErrors?: string[] }).__browserErrors).toEqual([]);
+});
+
+test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Small hero/ })).toBeVisible();
+  await expect(page.getByText('SYSTEM ONLINE · v0.2.0')).toBeVisible();
   for (const [width, height] of [
     [360, 800],
     [390, 844],
@@ -24,11 +42,15 @@ test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => 
   await page.getByRole('navigation').getByRole('button', { name: 'Records' }).click();
   await expect(page.locator('[data-achievement-icon]')).toHaveCount(2);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  const music = page.locator('input[type="range"]').first();
+  await music.focus();
+  await music.press('Home');
+  await expect(page.getByText('0%', { exact: true })).toBeVisible();
   await page.getByRole('checkbox').check();
   await page.reload();
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(page.getByRole('checkbox')).toBeChecked();
-  expect(errors).toEqual([]);
+  await expect(page.getByText('0%', { exact: true })).toBeVisible();
 });
 test('automatic battle pauses, changes speed and reaches a three-choice draft', async ({
   page,
@@ -245,8 +267,6 @@ test('unlocked chapters load their own backdrop, boss art and soundtrack', async
   }
 });
 test('all run screens, boss rewards, upgrade and save reload integrate', async ({ page }) => {
-  const errors: string[] = [];
-  page.on('pageerror', (error) => errors.push(error.message));
   // This checks screen integration; motion behavior is covered in dedicated browser tests.
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 360, height: 800 });
@@ -303,11 +323,15 @@ test('all run screens, boss rewards, upgrade and save reload integrate', async (
   }
   await expect(page.getByRole('heading', { name: 'The Feed is yours.' })).toBeVisible();
   await expect(page.getByText('Equipment chest:', { exact: false })).toBeVisible();
+  await page.getByRole('button', { name: 'Copy result', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Copied!', exact: true })).toBeVisible();
+  const sharedResult = await page.evaluate(() => localStorage.getItem('dlicom-test-clipboard'));
+  expect(sharedResult).toContain('SPAM KING DEFEATED');
+  expect(sharedResult).toContain('Seed:');
   await page.getByRole('button', { name: 'Upgrade equipment', exact: true }).click();
   await page.getByRole('button', { name: 'Upgrade · 100 Bits', exact: true }).first().click();
   await expect(page.getByText('LEVEL 2 / 5')).toBeVisible();
   await page.reload();
   await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
   await expect(page.getByText('LEVEL 2 / 5')).toBeVisible();
-  expect(errors).toEqual([]);
 });
