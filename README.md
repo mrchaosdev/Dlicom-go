@@ -56,12 +56,12 @@ npm run lint
 npm run validate:content
 npm test
 npm run build
-npx playwright install chromium
+npx playwright install chromium firefox webkit
 npm run test:e2e
 npm run simulate
 ```
 
-CI runs types, lint, content validation, unit/integration tests, a production build, and all seven browser flows on Chromium, Firefox and WebKit. The browser tests cover isolated fresh profiles, local save reload, all four chapter battle assets, mobile/desktop viewport layouts, settings, result sharing (with clipboard isolated in the test context), combat timing and a complete first-chapter run. The recorded deterministic balance sample covers 10,000 full runs, 2,500 per chapter, with a simple damage-priority draft bot; it is not a human playtest. Set `SIM_RUNS`, `SIM_CHAPTER`, and `SIM_UNLOCKED=1` to sample a particular chapter with unlocked equipment. The output includes median and 90th-percentile combat time, plus the share spent between presented events; menu and decision time is excluded.
+CI runs types, lint, content validation, unit/integration tests, a production build, and all seven browser flows on Chromium, Firefox and WebKit. The browser tests cover isolated fresh profiles, local save reload, all four chapter battle assets, mobile/desktop viewport layouts, settings, result sharing (with clipboard isolated in the test context), combat timing and a complete first-chapter run. They fail on uncaught app exceptions and unexpected console errors; Firefox's `InvalidStateError: Navigated away from page` during explicit test reloads is an expected browser cancellation and is ignored. The recorded deterministic balance sample covers 10,000 full runs, 2,500 per chapter, with a simple damage-priority draft bot; it is not a human playtest. Set `SIM_RUNS`, `SIM_CHAPTER`, and `SIM_UNLOCKED=1` to sample a particular chapter with unlocked equipment. The output includes median and 90th-percentile combat time, plus the share spent between presented events; menu and decision time is excluded.
 
 See [verification and balance report](docs/IMPLEMENTATION_STATUS.md) for measured results and limitations.
 

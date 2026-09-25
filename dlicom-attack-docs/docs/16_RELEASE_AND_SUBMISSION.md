@@ -112,7 +112,7 @@ PLAY DLICOM ATTACK.
 ## 8. Final release checklist
 
 - [ ] production build deployed
-- [x] no browser console errors in the automated Chromium, Firefox and WebKit user-flow suite
+- [x] no uncaught app exceptions or unexpected console errors in automated Chromium, Firefox and WebKit flows (Firefox logs a filtered `Navigated away from page` cancellation on explicit test reloads)
 - [x] save works (settings and upgraded equipment survive page reload)
 - [x] fresh isolated browser-context test (equivalent storage isolation; physical incognito check remains useful)
 - [x] chapter progression unlock behavior passes deterministic unit tests; all four chapter battle screens, chapter art, boss art and soundtracks load when unlocked

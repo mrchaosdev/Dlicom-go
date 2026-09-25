@@ -3,7 +3,9 @@ test.beforeEach(async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
+    if (message.type() === 'error'
+      && !message.text().includes('InvalidStateError: Navigated away from page'))
+      errors.push(message.text());
   });
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'clipboard', {
