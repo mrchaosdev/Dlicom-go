@@ -15,8 +15,14 @@ test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => 
       true,
     );
   }
+  await page.setViewportSize({ width: 360, height: 800 });
   await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
   await expect(page.getByRole('heading', { name: 'Packet Blaster' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await expect(page.locator('[data-equipment-icon]')).toHaveCount(3);
+  await expect(page.locator('[data-equipment-option-icon]')).toHaveCount(3);
+  await page.getByRole('navigation').getByRole('button', { name: 'Records' }).click();
+  await expect(page.locator('[data-achievement-icon]')).toHaveCount(2);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.getByRole('checkbox').check();
   await page.reload();

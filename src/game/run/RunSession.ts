@@ -3,6 +3,7 @@ import { getChapter } from '../../content/chapters';
 import { NODES, generateEncounter, generateEventElite } from '../../content/encounters';
 import { eventsForChapter, type EventEffect } from '../../content/events';
 import { SKILL_BY_ID } from '../../content/skills';
+import { ACHIEVEMENT_IDS } from '../../content/achievements';
 import { accountLevel, type SaveFile } from '../../services/save';
 import { CombatEngine } from '../combat/CombatEngine';
 import {
@@ -237,9 +238,10 @@ export class RunSession {
       if (a.inventory[this.rewardGear]) a.bits += 50;
       else a.inventory[this.rewardGear] = 1;
     }
-    if (this.cleared && !a.achievements.includes('first_login')) a.achievements.push('first_login');
-    if (this.result === 'victory' && !a.achievements.includes('feed_cleaner'))
-      a.achievements.push('feed_cleaner');
+    if (this.cleared && !a.achievements.includes(ACHIEVEMENT_IDS.firstBattle))
+      a.achievements.push(ACHIEVEMENT_IDS.firstBattle);
+    if (this.result === 'victory' && !a.achievements.includes(ACHIEVEMENT_IDS.firstBoss))
+      a.achievements.push(ACHIEVEMENT_IDS.firstBoss);
     return next;
   }
 }

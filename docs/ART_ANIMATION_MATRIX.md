@@ -40,6 +40,8 @@ Idle has a different source resolution from the other poses. Breathing now anima
 
 All eight skill archetypes have original 256 × 256 transparent icons in the central manifest: Packet, Hammer, Firewall, Moderation, Encryption, Viral, Rage, and Heal. Each of the 70 skill definitions also has a distinct semantic glyph layered over its archetype artwork in both draft cards and the owned-skill list. A content test requires exact skill coverage and 70 unique glyphs. Draft entry is staggered; keyboard focus and hover lift the art. Both the game setting and system reduced-motion preference suppress those animations.
 
+The equipment collection gives all 18 items individual semantic glyphs in the loadout selector; achievements have their own symbols, route nodes use category icons, and Bits use a dedicated hexagon mark. Content tests verify equipment and achievement glyph uniqueness.
+
 | Effect family | Current battle presentation |
 | --- | --- |
 | Packet / DliClip | Cyan projectile; DliClip projectile is magenta |

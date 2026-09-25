@@ -3,35 +3,35 @@
 ## Character
 
 Dili:
-- [ ] idle
-- [ ] attack
-- [ ] crit
-- [ ] hurt
-- [ ] dodge
-- [ ] ultimate
-- [ ] low HP
-- [ ] victory
-- [ ] defeat
+- [x] idle
+- [x] attack
+- [x] crit
+- [x] hurt
+- [x] dodge
+- [x] ultimate
+- [x] low HP
+- [x] victory
+- [x] defeat
 
 ## Enemies
 
-- [ ] Spam Bot
-- [ ] Scam Link
-- [ ] Bug
-- [ ] Toxic Reply
-- [ ] Fake Account
-- [ ] Data Leech
-- [ ] Pop-up
-- [ ] Corrupted Clip
-- [ ] Raid Bot
-- [ ] Null Fragment
+- [x] Spam Bot
+- [x] Scam Link
+- [x] Bug
+- [x] Toxic Reply
+- [x] Fake Account
+- [x] Data Leech
+- [x] Pop-up
+- [x] Corrupted Clip
+- [x] Raid Bot
+- [x] Null Fragment
 
 ## Bosses
 
-- [ ] Spam King
-- [ ] Loop Phantom
-- [ ] Raid Master
-- [ ] Null.exe
+- [x] Spam King
+- [x] Loop Phantom
+- [x] Raid Master
+- [x] Null.exe
 
 ## Backgrounds
 
@@ -42,43 +42,43 @@ Dili:
 
 ## VFX
 
-- [ ] basic packet
-- [ ] impact
-- [ ] crit
-- [ ] shield
-- [ ] shield break
-- [ ] hammer
-- [ ] DliClip
-- [ ] Viral explosion
-- [ ] Glitch
-- [ ] Rage
-- [ ] ultimate
-- [ ] heal
-- [ ] dodge
-- [ ] boss warning
+- [x] basic packet
+- [x] impact
+- [x] crit
+- [x] shield
+- [x] shield break
+- [x] hammer
+- [x] DliClip
+- [x] Viral explosion
+- [x] Glitch
+- [x] Rage
+- [x] ultimate
+- [x] heal
+- [x] dodge
+- [x] boss warning
 
 ## Icons
 
 At least:
 - [x] 70 skill icons (archetype artwork with a distinct semantic glyph per skill)
 - [x] status icons
-- [ ] equipment icons
-- [ ] node icons
-- [ ] currency icon
-- [ ] achievement icons
+- [x] equipment icons (18 distinct item glyphs)
+- [x] node icons
+- [x] currency icon
+- [x] achievement icons
 
 ## UI
 
-- [ ] title
-- [ ] chapter card
-- [ ] equipment slots
-- [ ] HP
-- [ ] Rage
-- [ ] skill draft card
-- [ ] event panel
-- [ ] boss HP
-- [ ] pause
-- [ ] result screen
+- [x] title
+- [x] chapter card
+- [x] equipment slots
+- [x] HP
+- [x] Rage
+- [x] skill draft card
+- [x] event panel
+- [x] boss HP
+- [x] pause
+- [x] result screen
 
 ## Audio
 
@@ -98,11 +98,13 @@ At least:
 
 ## Text content
 
-- [ ] skill names
-- [ ] skill descriptions
-- [ ] enemy names
-- [ ] boss descriptions
-- [ ] 20 random events
-- [ ] achievements
-- [ ] chapter descriptions
-- [ ] tutorial hints
+- [x] skill names
+- [x] skill descriptions
+- [x] enemy names
+- [x] boss descriptions
+- [x] 20 random events
+- [x] achievements
+- [x] chapter descriptions
+- [x] tutorial hints
+
+This checklist tracks the implemented content package. Physical mobile alignment, human readability, pacing and performance playtests are separate release checks in `docs/ART_ANIMATION_MATRIX.md`.

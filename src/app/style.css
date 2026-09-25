@@ -694,6 +694,10 @@ footer i {
   margin: 15px 0;
 }
 .gear-options button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   min-height: 44px;
   background: #0e1727;
   border: 1px solid #2b3a52;
@@ -701,6 +705,9 @@ footer i {
   font-size: 11px;
   padding: 8px 12px;
   color: var(--muted);
+}
+.gear-options button svg {
+  flex: 0 0 auto;
 }
 .gear-options button.selected {
   border-color: #4c9c9d;

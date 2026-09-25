@@ -38,6 +38,8 @@ import { SKILLS, SKILL_BY_ID } from '../content/skills';
 import { NODES, generateEncounter } from '../content/encounters';
 import { CHAPTERS } from '../content/chapters';
 import { SKILL_GLYPHS, STATUS_GLYPHS } from '../content/skillGlyphs';
+import { ACHIEVEMENTS } from '../content/achievements';
+import { ACHIEVEMENT_GLYPHS, EQUIPMENT_GLYPHS } from '../content/progressionIcons';
 import { accountLevel } from '../services/save';
 import { playSound, startAudio, suspendAudio, updateAudio } from '../services/audio';
 import { applyCueVitals, snapshotVitals, turnDuration, type PresentedVitals } from '../game/phaser/presentation';
@@ -314,6 +316,7 @@ function EquipmentScreen() {
           {(['weapon', 'armor', 'module'] as Slot[]).map((slot) => {
             const id = save.account.equipped[slot],
               item = GEAR[id],
+              GearGlyph = EQUIPMENT_GLYPHS[id as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu,
               level = save.account.inventory[id],
               cost = UPGRADE_COSTS[level - 1];
             return (
@@ -326,8 +329,8 @@ function EquipmentScreen() {
                   </div>
                 </div>
                 <div className="gear-title">
-                  <div className="square-icon">
-                    {slot === 'weapon' ? <Crosshair /> : slot === 'armor' ? <Shield /> : <Cpu />}
+                  <div className="square-icon" data-equipment-icon={id}>
+                    <GearGlyph aria-hidden="true" />
                   </div>
                   <div>
                     <h3>{item.name}</h3>
@@ -336,15 +339,19 @@ function EquipmentScreen() {
                 </div>
                 <div className="gear-options">
                   {EQUIPMENT.filter((e) => e.slot === slot && save.account.inventory[e.id]).map(
-                    (e) => (
+                    (e) => {
+                      const OptionGlyph = EQUIPMENT_GLYPHS[e.id as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu;
+                      return (
                       <button
                         className={e.id === id ? 'selected' : ''}
                         key={e.id}
                         onClick={() => equip(e.id)}
                       >
+                        <OptionGlyph size={15} aria-hidden="true" data-equipment-option-icon={e.id} />
                         {e.id === id && <Check size={13} />} {e.name}
                       </button>
-                    ),
+                      );
+                    },
                   )}
                 </div>
                 <Button disabled={!cost || save.account.bits < cost} onClick={() => upgrade(slot)}>
@@ -437,19 +444,19 @@ function AchievementsScreen() {
   return (
     <div className="narrow">
       <PageHeading kicker="YOUR NETWORK LEGACY" title="Achievements" />
-      {[
-        ['first_login', 'First Login', 'Clear your first battle.'],
-        ['feed_cleaner', 'Feed Cleaner', 'Defeat the Spam King.'],
-      ].map(([id, name, desc]) => (
-        <div className="panel achievement" key={id}>
-          <Trophy size={30} />
-          <div>
-            <h3>{name}</h3>
-            <p>{desc}</p>
+      {ACHIEVEMENTS.map(({ id, name, description }) => {
+        const Glyph = ACHIEVEMENT_GLYPHS[id as keyof typeof ACHIEVEMENT_GLYPHS];
+        return (
+          <div className="panel achievement" key={id}>
+            <Glyph size={30} data-achievement-icon={id} aria-hidden="true" />
+            <div>
+              <h3>{name}</h3>
+              <p>{description}</p>
+            </div>
+            {save.account.achievements.includes(id) ? <Check /> : <LockKeyhole />}
           </div>
-          {save.account.achievements.includes(id) ? <Check /> : <LockKeyhole />}
-        </div>
-      ))}
+        );
+      })}
       <p className="muted">
         {save.account.runs} runs completed · {save.account.wins} victories · Level{' '}
         {accountLevel(save.account.xp)} operator

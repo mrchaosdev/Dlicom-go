@@ -6,6 +6,8 @@ import { EVENTS, eventsForChapter } from '../src/content/events';
 import { EQUIPMENT } from '../src/content/equipment';
 import { generateEncounter } from '../src/content/encounters';
 import { SKILL_GLYPHS, STATUS_GLYPHS } from '../src/content/skillGlyphs';
+import { ACHIEVEMENTS } from '../src/content/achievements';
+import { ACHIEVEMENT_GLYPHS, EQUIPMENT_GLYPHS } from '../src/content/progressionIcons';
 it('validates every definition', () => expect(() => validateContent()).not.toThrow());
 it('provides a distinct art glyph for all 70 skills and each combat status', () => {
   expect(Object.keys(SKILL_GLYPHS).sort()).toEqual(SKILLS.map(({ id }) => id).sort());
@@ -14,6 +16,14 @@ it('provides a distinct art glyph for all 70 skills and each combat status', () 
     'burn', 'corrupted', 'glitch', 'marked', 'silence', 'slow', 'vulnerable',
   ]);
   expect(new Set(Object.values(STATUS_GLYPHS)).size).toBe(Object.keys(STATUS_GLYPHS).length);
+});
+it('provides an individual glyph for every piece of gear and achievement', () => {
+  expect(Object.keys(EQUIPMENT_GLYPHS).sort()).toEqual(EQUIPMENT.map(({ id }) => id).sort());
+  expect(new Set(Object.values(EQUIPMENT_GLYPHS)).size).toBe(EQUIPMENT.length);
+  const achievements = ACHIEVEMENTS;
+  expect(achievements.map(({ id }) => id).sort()).toEqual(['feed_cleaner', 'first_login']);
+  expect(Object.keys(ACHIEVEMENT_GLYPHS).sort()).toEqual(achievements.map(({ id }) => id).sort());
+  expect(new Set(Object.values(ACHIEVEMENT_GLYPHS)).size).toBe(achievements.length);
 });
 it('ships four deterministic chapters, twenty events and eighteen equipment items', () => {
   expect(CHAPTERS).toHaveLength(4);
