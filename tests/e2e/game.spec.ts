@@ -156,8 +156,14 @@ test('shop chests reveal gear and queue a starter skill through reload and settl
   await page.reload();
   await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
   await page.getByRole('tab', { name: 'Shop' }).click();
+  for (const kind of ['gear', 'skill']) {
+    const art = page.locator(`[data-chest-kind="${kind}"] img`);
+    await art.scrollIntoViewIfNeeded();
+    await expect.poll(() => art.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+  }
   await page.locator('[data-chest-kind="gear"]').getByRole('button', { name: /Open.*250 Bits/ }).click();
   await expect(page.getByText('CHEST OPENED', { exact: false })).toBeVisible();
+  await expect(page.locator('[data-chest-reward-art="gear"]')).toBeVisible();
   const gearId = await page.evaluate(async () => {
     const path = performance.getEntriesByType('resource').map((entry) => entry.name)
       .find((url) => url.includes('/src/stores/gameStore.ts'))!;
@@ -167,6 +173,7 @@ test('shop chests reveal gear and queue a starter skill through reload and settl
   await expect(page.locator(`[data-inventory-id="${gearId}"]`)).toBeVisible();
   await page.getByRole('tab', { name: 'Shop' }).click();
   await page.locator('[data-chest-kind="skill"]').getByRole('button', { name: /Open.*200 Bits/ }).click();
+  await expect(page.locator('[data-chest-reward-art="skill"] [data-skill-icon]')).toBeVisible();
   const skillId = await page.evaluate(async () => {
     const path = performance.getEntriesByType('resource').map((entry) => entry.name)
       .find((url) => url.includes('/src/stores/gameStore.ts'))!;

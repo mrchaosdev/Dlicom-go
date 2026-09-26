@@ -24,6 +24,8 @@ for (const file of [
   'skill-viral.png',
   'skill-rage.png',
   'skill-heal.png',
+  'chest-gear.webp',
+  'chest-skill.webp',
   'spam-bot.svg',
   'spam-bot.png',
   'scam-link.png',
@@ -81,6 +83,10 @@ for (const file of [
 for (const file of ['dili-sword-idle.webp', 'dili-sword-attack.webp', 'dili-hammer-idle.webp', 'dili-hammer-attack.webp']) {
   const bytes = statSync(`public/assets/${file}`).size;
   if (bytes > 150_000) throw new Error(`Compressed weapon pose too large: ${file} (${bytes} > 150000)`);
+}
+for (const file of ['chest-gear.webp', 'chest-skill.webp']) {
+  const bytes = statSync(`public/assets/${file}`).size;
+  if (bytes > 100_000) throw new Error(`Compressed chest art too large: ${file} (${bytes} > 100000)`);
 }
 for (const file of [
   'dliclips-loop.mp3', 'rooms-loop.mp3', 'core-loop.mp3', 'feed-loop.mp3',

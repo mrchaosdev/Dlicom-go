@@ -373,7 +373,7 @@ function GuideScreen() {
   );
 }
 function EquipmentScreen() {
-  const { save, equip, upgrade, start } = useGame();
+  const { save, equip, upgrade, start, run } = useGame();
   const [tab, setTab] = useState<'loadout' | 'inventory' | 'shop'>('loadout');
   const stats = loadoutStats(save.account.equipped, save.account.inventory);
   return (
@@ -391,7 +391,10 @@ function EquipmentScreen() {
         ))}
       </div>
       {save.account.queuedSkill && (
-        <p className="queued-skill-note"><Sparkles size={17} /> Next run starts with <strong>{SKILL_BY_ID[save.account.queuedSkill].name}</strong> from your skill chest.</p>
+        <p className="queued-skill-note">
+          <SkillIcon skillId={save.account.queuedSkill} tag={SKILL_BY_ID[save.account.queuedSkill].tags[0]} />
+          <span>{run && !run.result ? 'Current run started with ' : 'Next run starts with '}<strong>{SKILL_BY_ID[save.account.queuedSkill].name}</strong> from your skill chest.</span>
+        </p>
       )}
       {tab === 'loadout' ? (
       <div className="equipment-layout">
@@ -505,12 +508,19 @@ function GearShopPanel({ onPurchased }: { onPurchased: () => void }) {
   const available = EQUIPMENT.filter((item) => !save.account.inventory[item.id]);
   const rewardItem = chestReward?.kind === 'gear' ? GEAR[chestReward.id] : undefined;
   const rewardSkill = chestReward?.kind === 'skill' ? SKILL_BY_ID[chestReward.id] : undefined;
+  const RewardGearGlyph = rewardItem ? EQUIPMENT_GLYPHS[rewardItem.id as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu : Cpu;
   return (
     <div className="collection-layout">
       <p className="shop-note">Earn Bits from every run, including defeats. Buy a known item below or open a chest for a surprise.</p>
       {chestReward && (
         <div className={`panel chest-reveal ${rewardItem?.rarity ?? rewardSkill?.rarity ?? 'common'}`} role="status" aria-live="polite" key={`${chestReward.kind}:${chestReward.id}`}>
-          <div className="chest-reveal-burst"><Gift size={36} aria-hidden="true" /></div>
+          <div className="chest-reveal-visuals">
+            <div className="chest-reveal-burst"><img src={chestReward.kind === 'gear' ? ASSETS.chest_gear : ASSETS.chest_skill} alt="" /></div>
+            <ArrowRight size={18} aria-hidden="true" />
+            <div className="chest-reveal-reward" data-chest-reward-art={chestReward.kind}>
+              {rewardSkill ? <SkillIcon skillId={rewardSkill.id} tag={rewardSkill.tags[0]} /> : <RewardGearGlyph size={52} aria-hidden="true" />}
+            </div>
+          </div>
           <div>
             <span className="eyebrow">CHEST OPENED · {(rewardItem?.rarity ?? rewardSkill?.rarity ?? 'common').toUpperCase()}</span>
             <h2>{rewardItem?.name ?? rewardSkill?.name}</h2>
@@ -526,14 +536,14 @@ function GearShopPanel({ onPurchased }: { onPurchased: () => void }) {
         <div className="section-heading"><h2>Open a chest</h2><span className="muted">ONE PURCHASE · ONE REWARD</span></div>
         <div className="chest-grid">
           <article className="panel chest-card" data-chest-kind="gear">
-            <div className="chest-emblem gear"><Gift size={38} aria-hidden="true" /></div>
+            <div className="chest-art gear"><img src={ASSETS.chest_gear} alt="Gear chest" loading="lazy" /></div>
             <div><span className="eyebrow">EQUIPMENT DROP</span><h3>Gear chest</h3><p>Receive one random item you do not own yet. Its rarity can be Common, Rare, Epic or Legendary.</p></div>
             <p className="chest-odds">Base rarity odds: Common 55% · Rare 30% · Epic 12% · Legendary 3%. Unavailable tiers are skipped.</p>
             <Button disabled={!canOpenChest(save, 'gear')} onClick={() => openChest('gear')}><Gift size={16} /> Open · {GEAR_CHEST_COST} Bits</Button>
             {!available.length && <small>Collection complete.</small>}
           </article>
           <article className="panel chest-card" data-chest-kind="skill">
-            <div className="chest-emblem skill"><Sparkles size={38} aria-hidden="true" /></div>
+            <div className="chest-art skill"><img src={ASSETS.chest_skill} alt="Skill chest" loading="lazy" /></div>
             <div><span className="eyebrow">NEXT-RUN BOOST</span><h3>Skill chest</h3><p>Reveal one random skill unlocked for your account. Start your next run with it at Rank 1.</p></div>
             <p className="chest-odds">One skill may be queued. It is spent only when that run ends.</p>
             <Button disabled={!canOpenChest(save, 'skill') || !!(run && !run.result)} onClick={() => openChest('skill')}><Sparkles size={16} /> Open · {SKILL_CHEST_COST} Bits</Button>

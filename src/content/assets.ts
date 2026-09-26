@@ -22,6 +22,8 @@ export const ASSETS = {
   skill_viral: asset('skill-viral.png'),
   skill_rage: asset('skill-rage.png'),
   skill_heal: asset('skill-heal.png'),
+  chest_gear: asset('chest-gear.webp'),
+  chest_skill: asset('chest-skill.webp'),
   enemy_bot_placeholder: asset('spam-bot.svg'),
   enemy_spam_bot_idle: asset('spam-bot.png'),
   enemy_scam_link_idle: asset('scam-link.png'),

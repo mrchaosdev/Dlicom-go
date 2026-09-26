@@ -833,6 +833,7 @@ footer i {
   font-size: 12px;
 }
 .queued-skill-note strong { color: #f0fcff; }
+.queued-skill-note .skill-icon { width: 45px; height: 45px; flex: none; }
 .chest-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -852,21 +853,28 @@ footer i {
 .chest-card .chest-odds { color: #9bcad4; font: 10px/1.6 var(--mono); }
 .chest-card .button { width: 100%; min-height: 46px; margin-top: auto; }
 .chest-card small { color: var(--cyan); font-size: 11px; }
-.chest-emblem {
+.chest-art {
   display: grid;
   place-items: center;
-  width: 70px;
-  height: 70px;
-  border: 1px solid #56bfca;
-  border-radius: 17px;
-  color: #91f3f2;
-  background: #143b4d;
-  box-shadow: 0 0 28px #56dcdf2b;
+  width: 100%;
+  height: 170px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: radial-gradient(ellipse at center, #2b677244, #091627 73%);
 }
-.chest-emblem.skill { border-color: #a796f0; color: #d2baff; background: #322c5b; box-shadow: 0 0 28px #ad88fa2b; }
+.chest-art.skill { background: radial-gradient(ellipse at center, #60409b55, #11162f 73%); }
+.chest-art img {
+  display: block;
+  width: min(100%, 210px);
+  height: 158px;
+  object-fit: contain;
+  filter: drop-shadow(0 9px 18px #50e6ff4d);
+  transition: transform 250ms ease;
+}
+.chest-card:is(:hover, :focus-within) .chest-art img { transform: translateY(-5px) scale(1.05); }
 .chest-reveal {
   display: grid;
-  grid-template-columns: 70px minmax(0, 1fr) auto;
+  grid-template-columns: 205px minmax(0, 1fr);
   align-items: center;
   gap: 17px;
   padding: 22px;
@@ -877,25 +885,30 @@ footer i {
 .chest-reveal.epic, .chest-reveal.legendary { border-color: #c2a4ff; }
 .chest-reveal h2 { margin: 4px 0; font-size: 29px; }
 .chest-reveal p { margin: 0; font-size: 12px; }
+.chest-reveal-visuals { display: flex; align-items: center; gap: 3px; color: var(--cyan); }
 .chest-reveal-burst {
   display: grid;
   place-items: center;
-  width: 70px;
-  height: 70px;
+  width: 91px;
+  height: 91px;
+  flex: none;
   border-radius: 16px;
-  color: #eaffff;
-  background: #246070;
-  box-shadow: 0 0 35px #65eeee77;
+  background: radial-gradient(circle, #29687855, transparent 75%);
 }
-.chest-reveal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.chest-reveal-burst img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 16px #65eeee77); }
+.chest-reveal-reward { display: grid; place-items: center; width: 89px; height: 89px; flex: none; border-radius: 14px; background: #182a42; box-shadow: inset 0 0 0 1px #6a8dad, 0 0 22px #76deee55; color: var(--cyan); }
+.chest-reveal-reward .skill-icon { width: 82px; height: 82px; }
+.chest-reveal-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
 .chest-reveal-actions .button { min-height: 44px; }
 @keyframes chest-open {
   from { opacity: 0; transform: scale(.92); filter: brightness(1.6); }
   to { opacity: 1; transform: scale(1); filter: brightness(1); }
 }
 .reduced-motion .chest-reveal { animation: none; }
+.reduced-motion .chest-card:is(:hover, :focus-within) .chest-art img { transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .chest-reveal { animation: none; }
+  .chest-card:is(:hover, :focus-within) .chest-art img { transform: none; }
 }
 .equipment-hero .hero-art {
   height: 480px;
@@ -2173,9 +2186,8 @@ footer i {
 }
 @media (max-width: 760px) {
   .chest-grid { grid-template-columns: 1fr; }
-  .chest-reveal { grid-template-columns: 56px minmax(0, 1fr); }
-  .chest-reveal-burst { width: 56px; height: 56px; }
-  .chest-reveal-actions { grid-column: 1 / -1; }
+  .chest-reveal { grid-template-columns: 1fr; }
+  .chest-reveal-visuals { justify-content: center; }
   .collection-grid {
     grid-template-columns: 1fr;
   }

@@ -1,5 +1,9 @@
 # Art, VFX and Audio Direction
 
+## Shop chest art
+
+The equipment and skill chests have original transparent cyber-fantasy illustrations in `assets/chest-source/`, with compressed runtime WebP assets in `public/assets/`. Equipment uses navy metal with cyan and magenta circuitry; the skill chest uses a violet translucent core. The Shop shows these as large objects, then reveals the chest beside the actual gear icon or skill art. The reward reveal is decorative and respects reduced motion; text remains the source of reward information.
+
 ## 1. Art identity
 
 Use the provided Dili mascot reference as anchor.
