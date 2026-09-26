@@ -137,7 +137,7 @@ test('Dili skin gallery saves a cosmetic choice and uses it in ranged battle', a
 });
 
 test('cosmetic skins retain matching sword and hammer poses in battle', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize({ width: 320, height: 740 });
   for (const [skinId, weaponId, image] of [
     ['solar_circuit', 'weapon_encryption_blade', 'dili-skin-solar-sword-attack.webp'],
     ['jade_glitch', 'weapon_moderator_hammer', 'dili-skin-jade-hammer-attack.webp'],
@@ -155,6 +155,11 @@ test('cosmetic skins retain matching sword and hammer poses in battle', async ({
     }, { skinId, weaponId });
     await page.reload();
     await expect(page.locator('.hero-art img').first()).toHaveAttribute('src', new RegExp(image.replace('-attack', '-idle')));
+    await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
+    await page.getByRole('tab', { name: 'Skins' }).click();
+    await expect(page.locator(`[data-skin-id="${skinId}"] img`)).toHaveAttribute('src', new RegExp(image.replace('-attack', '-idle')));
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.getByRole('navigation').getByRole('button', { name: 'Play' }).click();
     await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
     const attack = page.waitForResponse((response) => response.url().includes(image));
     await page.getByRole('button', { name: /Data lane/ }).click();

@@ -35,8 +35,8 @@ import type { Archetype, CombatEvent } from '../game/combat/types';
 import type { BattleSnapshot } from '../game/combat/CombatEngine';
 import { useGame } from '../stores/gameStore';
 import { ASSETS, DILI_SKIN_ASSETS, SKILL_ART } from '../content/assets';
-import { SKINS, SKIN_BY_ID } from '../content/skins';
-import { EQUIPMENT, GEAR, UPGRADE_COSTS, gearPrice, loadoutStats, type Slot } from '../content/equipment';
+import { SKINS, SKIN_BY_ID, type SkinId } from '../content/skins';
+import { EQUIPMENT, GEAR, UPGRADE_COSTS, gearPrice, loadoutStats, weaponAttackStyle, type Slot } from '../content/equipment';
 import { RUN_SHOP_COST } from '../game/run/RunSession';
 import { canOpenChest, GEAR_CHEST_COST, SKILL_CHEST_COST } from '../game/meta/chests';
 import { SKILLS, SKILL_BY_ID } from '../content/skills';
@@ -153,13 +153,16 @@ function Meter({
     </div>
   );
 }
+function skinWeaponPreview(skinId: SkinId, weaponId: string) {
+  const poses = DILI_SKIN_ASSETS[skinId];
+  const style = weaponAttackStyle(weaponId);
+  return style === 'blade' ? poses.sword_idle : style === 'hammer' ? poses.hammer_idle : poses.idle;
+}
 function HeroPanel() {
   const weaponId = useGame((state) => state.save.account.equipped.weapon);
   const skinId = useGame((state) => state.save.account.skinId);
-  const style = GEAR[weaponId].attackStyle;
-  const poses = DILI_SKIN_ASSETS[skinId];
-  const preview = style === 'blade' ? poses.sword_idle
-    : style === 'hammer' ? poses.hammer_idle : poses.idle;
+  const weapon = GEAR[weaponId];
+  const preview = skinWeaponPreview(skinId, weaponId);
   return (
     <div className="hero-art">
       <div className="orbit orbit-one" />
@@ -173,7 +176,7 @@ function HeroPanel() {
       <div className="hero-glow" />
       <img
         src={preview}
-        alt={`Dili in ${SKIN_BY_ID[skinId].name}, holding ${style === 'blade' ? 'an encryption sword' : style === 'hammer' ? 'a moderator hammer' : 'a glowing packet blaster'}`}
+        alt={`Dili in ${SKIN_BY_ID[skinId].name}, holding ${weapon.name}`}
       />
       <div className="hero-platform" />
       <span className="hero-caption">
@@ -509,16 +512,18 @@ function InventoryPanel() {
 }
 function SkinPanel() {
   const { save, selectSkin, run } = useGame();
+  const weaponId = save.account.equipped.weapon;
+  const weapon = GEAR[weaponId];
   return (
     <section className="skin-collection" aria-label="Dili skins">
-      <p className="shop-note">All costumes are available and cosmetic only. Your choice is saved locally and applies to the next run{run && !run.result ? '; the active run keeps its current outfit' : ''}.</p>
+      <p className="shop-note">Costume previews use your equipped {weapon.name}. All costumes are cosmetic only and apply to the next run{run && !run.result ? '; the active run keeps its current outfit and weapon' : ''}.</p>
       <div className="skin-grid">
         {SKINS.map((skin) => {
           const selected = save.account.skinId === skin.id;
           return (
             <article className="panel skin-card" key={skin.id} data-skin-id={skin.id} data-selected={selected} style={{ '--skin-color': skin.accent } as CSSProperties}>
-              <div className="skin-card-art"><img src={DILI_SKIN_ASSETS[skin.id].idle} alt={`Dili wearing ${skin.name}`} loading="lazy" /></div>
-              <div><span className="eyebrow">DILI COSTUME</span><h2>{skin.name}</h2><p>{skin.description}</p></div>
+              <div className="skin-card-art"><img src={skinWeaponPreview(skin.id, weaponId)} alt={`Dili wearing ${skin.name} and holding ${weapon.name}`} loading="lazy" /></div>
+              <div><span className="eyebrow">DILI COSTUME · {weapon.name.toUpperCase()}</span><h2>{skin.name}</h2><p>{skin.description}</p></div>
               <Button disabled={selected} onClick={() => selectSkin(skin.id)}>{selected ? 'Selected' : 'Use this skin'}</Button>
             </article>
           );

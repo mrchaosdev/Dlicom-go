@@ -1,4 +1,4 @@
-import { EQUIPMENT, loadoutStats, GEAR, UPGRADE_COSTS, gearPrice, type Slot, type AttackStyle } from '../../content/equipment';
+import { EQUIPMENT, loadoutStats, GEAR, UPGRADE_COSTS, gearPrice, weaponAttackStyle, type Slot, type AttackStyle } from '../../content/equipment';
 import { getChapter } from '../../content/chapters';
 import { NODES, generateEncounter, generateEventElite } from '../../content/encounters';
 import { eventsForChapter, type EventEffect } from '../../content/events';
@@ -60,7 +60,7 @@ export class RunSession {
     getChapter(chapterId);
     this.rng = new SeededRng(seed);
     this.level = accountLevel(save.account.xp);
-    this.weaponStyle = GEAR[save.account.equipped.weapon].attackStyle ?? 'ranged';
+    this.weaponStyle = weaponAttackStyle(save.account.equipped.weapon);
     this.skinId = save.account.skinId;
     this.starterSkill = save.account.queuedSkill;
     if (this.starterSkill) this.skills[this.starterSkill] = 1;

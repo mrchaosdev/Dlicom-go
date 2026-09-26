@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { defaultSave, loadSave, migrateSave, SAVE_KEY, writeSave } from '../src/services/save';
 import { buyGear, equip, RUN_SHOP_COST, RunSession, upgrade, upgradeItem } from '../src/game/run/RunSession';
-import { gearPrice, GEAR } from '../src/content/equipment';
+import { EQUIPMENT, gearPrice, GEAR, weaponAttackStyle } from '../src/content/equipment';
 import { SKILL_BY_ID } from '../src/content/skills';
 import { NODES } from '../src/content/encounters';
 import { CHAPTERS } from '../src/content/chapters';
@@ -138,6 +138,13 @@ describe('run progression', () => {
     save.account.equipped.weapon = 'weapon_moderator_hammer';
     expect(run.weaponStyle).toBe('blade');
     expect(new RunSession('hammer-style', save).weaponStyle).toBe('hammer');
+  });
+  it('requires every weapon to declare its presentation style', () => {
+    expect(EQUIPMENT.filter((item) => item.slot === 'weapon').map((item) => item.attackStyle)).toEqual([
+      'ranged', 'hammer', 'ranged', 'ranged', 'blade', 'ranged',
+    ]);
+    expect(weaponAttackStyle('weapon_encryption_blade')).toBe('blade');
+    expect(() => weaponAttackStyle('armor_firewall_shell')).toThrow('Expected an equipped weapon');
   });
   it('captures a cosmetic skin for the entire run without changing combat stats', () => {
     const save = defaultSave();

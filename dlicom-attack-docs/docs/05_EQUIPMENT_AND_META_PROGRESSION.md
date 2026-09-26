@@ -30,6 +30,8 @@ Only 3 slots.
 
 This keeps UI manageable.
 
+A run always has exactly one owned weapon equipped. Every weapon definition must declare its presentation style as `ranged`, `blade` or `hammer`; there is no implicit fallback weapon. Dili's home preview, costume gallery, battle pose, melee movement and attack sound all derive from that equipped weapon. Equipment changes during an active run apply on the next run.
+
 ---
 
 ## 3. Weapon examples

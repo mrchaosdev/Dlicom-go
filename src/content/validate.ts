@@ -93,6 +93,18 @@ const skillSchema = z.object({
   unlockLevel: z.number().int().min(1).max(6),
   effects: z.array(effect).min(1),
 });
+const equipmentBase = z.object({
+  id,
+  name: z.string().min(1),
+  description: z.string().min(1),
+  rarity: z.enum(['common', 'rare', 'epic', 'legendary']).optional(),
+  stats: z.record(z.number().finite()),
+});
+const equipmentSchema = z.discriminatedUnion('slot', [
+  equipmentBase.extend({ slot: z.literal('weapon'), attackStyle: z.enum(['ranged', 'blade', 'hammer']) }),
+  equipmentBase.extend({ slot: z.literal('armor'), attackStyle: z.never().optional() }),
+  equipmentBase.extend({ slot: z.literal('module'), attackStyle: z.never().optional() }),
+]);
 export function validateContent(skills: SkillDefinition[] = SKILLS) {
   const ids = new Set<string>();
   for (const s of skills) {
@@ -117,12 +129,7 @@ export function validateContent(skills: SkillDefinition[] = SKILLS) {
   for (const item of EQUIPMENT) {
     if (ids.has(item.id)) throw new Error(`Duplicate item ID: ${item.id}`);
     ids.add(item.id);
-    z.object({
-      id,
-      name: z.string().min(1),
-      slot: z.enum(['weapon', 'armor', 'module']),
-      stats: z.record(z.number().finite()),
-    }).parse(item);
+    equipmentSchema.parse(item);
   }
   if (EQUIPMENT.length !== 18) throw new Error(`Expected 18 equipment definitions, got ${EQUIPMENT.length}`);
   const chapterIds = new Set<string>();

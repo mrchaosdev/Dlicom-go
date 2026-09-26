@@ -1,15 +1,17 @@
 import { BASE_STATS, type Rarity, type Stats } from '../game/combat/types';
 export type Slot = 'weapon' | 'armor' | 'module';
 export type AttackStyle = 'ranged' | 'blade' | 'hammer';
-export interface Equipment {
+interface EquipmentBase {
   id: string;
   name: string;
-  slot: Slot;
   description: string;
   rarity?: Rarity;
   stats: Partial<Stats>;
-  attackStyle?: AttackStyle;
 }
+export type Equipment = EquipmentBase & (
+  | { slot: 'weapon'; attackStyle: AttackStyle }
+  | { slot: 'armor' | 'module'; attackStyle?: never }
+);
 export const EQUIPMENT: Equipment[] = [
   {
     id: 'weapon_packet_blaster',
@@ -17,6 +19,7 @@ export const EQUIPMENT: Equipment[] = [
     slot: 'weapon',
     description: '+10 ATK · Basic damage +10%',
     stats: { atk: 10, basicDamage: 0.1 },
+    attackStyle: 'ranged',
   },
   {
     id: 'weapon_moderator_hammer',
@@ -32,10 +35,11 @@ export const EQUIPMENT: Equipment[] = [
     slot: 'weapon',
     description: '+10 ATK · Start with 20 Rage',
     stats: { atk: 10, startRage: 20 },
+    attackStyle: 'ranged',
   },
   {
     id: 'weapon_viral_launcher', name: 'Viral Launcher', slot: 'weapon', rarity: 'rare',
-    description: '+12 ATK · Viral explosions +20%', stats: { atk: 12, viralLauncher: 0.2 },
+    description: '+12 ATK · Viral explosions +20%', stats: { atk: 12, viralLauncher: 0.2 }, attackStyle: 'ranged',
   },
   {
     id: 'weapon_encryption_blade', name: 'Encryption Blade', slot: 'weapon', rarity: 'rare',
@@ -44,7 +48,7 @@ export const EQUIPMENT: Equipment[] = [
   },
   {
     id: 'weapon_dliclip_cannon', name: 'DliClip Cannon', slot: 'weapon', rarity: 'epic',
-    description: '+14 ATK · Critical DliClip damage +25%', stats: { atk: 14, clipDamage: 0.25 },
+    description: '+14 ATK · Critical DliClip damage +25%', stats: { atk: 14, clipDamage: 0.25 }, attackStyle: 'ranged',
   },
   {
     id: 'armor_firewall_shell',
@@ -113,7 +117,12 @@ export const EQUIPMENT: Equipment[] = [
     description: 'Boss damage +8%', stats: { bossDamage: 0.08 },
   },
 ];
-export const GEAR = Object.fromEntries(EQUIPMENT.map((e) => [e.id, e]));
+export const GEAR: Record<string, Equipment> = Object.fromEntries(EQUIPMENT.map((e) => [e.id, e]));
+export function weaponAttackStyle(id: string): AttackStyle {
+  const item = GEAR[id];
+  if (!item || item.slot !== 'weapon') throw new Error(`Expected an equipped weapon, got ${id}`);
+  return item.attackStyle;
+}
 export const UPGRADE_COSTS = [100, 180, 300, 500];
 export const GEAR_PRICES: Record<Rarity, number> = {
   common: 150,
