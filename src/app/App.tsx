@@ -4,6 +4,7 @@ import {
   ArrowRight,
   AudioLines,
   Bolt,
+  BookOpen,
   Check,
   ChevronRight,
   CircleHelp,
@@ -204,6 +205,9 @@ function HomeScreen() {
             <Button onClick={() => navigate('equipment')}>
               <Cpu size={18} /> Loadout
             </Button>
+            <Button onClick={() => navigate('guide')}>
+              <CircleHelp size={18} /> How to play
+            </Button>
           </div>
           <div className="hero-foot">
             <span>
@@ -282,6 +286,41 @@ function HomeScreen() {
         </div>
       </section>
     </>
+  );
+}
+function GuideScreen() {
+  const { start, navigate, run } = useGame();
+  const enter = () => (run && !run.result ? navigate('play') : start());
+  const steps = [
+    { number: '01', icon: Cpu, title: 'Prepare your loadout', text: 'Equip a weapon, armor and module before a run. Gear stats apply to your next run, and upgrades spend Bits.' },
+    { number: '02', icon: ArrowRight, title: 'Choose a route', text: 'Pick a lane at each route map. Battles build your run; events, rest stops and elites offer different risks and rewards.' },
+    { number: '03', icon: Swords, title: 'Watch Dili fight automatically', text: 'Attacks, skills and enemy turns resolve on their own. Pause or switch between ×1 and ×2 speed whenever you need.' },
+    { number: '04', icon: Sparkles, title: 'Build a skill synergy', text: 'After a battle, choose 1 of 3 skills. Read each effect and tags, then combine skills that reinforce the same strategy. Tap a skill or status to inspect it.' },
+    { number: '05', icon: Crown, title: 'Reach the boss and improve', text: 'Clear 12 nodes to face the chapter boss. Victory earns Bits and equipment; use them to upgrade your loadout and try a new build.' },
+  ];
+  return (
+    <div className="guide-page">
+      <PageHeading kicker="YOUR FIRST RUN, DECODED" title="How to play" text="No reflex tests or manual aiming. Make a few sharp choices and let Dili handle the fight." />
+      <section className="guide-steps" aria-label="How to play steps">
+        {steps.map(({ number, icon: Icon, title: stepTitle, text }) => (
+          <article className="panel guide-step" key={number}>
+            <span className="guide-number">{number}</span>
+            <span className="square-icon"><Icon size={21} /></span>
+            <div><h3>{stepTitle}</h3><p>{text}</p></div>
+          </article>
+        ))}
+      </section>
+      <section className="panel guide-tip">
+        <div className="square-icon"><Zap size={21} /></div>
+        <div><span className="eyebrow">QUICK TIP</span><p>Skills with matching tags can trigger each other. Check your active skills during a run and look for a build taking shape.</p></div>
+      </section>
+      <div className="guide-actions">
+        <Button className="primary" audioChapterId={run && !run.result ? run.chapterId : 'chapter_feed'} onClick={enter}>
+          <Play size={17} fill="currentColor" /> {run && !run.result ? 'Resume connection' : 'Start your first run'} <ArrowRight size={18} />
+        </Button>
+        <Button onClick={() => navigate('equipment')}><Cpu size={17} /> View loadout</Button>
+      </div>
+    </div>
   );
 }
 function EquipmentScreen() {
@@ -1002,6 +1041,7 @@ export default function App() {
         <nav aria-label="Main navigation">
           {[
             ['home', 'Play', Home],
+            ['guide', 'Guide', BookOpen],
             ['equipment', 'Loadout', Cpu],
             ['achievements', 'Records', Trophy],
           ].map(([id, label, Icon]) => {
@@ -1010,7 +1050,7 @@ export default function App() {
               <button
                 key={String(id)}
                 className={screen === id || (id === 'home' && screen === 'play') ? 'active' : ''}
-                onClick={() => navigate(id as 'home' | 'equipment' | 'achievements')}
+                onClick={() => navigate(id as 'home' | 'guide' | 'equipment' | 'achievements')}
               >
                 <NavIcon size={16} />
                 <span>{String(label)}</span>
@@ -1053,6 +1093,8 @@ export default function App() {
         )}
         {screen === 'home' ? (
           <HomeScreen />
+        ) : screen === 'guide' ? (
+          <GuideScreen />
         ) : screen === 'equipment' ? (
           <EquipmentScreen />
         ) : screen === 'settings' ? (

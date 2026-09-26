@@ -20,7 +20,7 @@ interface GameStore {
   warning: string;
   run?: RunSession;
   revision: number;
-  screen: 'home' | 'equipment' | 'settings' | 'achievements' | 'play';
+  screen: 'home' | 'guide' | 'equipment' | 'settings' | 'achievements' | 'play';
   paused: boolean;
   speed: 1 | 2;
   events: CombatEvent[];

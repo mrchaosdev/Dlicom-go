@@ -20,6 +20,7 @@ npm run dev
 Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight automatically. Between fights, choose one of three skills. Reach that chapter's boss at node 12, collect Bits and equipment, upgrade your loadout, and try another build.
 
 - Mouse/touch only; no aiming or manual movement.
+- Open **Guide** from the main navigation or **How to play** on the home screen for a step-by-step first-run walkthrough.
 - Pause and ×1/×2 during battle.
 - Tap a skill/status to inspect it.
 - Music, SFX, reduced motion and default speed in Settings.

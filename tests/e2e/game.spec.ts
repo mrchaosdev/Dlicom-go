@@ -36,6 +36,14 @@ test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => 
     );
   }
   await page.setViewportSize({ width: 360, height: 800 });
+  await page.getByRole('navigation').getByRole('button', { name: 'Guide' }).click();
+  await expect(page.getByRole('heading', { name: 'How to play' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'How to play steps' }).locator('article')).toHaveCount(5);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'Start your first run' }).click();
+  await expect(page.getByRole('button', { name: /Data lane/ })).toBeVisible();
+  await page.getByRole('button', { name: 'DLICOM ATTACK home' }).click();
+  await page.setViewportSize({ width: 360, height: 800 });
   await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
   await expect(page.getByRole('heading', { name: 'Packet Blaster' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

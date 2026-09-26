@@ -21,9 +21,14 @@ tiny desktop-first UI.
 
 ## Title
 - Play
+- How to play
 - Equipment
 - Achievements
 - Settings
+
+## How to play
+- Explain the first-run loop: loadout, route choices, automatic combat, skill drafts, boss and rewards.
+- Include mobile-readable steps and a direct action to start or resume a run.
 
 ## Chapter Select
 - 4 chapter cards
