@@ -14,6 +14,16 @@ Dili has four selectable costumes: the original Signal Blue, Night Operative, So
 
 Preserve Dili's blue face, speech-bubble head, round transparent helmet, antenna and friendly proportions across all costumes. Keep a costume's silhouette, materials, weapon design and energy language consistent through its complete eight-pose set. Runtime assets are encoded as transparent WebP at quality 86.
 
+## Ranged weapon identity
+
+Ranged weapons must be identifiable from the battle sprite, not only from UI text. Packet Blaster keeps the costume's base gun. The other three weapons have idle/attack masters for all four costumes in `assets/weapon-source/`, with compressed 512 x 512 runtime WebP files in `public/assets/`.
+
+- **Overdrive Core:** visible gyroscope reactor, stacked capacitors, short vented barrel and tight reactor-ring discharge.
+- **Viral Launcher:** asymmetric capsule chamber, branching node tubes, warning fins, hexagonal muzzle and connected-node payload.
+- **DliClip Cannon:** triangular play aperture, clip-frame cartridges, timeline rail, broadcast fins and video-frame projectile echoes.
+
+The exact equipped weapon ID selects the art. Costume colors may affect trim and energy, but the weapon's silhouette and core motif must remain recognizable. Sword and hammer retain their dedicated costume pose sets. Hurt and ultimate presentation must preserve the equipped weapon: Packet Blaster can use its dedicated reaction/ultimate art, while other weapons keep their own idle/attack sprite under the reaction motion and VFX.
+
 ## 1. Art identity
 
 Use the provided Dili mascot reference as anchor.

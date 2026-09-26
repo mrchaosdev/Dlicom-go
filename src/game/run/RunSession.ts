@@ -21,6 +21,7 @@ export const RUN_SHOP_COST = 80;
 export class RunSession {
   readonly rng: SeededRng;
   readonly baseStats: Stats;
+  readonly weaponId: string;
   readonly weaponStyle: AttackStyle;
   readonly skinId: SkinId;
   readonly starterSkill: string;
@@ -60,7 +61,8 @@ export class RunSession {
     getChapter(chapterId);
     this.rng = new SeededRng(seed);
     this.level = accountLevel(save.account.xp);
-    this.weaponStyle = weaponAttackStyle(save.account.equipped.weapon);
+    this.weaponId = save.account.equipped.weapon;
+    this.weaponStyle = weaponAttackStyle(this.weaponId);
     this.skinId = save.account.skinId;
     this.starterSkill = save.account.queuedSkill;
     if (this.starterSkill) this.skills[this.starterSkill] = 1;

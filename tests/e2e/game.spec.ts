@@ -136,11 +136,14 @@ test('Dili skin gallery saves a cosmetic choice and uses it in ranged battle', a
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
-test('cosmetic skins retain matching sword and hammer poses in battle', async ({ page }) => {
+test('cosmetic skins retain matching equipped weapon poses in gallery and battle', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 740 });
   for (const [skinId, weaponId, image] of [
     ['solar_circuit', 'weapon_encryption_blade', 'dili-skin-solar-sword-attack.webp'],
     ['jade_glitch', 'weapon_moderator_hammer', 'dili-skin-jade-hammer-attack.webp'],
+    ['signal_blue', 'weapon_overdrive_core', 'dili-weapon-overdrive-signal-attack.webp'],
+    ['neon_rose', 'weapon_viral_launcher', 'dili-weapon-viral-rose-attack.webp'],
+    ['solar_circuit', 'weapon_dliclip_cannon', 'dili-weapon-dliclip-solar-attack.webp'],
   ]) {
     await page.goto('/');
     await page.evaluate(async ({ skinId, weaponId }) => {

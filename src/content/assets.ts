@@ -1,4 +1,5 @@
 import type { Archetype } from '../game/combat/types';
+import { weaponAttackStyle } from './equipment';
 import type { SkinId } from './skins';
 
 const asset = (file: string) => `${import.meta.env.BASE_URL}assets/${file}`;
@@ -103,3 +104,43 @@ export const DILI_SKIN_ASSETS: Record<SkinId, Record<DiliPose, string>> = {
   solar_circuit: costumeAssetSet('solar'),
   jade_glitch: costumeAssetSet('jade'),
 };
+
+export interface DiliWeaponPoseSet {
+  idle: string;
+  attack: string;
+  hurt: string;
+  ultimate: string;
+}
+const rangedVariantAssetSet = (skin: string) => ({
+  weapon_overdrive_core: {
+    idle: asset(`dili-weapon-overdrive-${skin}-idle.webp`),
+    attack: asset(`dili-weapon-overdrive-${skin}-attack.webp`),
+  },
+  weapon_viral_launcher: {
+    idle: asset(`dili-weapon-viral-${skin}-idle.webp`),
+    attack: asset(`dili-weapon-viral-${skin}-attack.webp`),
+  },
+  weapon_dliclip_cannon: {
+    idle: asset(`dili-weapon-dliclip-${skin}-idle.webp`),
+    attack: asset(`dili-weapon-dliclip-${skin}-attack.webp`),
+  },
+});
+const RANGED_WEAPON_VARIANTS: Record<SkinId, Record<string, { idle: string; attack: string }>> = {
+  signal_blue: rangedVariantAssetSet('signal'),
+  neon_rose: rangedVariantAssetSet('rose'),
+  solar_circuit: rangedVariantAssetSet('solar'),
+  jade_glitch: rangedVariantAssetSet('jade'),
+};
+export function diliWeaponPoses(skinId: SkinId, weaponId: string): DiliWeaponPoseSet {
+  const costume = DILI_SKIN_ASSETS[skinId];
+  const style = weaponAttackStyle(weaponId);
+  if (style === 'blade')
+    return { idle: costume.sword_idle, attack: costume.sword_attack, hurt: costume.sword_idle, ultimate: costume.sword_attack };
+  if (style === 'hammer')
+    return { idle: costume.hammer_idle, attack: costume.hammer_attack, hurt: costume.hammer_idle, ultimate: costume.hammer_attack };
+  if (weaponId === 'weapon_packet_blaster')
+    return { idle: costume.idle, attack: costume.attack, hurt: costume.hurt, ultimate: costume.ultimate };
+  const variant = RANGED_WEAPON_VARIANTS[skinId][weaponId];
+  if (!variant) throw new Error(`Missing Dili ranged weapon art for ${skinId}:${weaponId}`);
+  return { ...variant, hurt: variant.idle, ultimate: variant.attack };
+}

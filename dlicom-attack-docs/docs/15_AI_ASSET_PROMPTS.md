@@ -136,3 +136,15 @@ ultimate
 ## Glitch Phantom
 
 > Same Dili mascot wearing a deep midnight-teal hooded data-cloak with an asymmetric torn pixel hem, floating data shards, faceted jade armor, luminous circuit cracks, one angular shoulder guard and jade headset details. Dark weapons split into jade data effects. Ultimate creates a teal-jade data rupture with pixel shards and broken circuit arcs. Preserve Dili's blue face, round transparent helmet, antenna and cute proportions. Polished 2D game sprite, thick clean outline, readable silhouette, transparent background.
+
+---
+
+# 15. Ranged weapon variants
+
+Use the matching costume idle or attack master as the only image reference. Preserve the costume, character, hands, pose, face, helmet, silhouette and transparent framing. Replace only the firearm. Generate idle and attack for Signal Blue, Night Operative, Solar Vanguard and Glitch Phantom. Costume colors may tune the energy and trim while the weapon structure remains consistent.
+
+- **Overdrive Core:** compact forearm-supported energy cannon, large visible gyroscope reactor centered in the receiver, two stacked capacitor cylinders, short vented barrel, tight reactor rings and concentrated overclock bolt.
+- **Viral Launcher:** chunky asymmetric bio-digital launcher, translucent capsule chamber, branching network-node tubes, warning fins, wide hexagonal muzzle and a projectile made of connected viral nodes.
+- **DliClip Cannon:** compact cinematic data-projector cannon, triangular play-button muzzle aperture, two clip-frame cartridges, glowing timeline rail, angular broadcast fins and a rectangular video-data projectile with frame echoes.
+
+Always require genuine alpha transparency and exclude scenery, floor, text, letters, logos, watermarks, borders, extra limbs, swords and hammers.

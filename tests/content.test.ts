@@ -8,6 +8,8 @@ import { generateEncounter } from '../src/content/encounters';
 import { SKILL_GLYPHS, STATUS_GLYPHS } from '../src/content/skillGlyphs';
 import { ACHIEVEMENTS } from '../src/content/achievements';
 import { ACHIEVEMENT_GLYPHS, EQUIPMENT_GLYPHS } from '../src/content/progressionIcons';
+import { diliWeaponPoses } from '../src/content/assets';
+import { SKIN_IDS } from '../src/content/skins';
 it('validates every definition', () => expect(() => validateContent()).not.toThrow());
 it('provides a distinct art glyph for all 70 skills and each combat status', () => {
   expect(Object.keys(SKILL_GLYPHS).sort()).toEqual(SKILLS.map(({ id }) => id).sort());
@@ -24,6 +26,20 @@ it('provides an individual glyph for every piece of gear and achievement', () =>
   expect(achievements.map(({ id }) => id).sort()).toEqual(['feed_cleaner', 'first_login']);
   expect(Object.keys(ACHIEVEMENT_GLYPHS).sort()).toEqual(achievements.map(({ id }) => id).sort());
   expect(new Set(Object.values(ACHIEVEMENT_GLYPHS)).size).toBe(achievements.length);
+});
+it('provides distinct ranged weapon art for every Dili costume', () => {
+  const rangedWeapons = [
+    'weapon_packet_blaster',
+    'weapon_overdrive_core',
+    'weapon_viral_launcher',
+    'weapon_dliclip_cannon',
+  ];
+  for (const skinId of SKIN_IDS) {
+    const poses = rangedWeapons.map((weaponId) => diliWeaponPoses(skinId, weaponId));
+    expect(new Set(poses.map(({ idle }) => idle)).size).toBe(rangedWeapons.length);
+    expect(new Set(poses.map(({ attack }) => attack)).size).toBe(rangedWeapons.length);
+    expect(poses.slice(1).every(({ idle, hurt }) => idle === hurt)).toBe(true);
+  }
 });
 it('ships four deterministic chapters, twenty events and eighteen equipment items', () => {
   expect(CHAPTERS).toHaveLength(4);

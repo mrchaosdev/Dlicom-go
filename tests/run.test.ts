@@ -133,9 +133,11 @@ describe('run progression', () => {
     save.account.inventory.weapon_encryption_blade = 1;
     save.account.equipped.weapon = 'weapon_encryption_blade';
     const run = new RunSession('blade-style', save);
+    expect(run.weaponId).toBe('weapon_encryption_blade');
     expect(run.weaponStyle).toBe('blade');
     save.account.inventory.weapon_moderator_hammer = 1;
     save.account.equipped.weapon = 'weapon_moderator_hammer';
+    expect(run.weaponId).toBe('weapon_encryption_blade');
     expect(run.weaponStyle).toBe('blade');
     expect(new RunSession('hammer-style', save).weaponStyle).toBe('hammer');
   });

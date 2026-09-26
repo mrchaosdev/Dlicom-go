@@ -34,9 +34,9 @@ import type { CSSProperties, ReactNode } from 'react';
 import type { Archetype, CombatEvent } from '../game/combat/types';
 import type { BattleSnapshot } from '../game/combat/CombatEngine';
 import { useGame } from '../stores/gameStore';
-import { ASSETS, DILI_SKIN_ASSETS, SKILL_ART } from '../content/assets';
-import { SKINS, SKIN_BY_ID, type SkinId } from '../content/skins';
-import { EQUIPMENT, GEAR, UPGRADE_COSTS, gearPrice, loadoutStats, weaponAttackStyle, type Slot } from '../content/equipment';
+import { ASSETS, SKILL_ART, diliWeaponPoses } from '../content/assets';
+import { SKINS, SKIN_BY_ID } from '../content/skins';
+import { EQUIPMENT, GEAR, UPGRADE_COSTS, gearPrice, loadoutStats, type Slot } from '../content/equipment';
 import { RUN_SHOP_COST } from '../game/run/RunSession';
 import { canOpenChest, GEAR_CHEST_COST, SKILL_CHEST_COST } from '../game/meta/chests';
 import { SKILLS, SKILL_BY_ID } from '../content/skills';
@@ -153,16 +153,11 @@ function Meter({
     </div>
   );
 }
-function skinWeaponPreview(skinId: SkinId, weaponId: string) {
-  const poses = DILI_SKIN_ASSETS[skinId];
-  const style = weaponAttackStyle(weaponId);
-  return style === 'blade' ? poses.sword_idle : style === 'hammer' ? poses.hammer_idle : poses.idle;
-}
 function HeroPanel() {
   const weaponId = useGame((state) => state.save.account.equipped.weapon);
   const skinId = useGame((state) => state.save.account.skinId);
   const weapon = GEAR[weaponId];
-  const preview = skinWeaponPreview(skinId, weaponId);
+  const preview = diliWeaponPoses(skinId, weaponId).idle;
   return (
     <div className="hero-art">
       <div className="orbit orbit-one" />
@@ -522,7 +517,7 @@ function SkinPanel() {
           const selected = save.account.skinId === skin.id;
           return (
             <article className="panel skin-card" key={skin.id} data-skin-id={skin.id} data-selected={selected} style={{ '--skin-color': skin.accent } as CSSProperties}>
-              <div className="skin-card-art"><img src={skinWeaponPreview(skin.id, weaponId)} alt={`Dili wearing ${skin.name} and holding ${weapon.name}`} loading="lazy" /></div>
+              <div className="skin-card-art"><img src={diliWeaponPoses(skin.id, weaponId).idle} alt={`Dili wearing ${skin.name} and holding ${weapon.name}`} loading="lazy" /></div>
               <div><span className="eyebrow">DILI COSTUME · {weapon.name.toUpperCase()}</span><h2>{skin.name}</h2><p>{skin.description}</p></div>
               <Button disabled={selected} onClick={() => selectSkin(skin.id)}>{selected ? 'Selected' : 'Use this skin'}</Button>
             </article>

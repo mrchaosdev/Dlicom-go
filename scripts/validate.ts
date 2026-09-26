@@ -92,6 +92,16 @@ for (const skin of ['rose', 'solar', 'jade']) {
     if (bytes > 120_000) throw new Error(`Compressed skin pose too large: ${file} (${bytes} > 120000)`);
   }
 }
+for (const weapon of ['overdrive', 'viral', 'dliclip']) {
+  for (const skin of ['signal', 'rose', 'solar', 'jade']) {
+    for (const pose of ['idle', 'attack']) {
+      const file = `dili-weapon-${weapon}-${skin}-${pose}.webp`;
+      if (!existsSync(`public/assets/${file}`)) throw new Error(`Weapon pose missing: ${file}`);
+      const bytes = statSync(`public/assets/${file}`).size;
+      if (bytes > 120_000) throw new Error(`Compressed weapon pose too large: ${file} (${bytes} > 120000)`);
+    }
+  }
+}
 for (const file of ['chest-gear.webp', 'chest-skill.webp']) {
   const bytes = statSync(`public/assets/${file}`).size;
   if (bytes > 100_000) throw new Error(`Compressed chest art too large: ${file} (${bytes} > 100000)`);

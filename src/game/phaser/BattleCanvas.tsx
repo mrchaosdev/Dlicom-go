@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
-import { ASSETS, DILI_SKIN_ASSETS } from '../../content/assets';
+import { ASSETS, diliWeaponPoses } from '../../content/assets';
 import type { AttackStyle } from '../../content/equipment';
 import type { SkinId } from '../../content/skins';
 import { getChapter } from '../../content/chapters';
@@ -152,6 +152,7 @@ class BattleScene extends Phaser.Scene {
   private ready = false;
   constructor(
     private readonly chapterId: string,
+    private readonly weaponId: string,
     private readonly attackStyle: AttackStyle,
     private readonly skinId: SkinId,
     private readonly onCue: (event: CombatEvent) => void,
@@ -160,19 +161,12 @@ class BattleScene extends Phaser.Scene {
     super('battle');
   }
   preload() {
-    const poses = DILI_SKIN_ASSETS[this.skinId];
+    const weaponPoses = diliWeaponPoses(this.skinId, this.weaponId);
     this.load.image('battle_background', BACKGROUND_SPRITES[this.chapterId]);
-    this.load.image('dili_idle', poses.idle);
-    this.load.image('dili_attack', poses.attack);
-    if (this.attackStyle === 'blade') {
-      this.load.image('dili_sword_idle', poses.sword_idle);
-      this.load.image('dili_sword_attack', poses.sword_attack);
-    } else if (this.attackStyle === 'hammer') {
-      this.load.image('dili_hammer_idle', poses.hammer_idle);
-      this.load.image('dili_hammer_attack', poses.hammer_attack);
-    }
-    this.load.image('dili_hurt', poses.hurt);
-    this.load.image('dili_ultimate', poses.ultimate);
+    this.load.image('dili_idle', weaponPoses.idle);
+    this.load.image('dili_attack', weaponPoses.attack);
+    this.load.image('dili_hurt', weaponPoses.hurt);
+    this.load.image('dili_ultimate', weaponPoses.ultimate);
     this.load.image('skill_hammer', ASSETS.skill_hammer);
     this.load.image('skill_viral', ASSETS.skill_viral);
     this.load.image('skill_rage', ASSETS.skill_rage);
@@ -335,7 +329,7 @@ class BattleScene extends Phaser.Scene {
     const sprite = this.add.image(
       x,
       y,
-      hero ? this.attackStyle === 'blade' ? 'dili_sword_idle' : this.attackStyle === 'hammer' ? 'dili_hammer_idle' : 'dili_idle' : boss ? bossKeys[actor.kind] ?? 'king' : ENEMY_SPRITES[enemyKind] ? enemyKind : 'bot',
+      hero ? 'dili_idle' : boss ? bossKeys[actor.kind] ?? 'king' : ENEMY_SPRITES[enemyKind] ? enemyKind : 'bot',
     );
     const size = hero ? 230 : boss ? 245 : summoned ? 135 : 155;
     sprite
@@ -423,14 +417,7 @@ class BattleScene extends Phaser.Scene {
   private showHeroPose(texture: 'dili_idle' | 'dili_attack' | 'dili_hurt' | 'dili_ultimate', duration: number) {
     const hero = this.sprites.get('dili');
     if (!hero) return;
-    const activeTexture = this.attackStyle === 'blade'
-      ? texture === 'dili_idle' ? 'dili_sword_idle'
-        : texture === 'dili_attack' || texture === 'dili_ultimate' ? 'dili_sword_attack' : texture
-      : this.attackStyle === 'hammer'
-        ? texture === 'dili_idle' ? 'dili_hammer_idle'
-          : texture === 'dili_attack' || texture === 'dili_ultimate' ? 'dili_hammer_attack' : texture
-        : texture;
-    hero.setTexture(activeTexture).setDisplaySize(230, (230 * hero.height) / hero.width);
+    hero.setTexture(texture).setDisplaySize(230, (230 * hero.height) / hero.width);
     const breathing = this.breathing.get('dili');
     if (breathing) breathing.baseScaleY = hero.scaleY;
     this.heroPoseWait = duration;
@@ -967,12 +954,14 @@ export default function BattleCanvas({
   handlers.current = { onCue, onSnapshot };
   const sequence = useGame((s) => s.sequence);
   const chapterId = useGame((s) => s.run?.chapterId ?? 'chapter_feed');
+  const weaponId = useGame((s) => s.run?.weaponId ?? 'weapon_packet_blaster');
   const attackStyle = useGame((s) => s.run?.weaponStyle ?? 'ranged');
   const skinId = useGame((s) => s.run?.skinId ?? 'signal_blue');
   useEffect(() => {
     const mount = parent.current!;
     const current = new BattleScene(
       chapterId,
+      weaponId,
       attackStyle,
       skinId,
       (event) => handlers.current.onCue(event),
@@ -996,7 +985,7 @@ export default function BattleCanvas({
       mount.replaceChildren();
       scene.current = null;
     };
-  }, [chapterId, attackStyle, skinId]);
+  }, [chapterId, weaponId, attackStyle, skinId]);
   useEffect(() => {
     const state = useGame.getState();
     if (state.snapshot) scene.current?.sync(state.snapshot, state.events);
