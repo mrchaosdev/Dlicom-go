@@ -139,6 +139,17 @@ describe('run progression', () => {
     expect(run.weaponStyle).toBe('blade');
     expect(new RunSession('hammer-style', save).weaponStyle).toBe('hammer');
   });
+  it('captures a cosmetic skin for the entire run without changing combat stats', () => {
+    const save = defaultSave();
+    const baseline = new RunSession('skin-seed', save);
+    save.account.skinId = 'neon_rose';
+    const rose = new RunSession('skin-seed', save);
+    expect(rose.skinId).toBe('neon_rose');
+    expect(rose.baseStats).toEqual(baseline.baseStats);
+    save.account.skinId = 'jade_glitch';
+    expect(rose.skinId).toBe('neon_rose');
+    expect(new RunSession('skin-seed', save).skinId).toBe('jade_glitch');
+  });
   it('route definition matches the GDD', () =>
     expect(NODES).toEqual([
       'battle',
@@ -156,7 +167,7 @@ describe('run progression', () => {
     ]));
 });
 describe('save compatibility and recovery', () => {
-  it('roundtrips version 3 and migrates versions 1 and 2 without losing progress', () => {
+  it('roundtrips version 4 and migrates versions 1, 2 and 3 without losing progress', () => {
     const now = 1_700_000_000_000;
     const current = defaultSave(now);
     expect(migrateSave(JSON.parse(JSON.stringify(current)), now)).toEqual(current);
@@ -168,19 +179,28 @@ describe('save compatibility and recovery', () => {
     delete legacy.account.activeRunEnergy;
     delete legacy.account.dailyClaimedOn;
     const migrated = migrateSave(legacy, now);
-    expect(migrated.version).toBe(3);
+    expect(migrated.version).toBe(4);
     expect(migrated.account.bits).toBe(750);
     expect(migrated.account.energy).toBe(15);
     expect(migrated.account.queuedSkill).toBe('');
+    expect(migrated.account.skinId).toBe('signal_blue');
     const previous = JSON.parse(JSON.stringify(current));
     previous.version = 2;
     previous.account.bits = 420;
     delete previous.account.queuedSkill;
     const migratedPrevious = migrateSave(previous, now);
-    expect(migratedPrevious.version).toBe(3);
+    expect(migratedPrevious.version).toBe(4);
     expect(migratedPrevious.account.bits).toBe(420);
     expect(migratedPrevious.account.energy).toBe(current.account.energy);
     expect(migratedPrevious.account.queuedSkill).toBe('');
+    const chestVersion = JSON.parse(JSON.stringify(current));
+    chestVersion.version = 3;
+    chestVersion.account.queuedSkill = 'packet_boost';
+    delete chestVersion.account.skinId;
+    const migratedChestVersion = migrateSave(chestVersion, now);
+    expect(migratedChestVersion.version).toBe(4);
+    expect(migratedChestVersion.account.queuedSkill).toBe('packet_boost');
+    expect(migratedChestVersion.account.skinId).toBe('signal_blue');
   });
   it.each([
     '{bad',
@@ -205,6 +225,11 @@ describe('save compatibility and recovery', () => {
   it('rejects equipped items in the wrong slot', () => {
     const save = defaultSave();
     save.account.equipped.weapon = 'armor_firewall_shell';
+    expect(() => migrateSave(save)).toThrow();
+  });
+  it('rejects an unknown saved skin ID', () => {
+    const save = defaultSave();
+    (save.account as { skinId: string }).skinId = 'unknown_skin';
     expect(() => migrateSave(save)).toThrow();
   });
   it('keeps the game playable when storage quota is exhausted', () => {

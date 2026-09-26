@@ -155,6 +155,8 @@ Per the later human direction, the loadout screen also has an Inventory and a ge
 
 The later chest request adds two optional Bits purchases in that Shop. A **Gear chest costs 250 Bits** and reveals one random unowned equipment item. The base rarity weights are Common 55%, Rare 30%, Epic 12%, Legendary 3%; tiers with no unowned items are skipped and the remaining weights are normalized. The chest closes when the full collection is owned. A **Skill chest costs 200 Bits** and reveals one currently unlocked skill with no unmet prerequisites. It is queued at Rank 1 for the next run. Only one skill may be queued; the skill remains queued if that run is interrupted or the page reloads, and is consumed when the run ends. These prices and weights are reversible balance assumptions. Chest draws use seeded RNG, show the result immediately, and remain local-save only.
 
+The later skin request adds a Skins tab beside Loadout, Inventory and Shop. Signal Blue and three alternate Dili palettes are available without Bits cost. Skin choice is cosmetic, stored in versioned local save, and applied to all Dili combat poses at the start of the next run. No skin adds stats or changes skill rules.
+
 ---
 
 ## 8. Drop system

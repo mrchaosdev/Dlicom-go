@@ -1,12 +1,13 @@
 import { z } from 'zod';
 import { GEAR } from '../content/equipment';
 import { SKILL_BY_ID } from '../content/skills';
+import { SKIN_IDS } from '../content/skins';
 import { ENERGY_MAX, RUN_ENERGY_COST, STARTING_ENERGY, recoverInterruptedEnergy } from '../game/meta/energy';
 export const SAVE_KEY = 'dlicom_attack_v1';
 const equipmentId = z.string().refine((id) => !!GEAR[id], 'Unknown equipment ID');
 const schema = z
   .object({
-    version: z.literal(3),
+    version: z.literal(4),
     account: z.object({
       bits: z.number().int().min(0).max(1e9),
       xp: z.number().int().min(0).max(1e9),
@@ -22,6 +23,7 @@ const schema = z
       activeRunEnergy: z.union([z.literal(0), z.literal(RUN_ENERGY_COST)]),
       dailyClaimedOn: z.string().regex(/^(?:|\d{4}-\d{2}-\d{2})$/),
       queuedSkill: z.string().refine((id) => !id || !!SKILL_BY_ID[id], 'Unknown skill ID'),
+      skinId: z.enum(SKIN_IDS),
     }),
     settings: z.object({
       music: z.number().min(0).max(1),
@@ -42,7 +44,7 @@ const schema = z
 export type SaveFile = z.infer<typeof schema>;
 export function defaultSave(now = Date.now()): SaveFile {
   return {
-    version: 3,
+    version: 4,
     account: {
       bits: 0,
       xp: 0,
@@ -62,17 +64,18 @@ export function defaultSave(now = Date.now()): SaveFile {
       activeRunEnergy: 0,
       dailyClaimedOn: '',
       queuedSkill: '',
+      skinId: 'signal_blue',
     },
     settings: { music: 0.25, sfx: 0.5, reducedMotion: false, speed: 1 },
   };
 }
 export function migrateSave(raw: unknown, now = Date.now()): SaveFile {
-  if (raw && typeof raw === 'object' && 'version' in raw && (raw.version === 1 || raw.version === 2)
+  if (raw && typeof raw === 'object' && 'version' in raw && (raw.version === 1 || raw.version === 2 || raw.version === 3)
     && 'account' in raw && raw.account && typeof raw.account === 'object') {
     const previous = raw as Record<string, unknown> & { account: Record<string, unknown> };
     return schema.parse({
       ...previous,
-      version: 3,
+      version: 4,
       account: {
         ...previous.account,
         ...(raw.version === 1 ? {
@@ -81,7 +84,8 @@ export function migrateSave(raw: unknown, now = Date.now()): SaveFile {
           activeRunEnergy: 0,
           dailyClaimedOn: '',
         } : {}),
-        queuedSkill: '',
+        queuedSkill: raw.version === 3 ? previous.account.queuedSkill : '',
+        skinId: 'signal_blue',
       },
     });
   }

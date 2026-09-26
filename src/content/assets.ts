@@ -1,4 +1,5 @@
 import type { Archetype } from '../game/combat/types';
+import type { SkinId } from './skins';
 
 const asset = (file: string) => `${import.meta.env.BASE_URL}assets/${file}`;
 export const ASSETS = {
@@ -74,4 +75,31 @@ export const SKILL_ART: Record<Archetype, string> = {
   viral: ASSETS.skill_viral,
   rage: ASSETS.skill_rage,
   heal: ASSETS.skill_heal,
+};
+
+export type DiliPose = 'idle' | 'attack' | 'sword_idle' | 'sword_attack' | 'hammer_idle' | 'hammer_attack' | 'hurt' | 'ultimate';
+const palette = (name: string): Record<DiliPose, string> => ({
+  idle: asset(`dili-skin-${name}-idle.webp`),
+  attack: asset(`dili-skin-${name}-attack.webp`),
+  sword_idle: asset(`dili-skin-${name}-sword-idle.webp`),
+  sword_attack: asset(`dili-skin-${name}-sword-attack.webp`),
+  hammer_idle: asset(`dili-skin-${name}-hammer-idle.webp`),
+  hammer_attack: asset(`dili-skin-${name}-hammer-attack.webp`),
+  hurt: asset(`dili-skin-${name}-hurt.webp`),
+  ultimate: asset(`dili-skin-${name}-ultimate.webp`),
+});
+export const DILI_SKIN_ASSETS: Record<SkinId, Record<DiliPose, string>> = {
+  signal_blue: {
+    idle: ASSETS.dili_idle,
+    attack: ASSETS.dili_attack,
+    sword_idle: ASSETS.dili_sword_idle,
+    sword_attack: ASSETS.dili_sword_attack,
+    hammer_idle: ASSETS.dili_hammer_idle,
+    hammer_attack: ASSETS.dili_hammer_attack,
+    hurt: ASSETS.dili_hurt,
+    ultimate: ASSETS.dili_ultimate,
+  },
+  neon_rose: palette('rose'),
+  solar_circuit: palette('solar'),
+  jade_glitch: palette('jade'),
 };

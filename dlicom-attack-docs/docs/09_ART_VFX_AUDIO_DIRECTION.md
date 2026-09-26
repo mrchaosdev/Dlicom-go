@@ -4,6 +4,12 @@
 
 The equipment and skill chests have original transparent cyber-fantasy illustrations in `assets/chest-source/`, with compressed runtime WebP assets in `public/assets/`. Equipment uses navy metal with cyan and magenta circuitry; the skill chest uses a violet translucent core. The Shop shows these as large objects, then reveals the chest beside the actual gear icon or skill art. The reward reveal is decorative and respects reduced motion; text remains the source of reward information.
 
+## Dili cosmetic skins
+
+Dili has four selectable visual palettes: the original Signal Blue plus Neon Rose, Solar Circuit and Jade Glitch. Each alternate palette is derived consistently from the existing Dili pose artwork and includes ranged idle/attack, sword idle/attack, hammer idle/attack, hurt and ultimate. These are compressed transparent WebP assets in `public/assets/`. Skins alter only presentation; combat rules and stats are unchanged. The selected skin is saved locally and captured when a run starts, so changing it while a run is active affects the next run.
+
+The palette transforms are hue rotations of 85°, 170° and 265° respectively, at 1.1/1.08/1.08 saturation. Source poses are resized to 512 px width and encoded as transparent WebP at quality 88. Keep the full eight-pose set aligned when adjusting a palette.
+
 ## 1. Art identity
 
 Use the provided Dili mascot reference as anchor.

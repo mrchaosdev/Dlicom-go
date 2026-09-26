@@ -39,6 +39,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Twenty seeded events with choices, run buffs, healing, Bits, skill drafts and optional elite fights.
 - Dili reference-based combat poses, distinct generated sprites for all ten normal enemy kinds and four bosses, four illustrated chapter battle backgrounds, one original synthesized music loop per chapter, bounded VFX/text objects and SFX.
 - Equipping Encryption Blade or Moderator Hammer changes Dili's idle and attack poses and turns basic attacks into a melee slash or heavy smash; their equipment passives also shape the build.
+- Four selectable Dili skins appear across ranged, sword and hammer poses, plus hurt and ultimate. Skin choice saves locally and never changes combat stats.
 - Node 10's Signal Bazaar offers an optional Rare-or-better skill draft for 80 run Bits, creating a choice between immediate power and the final Bits payout. Short transitions identify each new run phase.
 - Responsive desktop/mobile UI, keyboard focus states, local fonts and local audio.
 

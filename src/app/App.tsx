@@ -30,11 +30,12 @@ import {
   Volume2,
   Zap,
 } from 'lucide-react';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { Archetype, CombatEvent } from '../game/combat/types';
 import type { BattleSnapshot } from '../game/combat/CombatEngine';
 import { useGame } from '../stores/gameStore';
-import { ASSETS, SKILL_ART } from '../content/assets';
+import { ASSETS, DILI_SKIN_ASSETS, SKILL_ART } from '../content/assets';
+import { SKINS, SKIN_BY_ID } from '../content/skins';
 import { EQUIPMENT, GEAR, UPGRADE_COSTS, gearPrice, loadoutStats, type Slot } from '../content/equipment';
 import { RUN_SHOP_COST } from '../game/run/RunSession';
 import { canOpenChest, GEAR_CHEST_COST, SKILL_CHEST_COST } from '../game/meta/chests';
@@ -154,9 +155,11 @@ function Meter({
 }
 function HeroPanel() {
   const weaponId = useGame((state) => state.save.account.equipped.weapon);
+  const skinId = useGame((state) => state.save.account.skinId);
   const style = GEAR[weaponId].attackStyle;
-  const preview = style === 'blade' ? ASSETS.dili_sword_idle
-    : style === 'hammer' ? ASSETS.dili_hammer_idle : ASSETS.dili_idle;
+  const poses = DILI_SKIN_ASSETS[skinId];
+  const preview = style === 'blade' ? poses.sword_idle
+    : style === 'hammer' ? poses.hammer_idle : poses.idle;
   return (
     <div className="hero-art">
       <div className="orbit orbit-one" />
@@ -170,7 +173,7 @@ function HeroPanel() {
       <div className="hero-glow" />
       <img
         src={preview}
-        alt={`Dili, the blue cyber mascot, holding ${style === 'blade' ? 'an encryption sword' : style === 'hammer' ? 'a moderator hammer' : 'a glowing packet blaster'}`}
+        alt={`Dili in ${SKIN_BY_ID[skinId].name}, holding ${style === 'blade' ? 'an encryption sword' : style === 'hammer' ? 'a moderator hammer' : 'a glowing packet blaster'}`}
       />
       <div className="hero-platform" />
       <span className="hero-caption">
@@ -341,7 +344,7 @@ function GuideScreen() {
   const { start, navigate, run } = useGame();
   const enter = () => (run && !run.result ? navigate('play') : start());
   const steps = [
-    { number: '01', icon: Cpu, title: 'Prepare your loadout', text: 'Equip a weapon, armor and module before a run. Each run costs 5 energy; 1 restores every 10 minutes and your daily check-in grants 5 more.' },
+    { number: '01', icon: Cpu, title: 'Prepare your loadout', text: 'Equip a weapon, armor and module, then choose Dili\'s skin. Each run costs 5 energy; 1 restores every 10 minutes and your daily check-in grants 5 more.' },
     { number: '02', icon: ArrowRight, title: 'Choose a route', text: 'Pick a lane at each route map. Battles build your run; events, rest stops and elites offer different risks and rewards.' },
     { number: '03', icon: Swords, title: 'Watch Dili fight automatically', text: 'Attacks, skills and enemy turns resolve on their own. Pause or switch between ×1 and ×2 speed whenever you need.' },
     { number: '04', icon: Sparkles, title: 'Build a skill synergy', text: 'After a battle, choose 1 of 3 skills. Read each effect and tags, then combine skills that reinforce the same strategy. Tap a skill or status to inspect it.' },
@@ -374,19 +377,20 @@ function GuideScreen() {
 }
 function EquipmentScreen() {
   const { save, equip, upgrade, start, run } = useGame();
-  const [tab, setTab] = useState<'loadout' | 'inventory' | 'shop'>('loadout');
+  const [tab, setTab] = useState<'loadout' | 'inventory' | 'shop' | 'skins'>('loadout');
   const stats = loadoutStats(save.account.equipped, save.account.inventory);
   return (
     <>
       <PageHeading
         kicker="BUILD YOUR NEXT RUN"
-        title={tab === 'loadout' ? 'Your loadout' : tab === 'inventory' ? 'Your inventory' : 'Network shop'}
+        title={tab === 'loadout' ? 'Your loadout' : tab === 'inventory' ? 'Your inventory' : tab === 'shop' ? 'Network shop' : 'Dili skins'}
         text={tab === 'loadout' ? 'Three slots. A different way to break the network.'
           : tab === 'inventory' ? 'Every item you own, grouped by slot. Upgrade or equip for your next run.'
-            : 'Spend earned Bits on a known item or open a gear or skill chest.'}
+            : tab === 'shop' ? 'Spend earned Bits on a known item or open a gear or skill chest.'
+              : 'Choose a look for Dili. Skins change visuals only, across every combat pose.'}
       />
       <div className="gear-tabs" role="tablist" aria-label="Equipment views">
-        {([['loadout', 'Loadout'], ['inventory', 'Inventory'], ['shop', 'Shop']] as const).map(([id, label]) => (
+        {([['loadout', 'Loadout'], ['inventory', 'Inventory'], ['shop', 'Shop'], ['skins', 'Skins']] as const).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>{label}</button>
         ))}
       </div>
@@ -469,7 +473,7 @@ function EquipmentScreen() {
           </p>
         </div>
       </div>
-      ) : tab === 'inventory' ? <InventoryPanel /> : <GearShopPanel onPurchased={() => setTab('inventory')} />}
+      ) : tab === 'inventory' ? <InventoryPanel /> : tab === 'shop' ? <GearShopPanel onPurchased={() => setTab('inventory')} /> : <SkinPanel />}
     </>
   );
 }
@@ -501,6 +505,26 @@ function InventoryPanel() {
         </section>
       ))}
     </div>
+  );
+}
+function SkinPanel() {
+  const { save, selectSkin, run } = useGame();
+  return (
+    <section className="skin-collection" aria-label="Dili skins">
+      <p className="shop-note">All skins are available. Your choice is saved locally and applies to the next run{run && !run.result ? '; the active run keeps its current look' : ''}.</p>
+      <div className="skin-grid">
+        {SKINS.map((skin) => {
+          const selected = save.account.skinId === skin.id;
+          return (
+            <article className="panel skin-card" key={skin.id} data-skin-id={skin.id} data-selected={selected} style={{ '--skin-color': skin.accent } as CSSProperties}>
+              <div className="skin-card-art"><img src={DILI_SKIN_ASSETS[skin.id].idle} alt={`Dili wearing ${skin.name}`} loading="lazy" /></div>
+              <div><span className="eyebrow">DILI SKIN</span><h2>{skin.name}</h2><p>{skin.description}</p></div>
+              <Button disabled={selected} onClick={() => selectSkin(skin.id)}>{selected ? 'Selected' : 'Use this skin'}</Button>
+            </article>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 function GearShopPanel({ onPurchased }: { onPurchased: () => void }) {

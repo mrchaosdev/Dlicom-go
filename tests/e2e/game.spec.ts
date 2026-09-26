@@ -112,6 +112,54 @@ test('blade and hammer loadouts use their own battle poses and finish melee hits
   }
 });
 
+test('Dili skin gallery saves a cosmetic choice and uses it in ranged battle', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.goto('/');
+  await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
+  await page.getByRole('tab', { name: 'Skins' }).click();
+  await expect(page.locator('[data-skin-id]')).toHaveCount(4);
+  await expect(page.locator('[data-skin-id="signal_blue"] button')).toBeDisabled();
+  const rose = page.locator('[data-skin-id="neon_rose"]');
+  await rose.getByRole('button', { name: 'Use this skin' }).click();
+  await expect(rose.getByRole('button', { name: 'Selected' })).toBeDisabled();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.reload();
+  await expect(page.locator('.hero-art img').first()).toHaveAttribute('src', /dili-skin-rose-idle\.webp/);
+  await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
+  const attack = page.waitForResponse((response) => response.url().includes('dili-skin-rose-attack.webp'));
+  await page.getByRole('button', { name: /Data lane/ }).click();
+  expect((await attack).status()).toBe(200);
+  await expect(page.locator('.battle-canvas canvas').first()).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('cosmetic skins retain matching sword and hammer poses in battle', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const [skinId, weaponId, image] of [
+    ['solar_circuit', 'weapon_encryption_blade', 'dili-skin-solar-sword-attack.webp'],
+    ['jade_glitch', 'weapon_moderator_hammer', 'dili-skin-jade-hammer-attack.webp'],
+  ]) {
+    await page.goto('/');
+    await page.evaluate(async ({ skinId, weaponId }) => {
+      const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+        .find((url) => url.includes('/src/services/save.ts'))!;
+      const { defaultSave, SAVE_KEY } = await import(path);
+      const save = defaultSave();
+      save.account.skinId = skinId as typeof save.account.skinId;
+      save.account.inventory[weaponId] = 1;
+      save.account.equipped.weapon = weaponId;
+      localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+    }, { skinId, weaponId });
+    await page.reload();
+    await expect(page.locator('.hero-art img').first()).toHaveAttribute('src', new RegExp(image.replace('-attack', '-idle')));
+    await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
+    const attack = page.waitForResponse((response) => response.url().includes(image));
+    await page.getByRole('button', { name: /Data lane/ }).click();
+    expect((await attack).status()).toBe(200);
+    await expect(page.locator('.battle-canvas canvas').first()).toBeVisible();
+  }
+});
+
 test('gear shop purchase appears in inventory, equips and survives reload on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto('/');

@@ -823,6 +823,34 @@ footer i {
 .collection-empty {
   padding: 24px;
 }
+.skin-collection { padding-bottom: 25px; }
+.skin-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.skin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  min-width: 0;
+  padding: 20px;
+}
+.skin-card[data-selected='true'] { border-color: var(--skin-color); box-shadow: inset 0 0 0 1px var(--skin-color); }
+.skin-card-art {
+  display: grid;
+  place-items: center;
+  height: 190px;
+  overflow: hidden;
+  border-radius: 11px;
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--skin-color) 20%, #0b172a), #0b172a 75%);
+}
+.skin-card-art img {
+  display: block;
+  width: min(100%, 175px);
+  height: 185px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 15px #0008);
+}
+.skin-card h2 { margin: 4px 0; font-size: 27px; }
+.skin-card p { margin: 0; font-size: 12px; }
+.skin-card .button { min-height: 44px; margin-top: auto; }
 .queued-skill-note {
   display: flex;
   align-items: center;
@@ -2185,6 +2213,7 @@ footer i {
   }
 }
 @media (max-width: 760px) {
+  .skin-grid { grid-template-columns: 1fr; }
   .chest-grid { grid-template-columns: 1fr; }
   .chest-reveal { grid-template-columns: 1fr; }
   .chest-reveal-visuals { justify-content: center; }
@@ -2430,6 +2459,8 @@ footer i {
   .gear-tabs button {
     min-width: 0;
     flex: 1;
+    padding: 8px 6px;
+    font-size: 10px;
   }
   .hero-actions {
     flex-wrap: wrap;

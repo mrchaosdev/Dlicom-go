@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
-import { ASSETS } from '../../content/assets';
+import { ASSETS, DILI_SKIN_ASSETS } from '../../content/assets';
 import type { AttackStyle } from '../../content/equipment';
+import type { SkinId } from '../../content/skins';
 import { getChapter } from '../../content/chapters';
 import { useGame } from '../../stores/gameStore';
 import { playBossAttackSound, playSound } from '../../services/audio';
@@ -152,24 +153,26 @@ class BattleScene extends Phaser.Scene {
   constructor(
     private readonly chapterId: string,
     private readonly attackStyle: AttackStyle,
+    private readonly skinId: SkinId,
     private readonly onCue: (event: CombatEvent) => void,
     private readonly onSnapshot: (snapshot: BattleSnapshot) => void,
   ) {
     super('battle');
   }
   preload() {
+    const poses = DILI_SKIN_ASSETS[this.skinId];
     this.load.image('battle_background', BACKGROUND_SPRITES[this.chapterId]);
-    this.load.image('dili_idle', ASSETS.dili_idle);
-    this.load.image('dili_attack', ASSETS.dili_attack);
+    this.load.image('dili_idle', poses.idle);
+    this.load.image('dili_attack', poses.attack);
     if (this.attackStyle === 'blade') {
-      this.load.image('dili_sword_idle', ASSETS.dili_sword_idle);
-      this.load.image('dili_sword_attack', ASSETS.dili_sword_attack);
+      this.load.image('dili_sword_idle', poses.sword_idle);
+      this.load.image('dili_sword_attack', poses.sword_attack);
     } else if (this.attackStyle === 'hammer') {
-      this.load.image('dili_hammer_idle', ASSETS.dili_hammer_idle);
-      this.load.image('dili_hammer_attack', ASSETS.dili_hammer_attack);
+      this.load.image('dili_hammer_idle', poses.hammer_idle);
+      this.load.image('dili_hammer_attack', poses.hammer_attack);
     }
-    this.load.image('dili_hurt', ASSETS.dili_hurt);
-    this.load.image('dili_ultimate', ASSETS.dili_ultimate);
+    this.load.image('dili_hurt', poses.hurt);
+    this.load.image('dili_ultimate', poses.ultimate);
     this.load.image('skill_hammer', ASSETS.skill_hammer);
     this.load.image('skill_viral', ASSETS.skill_viral);
     this.load.image('skill_rage', ASSETS.skill_rage);
@@ -965,11 +968,13 @@ export default function BattleCanvas({
   const sequence = useGame((s) => s.sequence);
   const chapterId = useGame((s) => s.run?.chapterId ?? 'chapter_feed');
   const attackStyle = useGame((s) => s.run?.weaponStyle ?? 'ranged');
+  const skinId = useGame((s) => s.run?.skinId ?? 'signal_blue');
   useEffect(() => {
     const mount = parent.current!;
     const current = new BattleScene(
       chapterId,
       attackStyle,
+      skinId,
       (event) => handlers.current.onCue(event),
       (snapshot) => handlers.current.onSnapshot(snapshot),
     );
@@ -991,7 +996,7 @@ export default function BattleCanvas({
       mount.replaceChildren();
       scene.current = null;
     };
-  }, [chapterId, attackStyle]);
+  }, [chapterId, attackStyle, skinId]);
   useEffect(() => {
     const state = useGame.getState();
     if (state.snapshot) scene.current?.sync(state.snapshot, state.events);

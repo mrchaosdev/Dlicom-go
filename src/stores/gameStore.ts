@@ -6,6 +6,7 @@ import type { CombatEvent } from '../game/combat/types';
 import type { BattleSnapshot } from '../game/combat/CombatEngine';
 import { RUN_ENERGY_COST, claimDailyEnergy, rechargeEnergy, spendRunEnergy } from '../game/meta/energy';
 import { openChest, type ChestKind, type ChestReward } from '../game/meta/chests';
+import { SKIN_BY_ID, type SkinId } from '../content/skins';
 function initial() {
   try {
     return loadSave(window.localStorage);
@@ -45,6 +46,7 @@ interface GameStore {
   buyGear: (id: string) => void;
   openChest: (kind: ChestKind) => void;
   clearChestReward: () => void;
+  selectSkin: (id: SkinId) => void;
 }
 export const useGame = create<GameStore>((set, get) => {
   const save = (next: SaveFile) => {
@@ -157,5 +159,10 @@ export const useGame = create<GameStore>((set, get) => {
       set({ chestReward: result.reward });
     },
     clearChestReward: () => set({ chestReward: undefined }),
+    selectSkin: (id) => {
+      if (!SKIN_BY_ID[id] || get().save.account.skinId === id) return;
+      const current = get().save;
+      save({ ...current, account: { ...current.account, skinId: id } });
+    },
   };
 });

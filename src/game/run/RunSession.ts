@@ -15,12 +15,14 @@ import {
 } from '../combat/types';
 import { SeededRng } from '../rng/SeededRng';
 import { generateDraft } from './Draft';
+import type { SkinId } from '../../content/skins';
 export type Phase = 'route' | 'battle' | 'draft' | 'event' | 'rest' | 'summary';
 export const RUN_SHOP_COST = 80;
 export class RunSession {
   readonly rng: SeededRng;
   readonly baseStats: Stats;
   readonly weaponStyle: AttackStyle;
+  readonly skinId: SkinId;
   readonly starterSkill: string;
   readonly level: number;
   readonly skills: OwnedSkills = {};
@@ -59,6 +61,7 @@ export class RunSession {
     this.rng = new SeededRng(seed);
     this.level = accountLevel(save.account.xp);
     this.weaponStyle = GEAR[save.account.equipped.weapon].attackStyle ?? 'ranged';
+    this.skinId = save.account.skinId;
     this.starterSkill = save.account.queuedSkill;
     if (this.starterSkill) this.skills[this.starterSkill] = 1;
     this.baseStats = loadoutStats(save.account.equipped, save.account.inventory);
