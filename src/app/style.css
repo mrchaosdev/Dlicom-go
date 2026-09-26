@@ -823,6 +823,80 @@ footer i {
 .collection-empty {
   padding: 24px;
 }
+.queued-skill-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 700px;
+  margin: -9px 0 23px;
+  color: var(--cyan);
+  font-size: 12px;
+}
+.queued-skill-note strong { color: #f0fcff; }
+.chest-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.chest-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  min-width: 0;
+  padding: 22px;
+  background: radial-gradient(circle at top right, #264866 0, transparent 50%), #101d2f;
+}
+.chest-card h3 { margin: 4px 0 6px; font-size: 27px; }
+.chest-card p { margin: 0; color: var(--muted); font-size: 12px; }
+.chest-card .chest-odds { color: #9bcad4; font: 10px/1.6 var(--mono); }
+.chest-card .button { width: 100%; min-height: 46px; margin-top: auto; }
+.chest-card small { color: var(--cyan); font-size: 11px; }
+.chest-emblem {
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  border: 1px solid #56bfca;
+  border-radius: 17px;
+  color: #91f3f2;
+  background: #143b4d;
+  box-shadow: 0 0 28px #56dcdf2b;
+}
+.chest-emblem.skill { border-color: #a796f0; color: #d2baff; background: #322c5b; box-shadow: 0 0 28px #ad88fa2b; }
+.chest-reveal {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 17px;
+  padding: 22px;
+  border-color: #74d9e7;
+  background: radial-gradient(circle at 30% 50%, #214656, #101e30 75%);
+  animation: chest-open 480ms ease-out both;
+}
+.chest-reveal.epic, .chest-reveal.legendary { border-color: #c2a4ff; }
+.chest-reveal h2 { margin: 4px 0; font-size: 29px; }
+.chest-reveal p { margin: 0; font-size: 12px; }
+.chest-reveal-burst {
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  color: #eaffff;
+  background: #246070;
+  box-shadow: 0 0 35px #65eeee77;
+}
+.chest-reveal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.chest-reveal-actions .button { min-height: 44px; }
+@keyframes chest-open {
+  from { opacity: 0; transform: scale(.92); filter: brightness(1.6); }
+  to { opacity: 1; transform: scale(1); filter: brightness(1); }
+}
+.reduced-motion .chest-reveal { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .chest-reveal { animation: none; }
+}
 .equipment-hero .hero-art {
   height: 480px;
 }
@@ -2098,6 +2172,10 @@ footer i {
   }
 }
 @media (max-width: 760px) {
+  .chest-grid { grid-template-columns: 1fr; }
+  .chest-reveal { grid-template-columns: 56px minmax(0, 1fr); }
+  .chest-reveal-burst { width: 56px; height: 56px; }
+  .chest-reveal-actions { grid-column: 1 / -1; }
   .collection-grid {
     grid-template-columns: 1fr;
   }

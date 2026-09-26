@@ -25,7 +25,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Pause and ×1/×2 during battle.
 - Tap a skill/status to inspect it.
 - Music, SFX, reduced motion and default speed in Settings.
-- Equipment, Bits, Energy, daily claims, account unlocks, records and settings save locally. Loadout, Inventory and Shop let players buy specific gear with earned Bits, equip it, and upgrade owned gear. An active run is in memory; refreshing ends it and refunds its Energy. A malformed save is backed up where storage permits and defaults recover safely.
+- Equipment, Bits, Energy, daily claims, account unlocks, records and settings save locally. Loadout, Inventory and Shop let players buy specific gear, open gear or skill chests with earned Bits, equip items, and upgrade owned gear. A skill chest queues a Rank 1 starter skill for the next run. An active run is in memory; refreshing ends it and refunds its Energy while preserving a queued chest skill. A malformed save is backed up where storage permits and defaults recover safely.
 
 ## Included in v0.2
 

@@ -153,6 +153,8 @@ No complex fusion.
 
 Per the later human direction, the loadout screen also has an Inventory and a gear Shop. Inventory groups owned gear by the three existing slots and allows equipping or upgrading any owned item, including items outside the active loadout. The Shop spends earned account Bits to buy a specific unowned item at level 1 and immediately equips it for the next run. Repeated purchases of an owned item are unavailable. Current reversible rarity prices are Common 150, Rare 350, Epic 750 and Legendary 1400 Bits. This adds no extra currency, slots, backend or payment flow.
 
+The later chest request adds two optional Bits purchases in that Shop. A **Gear chest costs 250 Bits** and reveals one random unowned equipment item. The base rarity weights are Common 55%, Rare 30%, Epic 12%, Legendary 3%; tiers with no unowned items are skipped and the remaining weights are normalized. The chest closes when the full collection is owned. A **Skill chest costs 200 Bits** and reveals one currently unlocked skill with no unmet prerequisites. It is queued at Rank 1 for the next run. Only one skill may be queued; the skill remains queued if that run is interrupted or the page reloads, and is consumed when the run ends. These prices and weights are reversible balance assumptions. Chest draws use seeded RNG, show the result immediately, and remain local-save only.
+
 ---
 
 ## 8. Drop system

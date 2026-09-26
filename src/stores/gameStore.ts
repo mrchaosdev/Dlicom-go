@@ -5,6 +5,7 @@ import type { Slot } from '../content/equipment';
 import type { CombatEvent } from '../game/combat/types';
 import type { BattleSnapshot } from '../game/combat/CombatEngine';
 import { RUN_ENERGY_COST, claimDailyEnergy, rechargeEnergy, spendRunEnergy } from '../game/meta/energy';
+import { openChest, type ChestKind, type ChestReward } from '../game/meta/chests';
 function initial() {
   try {
     return loadSave(window.localStorage);
@@ -27,6 +28,7 @@ interface GameStore {
   events: CombatEvent[];
   snapshot?: BattleSnapshot;
   sequence: number;
+  chestReward?: ChestReward;
   navigate: (screen: GameStore['screen']) => void;
   start: (chapterId?: string) => void;
   syncEnergy: () => void;
@@ -41,6 +43,8 @@ interface GameStore {
   upgrade: (slot: Slot) => void;
   upgradeItem: (id: string) => void;
   buyGear: (id: string) => void;
+  openChest: (kind: ChestKind) => void;
+  clearChestReward: () => void;
 }
 export const useGame = create<GameStore>((set, get) => {
   const save = (next: SaveFile) => {
@@ -61,6 +65,7 @@ export const useGame = create<GameStore>((set, get) => {
     speed: loaded.save.settings.speed,
     events: [],
     sequence: 0,
+    chestReward: undefined,
     navigate: (screen) => set({ screen }),
     syncEnergy: () => {
       const current = get().save;
@@ -122,7 +127,11 @@ export const useGame = create<GameStore>((set, get) => {
       run.finishBattle();
       if (run.result) {
         const settled = run.settle(get().save);
-        save({ ...settled, account: { ...settled.account, activeRunEnergy: 0 } });
+        save({ ...settled, account: {
+          ...settled.account,
+          activeRunEnergy: 0,
+          queuedSkill: settled.account.queuedSkill === run.starterSkill ? '' : settled.account.queuedSkill,
+        } });
       }
       refresh();
     },
@@ -136,6 +145,17 @@ export const useGame = create<GameStore>((set, get) => {
     equip: (id) => save(equip(get().save, id)),
     upgrade: (slot) => save(upgrade(get().save, slot)),
     upgradeItem: (id) => save(upgradeItem(get().save, id)),
-    buyGear: (id) => save(buyGear(get().save, id)),
+    buyGear: (id) => {
+      save(buyGear(get().save, id));
+      set({ chestReward: undefined });
+    },
+    openChest: (kind) => {
+      if (kind === 'skill' && get().run && !get().run?.result) return;
+      const result = openChest(get().save, kind, crypto.randomUUID());
+      if (!result.reward) return;
+      save(result.save);
+      set({ chestReward: result.reward });
+    },
+    clearChestReward: () => set({ chestReward: undefined }),
   };
 });

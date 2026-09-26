@@ -156,7 +156,7 @@ describe('run progression', () => {
     ]));
 });
 describe('save compatibility and recovery', () => {
-  it('roundtrips version 2 and migrates version 1 without losing progress', () => {
+  it('roundtrips version 3 and migrates versions 1 and 2 without losing progress', () => {
     const now = 1_700_000_000_000;
     const current = defaultSave(now);
     expect(migrateSave(JSON.parse(JSON.stringify(current)), now)).toEqual(current);
@@ -168,9 +168,19 @@ describe('save compatibility and recovery', () => {
     delete legacy.account.activeRunEnergy;
     delete legacy.account.dailyClaimedOn;
     const migrated = migrateSave(legacy, now);
-    expect(migrated.version).toBe(2);
+    expect(migrated.version).toBe(3);
     expect(migrated.account.bits).toBe(750);
     expect(migrated.account.energy).toBe(15);
+    expect(migrated.account.queuedSkill).toBe('');
+    const previous = JSON.parse(JSON.stringify(current));
+    previous.version = 2;
+    previous.account.bits = 420;
+    delete previous.account.queuedSkill;
+    const migratedPrevious = migrateSave(previous, now);
+    expect(migratedPrevious.version).toBe(3);
+    expect(migratedPrevious.account.bits).toBe(420);
+    expect(migratedPrevious.account.energy).toBe(current.account.energy);
+    expect(migratedPrevious.account.queuedSkill).toBe('');
   });
   it.each([
     '{bad',

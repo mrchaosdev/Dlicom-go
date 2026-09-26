@@ -21,6 +21,7 @@ export class RunSession {
   readonly rng: SeededRng;
   readonly baseStats: Stats;
   readonly weaponStyle: AttackStyle;
+  readonly starterSkill: string;
   readonly level: number;
   readonly skills: OwnedSkills = {};
   readonly stats: BattleStats = emptyBattleStats();
@@ -58,6 +59,8 @@ export class RunSession {
     this.rng = new SeededRng(seed);
     this.level = accountLevel(save.account.xp);
     this.weaponStyle = GEAR[save.account.equipped.weapon].attackStyle ?? 'ranged';
+    this.starterSkill = save.account.queuedSkill;
+    if (this.starterSkill) this.skills[this.starterSkill] = 1;
     this.baseStats = loadoutStats(save.account.equipped, save.account.inventory);
     this.hp = this.baseStats.maxHp;
   }

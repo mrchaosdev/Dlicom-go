@@ -12,6 +12,7 @@ import {
   Crosshair,
   Crown,
   Gauge,
+  Gift,
   Heart,
   Hexagon,
   Home,
@@ -36,6 +37,7 @@ import { useGame } from '../stores/gameStore';
 import { ASSETS, SKILL_ART } from '../content/assets';
 import { EQUIPMENT, GEAR, UPGRADE_COSTS, gearPrice, loadoutStats, type Slot } from '../content/equipment';
 import { RUN_SHOP_COST } from '../game/run/RunSession';
+import { canOpenChest, GEAR_CHEST_COST, SKILL_CHEST_COST } from '../game/meta/chests';
 import { SKILLS, SKILL_BY_ID } from '../content/skills';
 import { NODES, generateEncounter } from '../content/encounters';
 import { CHAPTERS } from '../content/chapters';
@@ -343,7 +345,7 @@ function GuideScreen() {
     { number: '02', icon: ArrowRight, title: 'Choose a route', text: 'Pick a lane at each route map. Battles build your run; events, rest stops and elites offer different risks and rewards.' },
     { number: '03', icon: Swords, title: 'Watch Dili fight automatically', text: 'Attacks, skills and enemy turns resolve on their own. Pause or switch between ×1 and ×2 speed whenever you need.' },
     { number: '04', icon: Sparkles, title: 'Build a skill synergy', text: 'After a battle, choose 1 of 3 skills. Read each effect and tags, then combine skills that reinforce the same strategy. Tap a skill or status to inspect it.' },
-    { number: '05', icon: Crown, title: 'Reach the boss and improve', text: 'Clear 12 nodes to face the chapter boss. Victory earns Bits and equipment; use them to upgrade your loadout and try a new build.' },
+    { number: '05', icon: Crown, title: 'Reach the boss and improve', text: 'Clear 12 nodes to face the chapter boss. Spend earned Bits on gear, upgrades or chests in Shop. A skill chest gives your next run one starting skill.' },
   ];
   return (
     <div className="guide-page">
@@ -378,16 +380,19 @@ function EquipmentScreen() {
     <>
       <PageHeading
         kicker="BUILD YOUR NEXT RUN"
-        title={tab === 'loadout' ? 'Your loadout' : tab === 'inventory' ? 'Your inventory' : 'Gear shop'}
+        title={tab === 'loadout' ? 'Your loadout' : tab === 'inventory' ? 'Your inventory' : 'Network shop'}
         text={tab === 'loadout' ? 'Three slots. A different way to break the network.'
           : tab === 'inventory' ? 'Every item you own, grouped by slot. Upgrade or equip for your next run.'
-            : 'Turn earned Bits into a specific weapon, armor or module.'}
+            : 'Spend earned Bits on a known item or open a gear or skill chest.'}
       />
       <div className="gear-tabs" role="tablist" aria-label="Equipment views">
         {([['loadout', 'Loadout'], ['inventory', 'Inventory'], ['shop', 'Shop']] as const).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>{label}</button>
         ))}
       </div>
+      {save.account.queuedSkill && (
+        <p className="queued-skill-note"><Sparkles size={17} /> Next run starts with <strong>{SKILL_BY_ID[save.account.queuedSkill].name}</strong> from your skill chest.</p>
+      )}
       {tab === 'loadout' ? (
       <div className="equipment-layout">
         <div className="equipment-hero">
@@ -496,11 +501,47 @@ function InventoryPanel() {
   );
 }
 function GearShopPanel({ onPurchased }: { onPurchased: () => void }) {
-  const { save, buyGear } = useGame();
+  const { save, buyGear, openChest, chestReward, clearChestReward, run } = useGame();
   const available = EQUIPMENT.filter((item) => !save.account.inventory[item.id]);
+  const rewardItem = chestReward?.kind === 'gear' ? GEAR[chestReward.id] : undefined;
+  const rewardSkill = chestReward?.kind === 'skill' ? SKILL_BY_ID[chestReward.id] : undefined;
   return (
     <div className="collection-layout">
-      <p className="shop-note">Earn Bits from every run, including defeats. A purchase joins your inventory and equips for your next run.</p>
+      <p className="shop-note">Earn Bits from every run, including defeats. Buy a known item below or open a chest for a surprise.</p>
+      {chestReward && (
+        <div className={`panel chest-reveal ${rewardItem?.rarity ?? rewardSkill?.rarity ?? 'common'}`} role="status" aria-live="polite" key={`${chestReward.kind}:${chestReward.id}`}>
+          <div className="chest-reveal-burst"><Gift size={36} aria-hidden="true" /></div>
+          <div>
+            <span className="eyebrow">CHEST OPENED · {(rewardItem?.rarity ?? rewardSkill?.rarity ?? 'common').toUpperCase()}</span>
+            <h2>{rewardItem?.name ?? rewardSkill?.name}</h2>
+            <p>{rewardItem ? `${rewardItem.description} · Added to your inventory.` : `${rewardSkill?.description} · Ready at the start of your next run.`}</p>
+          </div>
+          <div className="chest-reveal-actions">
+            {rewardItem && <Button onClick={() => { clearChestReward(); onPurchased(); }}>View in inventory</Button>}
+            <Button onClick={clearChestReward}>Close</Button>
+          </div>
+        </div>
+      )}
+      <section className="collection-section">
+        <div className="section-heading"><h2>Open a chest</h2><span className="muted">ONE PURCHASE · ONE REWARD</span></div>
+        <div className="chest-grid">
+          <article className="panel chest-card" data-chest-kind="gear">
+            <div className="chest-emblem gear"><Gift size={38} aria-hidden="true" /></div>
+            <div><span className="eyebrow">EQUIPMENT DROP</span><h3>Gear chest</h3><p>Receive one random item you do not own yet. Its rarity can be Common, Rare, Epic or Legendary.</p></div>
+            <p className="chest-odds">Base rarity odds: Common 55% · Rare 30% · Epic 12% · Legendary 3%. Unavailable tiers are skipped.</p>
+            <Button disabled={!canOpenChest(save, 'gear')} onClick={() => openChest('gear')}><Gift size={16} /> Open · {GEAR_CHEST_COST} Bits</Button>
+            {!available.length && <small>Collection complete.</small>}
+          </article>
+          <article className="panel chest-card" data-chest-kind="skill">
+            <div className="chest-emblem skill"><Sparkles size={38} aria-hidden="true" /></div>
+            <div><span className="eyebrow">NEXT-RUN BOOST</span><h3>Skill chest</h3><p>Reveal one random skill unlocked for your account. Start your next run with it at Rank 1.</p></div>
+            <p className="chest-odds">One skill may be queued. It is spent only when that run ends.</p>
+            <Button disabled={!canOpenChest(save, 'skill') || !!(run && !run.result)} onClick={() => openChest('skill')}><Sparkles size={16} /> Open · {SKILL_CHEST_COST} Bits</Button>
+            {save.account.queuedSkill && <small>{SKILL_BY_ID[save.account.queuedSkill].name} is already queued.</small>}
+          </article>
+        </div>
+      </section>
+      <div className="section-heading"><h2>Choose an item</h2><span className="muted">DIRECT PURCHASE</span></div>
       {available.length ? (['weapon', 'armor', 'module'] as Slot[]).map((slot) => {
         const items = available.filter((item) => item.slot === slot);
         return items.length ? (

@@ -142,6 +142,67 @@ test('gear shop purchase appears in inventory, equips and survives reload on mob
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
+test('shop chests reveal gear and queue a starter skill through reload and settlement', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/services/save.ts'))!;
+    const { defaultSave, SAVE_KEY } = await import(path);
+    const save = defaultSave();
+    save.account.bits = 1000;
+    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+  });
+  await page.reload();
+  await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
+  await page.getByRole('tab', { name: 'Shop' }).click();
+  await page.locator('[data-chest-kind="gear"]').getByRole('button', { name: /Open.*250 Bits/ }).click();
+  await expect(page.getByText('CHEST OPENED', { exact: false })).toBeVisible();
+  const gearId = await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    return (await import(path)).useGame.getState().chestReward.id;
+  });
+  await page.getByRole('button', { name: 'View in inventory' }).click();
+  await expect(page.locator(`[data-inventory-id="${gearId}"]`)).toBeVisible();
+  await page.getByRole('tab', { name: 'Shop' }).click();
+  await page.locator('[data-chest-kind="skill"]').getByRole('button', { name: /Open.*200 Bits/ }).click();
+  const skillId = await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    return (await import(path)).useGame.getState().chestReward.id;
+  });
+  await expect(page.locator('[data-chest-kind="skill"] button')).toBeDisabled();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.reload();
+  await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
+  await expect(page.getByText('Next run starts with', { exact: false })).toBeVisible();
+  await page.getByRole('button', { name: 'Enter the Feed' }).click();
+  const runSkill = await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    const { useGame } = await import(path);
+    return { skills: useGame.getState().run.skills, queued: useGame.getState().save.account.queuedSkill };
+  });
+  expect(runSkill.skills[skillId]).toBe(1);
+  expect(runSkill.queued).toBe(skillId);
+  await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    const { useGame } = await import(path);
+    const state = useGame.getState();
+    state.run.enterNode();
+    state.run.engine.outcome = 'defeat';
+    state.run.engine.hero.hp = 0;
+    state.finish();
+  });
+  expect(await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    return (await import(path)).useGame.getState().save.account.queuedSkill;
+  })).toBe('');
+});
+
 test('Signal Bazaar spends run Bits for a Rare-or-better skill choice', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');

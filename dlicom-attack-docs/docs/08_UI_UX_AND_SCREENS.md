@@ -78,6 +78,8 @@ inventory and upgrade.
 
 Use Loadout, Inventory and Shop tabs. Show owned counts and current levels in Inventory; show price and affordability in Shop. Keep the three-slot loadout visible in its own tab. Short node-arrival transitions may mark route, combat, draft, event and rest changes; they must not add page overflow and must respect reduced-motion settings.
 
+The Shop also offers Gear and Skill chests. Show exact Bits prices, the gear chest's base rarity weights, the one-skill queue limit, and a visible reward reveal. The queued skill must be visible from Loadout before starting a run. Chest reveal animation respects reduced motion and must not introduce horizontal overflow on small phones.
+
 ## Settings
 music
 SFX
