@@ -69,6 +69,10 @@ wav('legendary', 0.82, (t) => {
   return notes.reduce((sum, note) => sum + Math.sin(2 * Math.PI * note * t), 0) * Math.sin(Math.PI * t / 0.82) * 0.055 + sparkle;
 });
 wav('hammer', 0.38, (t) => Math.sin(2 * Math.PI * (230 - 90 * t) * t) * Math.exp(-t * 7) * 0.42);
+wav('sword', 0.26, (t) => (
+  Math.sin(2 * Math.PI * (1400 - 950 * t) * t) * Math.exp(-t * 13) * 0.24 +
+  Math.sin(2 * Math.PI * 260 * t) * Math.exp(-t * 23) * 0.1
+));
 wav('shield-break', 0.34, (t) => (Math.sin(2 * Math.PI * (680 - 900 * t) * t) + Math.sin(2 * Math.PI * 1360 * t) * Math.exp(-t * 14)) * Math.exp(-t * 8) * 0.22);
 wav('boss-king-attack', 0.24, (t) => (Math.sin(2 * Math.PI * 92 * t) + Math.sin(2 * Math.PI * 184 * t) * 0.45) * Math.exp(-t * 11) * 0.32);
 wav('boss-phantom-attack', 0.26, (t) => (Math.sin(2 * Math.PI * (480 - 850 * t) * t) + Math.sin(2 * Math.PI * (490 - 850 * t) * t) * 0.7) * Math.exp(-t * 13) * 0.2);
@@ -114,7 +118,7 @@ loop('core-loop',
 
 const audioFiles = [
   'attack', 'crit', 'ultimate', 'select', 'dodge', 'heal', 'shield', 'death', 'boss-intro',
-  'victory', 'defeat', 'reward', 'legendary', 'hammer', 'shield-break', 'boss-king-attack',
+  'victory', 'defeat', 'reward', 'legendary', 'hammer', 'sword', 'shield-break', 'boss-king-attack',
   'boss-phantom-attack', 'boss-raid-attack', 'boss-null-attack', 'feed-loop', 'dliclips-loop',
   'rooms-loop', 'core-loop',
 ];

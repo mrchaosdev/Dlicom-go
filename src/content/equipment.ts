@@ -1,5 +1,6 @@
 import { BASE_STATS, type Rarity, type Stats } from '../game/combat/types';
 export type Slot = 'weapon' | 'armor' | 'module';
+export type AttackStyle = 'ranged' | 'blade' | 'hammer';
 export interface Equipment {
   id: string;
   name: string;
@@ -7,6 +8,7 @@ export interface Equipment {
   description: string;
   rarity?: Rarity;
   stats: Partial<Stats>;
+  attackStyle?: AttackStyle;
 }
 export const EQUIPMENT: Equipment[] = [
   {
@@ -22,6 +24,7 @@ export const EQUIPMENT: Equipment[] = [
     slot: 'weapon',
     description: '+10 ATK · Hammer every 3 basics',
     stats: { atk: 10, hammerInterval: -1 },
+    attackStyle: 'hammer',
   },
   {
     id: 'weapon_overdrive_core',
@@ -36,6 +39,7 @@ export const EQUIPMENT: Equipment[] = [
   },
   {
     id: 'weapon_encryption_blade', name: 'Encryption Blade', slot: 'weapon', rarity: 'rare',
+    attackStyle: 'blade',
     description: '+12 ATK · After a Dodge, your next attack +30%', stats: { atk: 12, dodgeFollowup: 0.3 },
   },
   {

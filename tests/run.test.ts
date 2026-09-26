@@ -81,6 +81,17 @@ describe('run progression', () => {
     expect(equip(save, 'weapon_moderator_hammer')).toEqual(save);
     expect(upgrade(save, 'weapon')).toEqual(save);
   });
+  it('captures the equipped attack style for the entire run', () => {
+    const save = defaultSave();
+    save.account.inventory.weapon_encryption_blade = 1;
+    save.account.equipped.weapon = 'weapon_encryption_blade';
+    const run = new RunSession('blade-style', save);
+    expect(run.weaponStyle).toBe('blade');
+    save.account.inventory.weapon_moderator_hammer = 1;
+    save.account.equipped.weapon = 'weapon_moderator_hammer';
+    expect(run.weaponStyle).toBe('blade');
+    expect(new RunSession('hammer-style', save).weaponStyle).toBe('hammer');
+  });
   it('route definition matches the GDD', () =>
     expect(NODES).toEqual([
       'battle',

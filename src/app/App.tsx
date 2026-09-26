@@ -150,6 +150,10 @@ function Meter({
   );
 }
 function HeroPanel() {
+  const weaponId = useGame((state) => state.save.account.equipped.weapon);
+  const style = GEAR[weaponId].attackStyle;
+  const preview = style === 'blade' ? ASSETS.dili_sword_idle
+    : style === 'hammer' ? ASSETS.dili_hammer_idle : ASSETS.dili_idle;
   return (
     <div className="hero-art">
       <div className="orbit orbit-one" />
@@ -162,8 +166,8 @@ function HeroPanel() {
       </span>
       <div className="hero-glow" />
       <img
-        src={ASSETS.dili_idle}
-        alt="Dili, the blue cyber mascot, holding a glowing packet blaster"
+        src={preview}
+        alt={`Dili, the blue cyber mascot, holding ${style === 'blade' ? 'an encryption sword' : style === 'hammer' ? 'a moderator hammer' : 'a glowing packet blaster'}`}
       />
       <div className="hero-platform" />
       <span className="hero-caption">

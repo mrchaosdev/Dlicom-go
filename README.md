@@ -38,6 +38,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Three equipment slots, 18 equipment items across four rarities, five upgrade levels and a chest on victory.
 - Twenty seeded events with choices, run buffs, healing, Bits, skill drafts and optional elite fights.
 - Dili reference-based combat poses, distinct generated sprites for all ten normal enemy kinds and four bosses, four illustrated chapter battle backgrounds, one original synthesized music loop per chapter, bounded VFX/text objects and SFX.
+- Equipping Encryption Blade or Moderator Hammer changes Dili's idle and attack poses and turns basic attacks into a melee slash or heavy smash; their equipment passives also shape the build.
 - Responsive desktop/mobile UI, keyboard focus states, local fonts and local audio.
 
 ## Architecture

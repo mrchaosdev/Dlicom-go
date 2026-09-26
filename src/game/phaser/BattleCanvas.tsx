@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import { ASSETS } from '../../content/assets';
+import type { AttackStyle } from '../../content/equipment';
 import { getChapter } from '../../content/chapters';
 import { useGame } from '../../stores/gameStore';
 import { playBossAttackSound, playSound } from '../../services/audio';
@@ -133,6 +134,7 @@ class BattleScene extends Phaser.Scene {
   private projectile!: Phaser.GameObjects.Arc;
   private impactRing!: Phaser.GameObjects.Arc;
   private impactSpark!: Phaser.GameObjects.Image;
+  private slash!: Phaser.GameObjects.Graphics;
   private enemyPulseRings: Phaser.GameObjects.Arc[] = [];
   private enemyPulseIndex = 0;
   private skillImpact!: Phaser.GameObjects.Image;
@@ -149,6 +151,7 @@ class BattleScene extends Phaser.Scene {
   private ready = false;
   constructor(
     private readonly chapterId: string,
+    private readonly attackStyle: AttackStyle,
     private readonly onCue: (event: CombatEvent) => void,
     private readonly onSnapshot: (snapshot: BattleSnapshot) => void,
   ) {
@@ -158,6 +161,13 @@ class BattleScene extends Phaser.Scene {
     this.load.image('battle_background', BACKGROUND_SPRITES[this.chapterId]);
     this.load.image('dili_idle', ASSETS.dili_idle);
     this.load.image('dili_attack', ASSETS.dili_attack);
+    if (this.attackStyle === 'blade') {
+      this.load.image('dili_sword_idle', ASSETS.dili_sword_idle);
+      this.load.image('dili_sword_attack', ASSETS.dili_sword_attack);
+    } else if (this.attackStyle === 'hammer') {
+      this.load.image('dili_hammer_idle', ASSETS.dili_hammer_idle);
+      this.load.image('dili_hammer_attack', ASSETS.dili_hammer_attack);
+    }
     this.load.image('dili_hurt', ASSETS.dili_hurt);
     this.load.image('dili_ultimate', ASSETS.dili_ultimate);
     this.load.image('skill_hammer', ASSETS.skill_hammer);
@@ -238,6 +248,7 @@ class BattleScene extends Phaser.Scene {
     sparkGraphics.generateTexture('impact_spark', 80, 80);
     sparkGraphics.destroy();
     this.impactSpark = this.add.image(0, 0, 'impact_spark').setVisible(false).setDepth(17);
+    this.slash = this.add.graphics().setVisible(false).setDepth(18);
     for (let i = 0; i < 4; i++)
       this.enemyPulseRings.push(
         this.add.circle(0, 0, 28).setStrokeStyle(4, 0xff78c8).setVisible(false).setDepth(12),
@@ -321,7 +332,7 @@ class BattleScene extends Phaser.Scene {
     const sprite = this.add.image(
       x,
       y,
-      hero ? 'dili_idle' : boss ? bossKeys[actor.kind] ?? 'king' : ENEMY_SPRITES[enemyKind] ? enemyKind : 'bot',
+      hero ? this.attackStyle === 'blade' ? 'dili_sword_idle' : this.attackStyle === 'hammer' ? 'dili_hammer_idle' : 'dili_idle' : boss ? bossKeys[actor.kind] ?? 'king' : ENEMY_SPRITES[enemyKind] ? enemyKind : 'bot',
     );
     const size = hero ? 230 : boss ? 245 : summoned ? 135 : 155;
     sprite
@@ -409,7 +420,14 @@ class BattleScene extends Phaser.Scene {
   private showHeroPose(texture: 'dili_idle' | 'dili_attack' | 'dili_hurt' | 'dili_ultimate', duration: number) {
     const hero = this.sprites.get('dili');
     if (!hero) return;
-    hero.setTexture(texture).setDisplaySize(230, (230 * hero.height) / hero.width);
+    const activeTexture = this.attackStyle === 'blade'
+      ? texture === 'dili_idle' ? 'dili_sword_idle'
+        : texture === 'dili_attack' || texture === 'dili_ultimate' ? 'dili_sword_attack' : texture
+      : this.attackStyle === 'hammer'
+        ? texture === 'dili_idle' ? 'dili_hammer_idle'
+          : texture === 'dili_attack' || texture === 'dili_ultimate' ? 'dili_hammer_attack' : texture
+        : texture;
+    hero.setTexture(activeTexture).setDisplaySize(230, (230 * hero.height) / hero.width);
     const breathing = this.breathing.get('dili');
     if (breathing) breathing.baseScaleY = hero.scaleY;
     this.heroPoseWait = duration;
@@ -505,6 +523,20 @@ class BattleScene extends Phaser.Scene {
       alpha: 0,
       duration: 700,
       onComplete: () => text.setVisible(false),
+    });
+  }
+  private showSlash(x: number, y: number, reduced: boolean) {
+    this.tweens.killTweensOf(this.slash);
+    this.slash.clear()
+      .lineStyle(10, 0x62eff3, 0.95).arc(0, 0, 72, -1.35, 1.35).strokePath()
+      .lineStyle(3, 0xe5ffff, 0.95).arc(0, 0, 82, -1.2, 1.2).strokePath();
+    this.slash.setPosition(x - 16, y).setScale(reduced ? 1 : 0.55).setAlpha(1).setVisible(true);
+    this.tweens.add({
+      targets: this.slash,
+      scale: reduced ? 1 : 1.3,
+      alpha: 0,
+      duration: reduced ? 90 : 200,
+      onComplete: () => this.slash.setVisible(false),
     });
   }
   private present(event: PresentationCue) {
@@ -611,6 +643,8 @@ class BattleScene extends Phaser.Scene {
     if (event.type === 'damage') {
       const indirectDamage = event.tag === 'status' || event.tag === 'reflect';
       const bossAttack = event.source.startsWith('boss_') && !indirectDamage;
+      const bladeBasic = event.source === 'dili' && event.tag === 'basic' && this.attackStyle === 'blade';
+      const hammerBasic = event.source === 'dili' && event.tag === 'basic' && this.attackStyle === 'hammer';
       if (event.source === 'dili' && !indirectDamage)
         this.showHeroPose('dili_attack', event.crit ? 300 : 230);
       const impact = () => {
@@ -619,12 +653,14 @@ class BattleScene extends Phaser.Scene {
         if (event.target === 'dili' && event.source !== 'dili')
           this.showHeroPose('dili_hurt', 220);
         if (!indirectDamage) {
-          if (event.label === 'Ban Hammer') playSound('hammer');
+          if (event.label === 'Ban Hammer' || hammerBasic) playSound('hammer');
+          else if (bladeBasic) playSound('sword');
           else if (bossAttack) playBossAttackSound(event.source);
           else playSound(event.crit ? 'crit' : 'attack');
         }
-        const hammer = event.label === 'Ban Hammer';
+        const hammer = event.label === 'Ban Hammer' || hammerBasic;
         const viralExplosion = event.label === 'Viral Explosion';
+        if (bladeBasic) this.showSlash(target.x, target.y, reduced);
         const statusColor = event.tag === 'status' ? STATUS_COLORS[event.label.toLowerCase()] : undefined;
         const impactColor = hammer
           ? 0xff78c8
@@ -723,7 +759,20 @@ class BattleScene extends Phaser.Scene {
         }
         this.floating(target, event);
       };
-      if (source && !reduced && !indirectDamage) {
+      if (source && !reduced && (bladeBasic || hammerBasic)) {
+        this.tweens.killTweensOf(source);
+        source.setX(197);
+        this.tweens.add({
+          targets: source,
+          x: target.x - (bladeBasic ? 105 : 115),
+          duration: 125,
+          ease: 'Cubic.Out',
+          onComplete: () => {
+            impact();
+            this.tweens.add({ targets: source, x: 197, duration: 140, ease: 'Cubic.In' });
+          },
+        });
+      } else if (source && !reduced && !indirectDamage) {
         this.tweens.add({
           targets: source,
           x: source.x + (source.x < target.x ? 1 : -1) * (bossAttack ? 15 : 8),
@@ -915,9 +964,11 @@ export default function BattleCanvas({
   handlers.current = { onCue, onSnapshot };
   const sequence = useGame((s) => s.sequence);
   const chapterId = useGame((s) => s.run?.chapterId ?? 'chapter_feed');
+  const attackStyle = useGame((s) => s.run?.weaponStyle ?? 'ranged');
   useEffect(() => {
     const current = new BattleScene(
       chapterId,
+      attackStyle,
       (event) => handlers.current.onCue(event),
       (snapshot) => handlers.current.onSnapshot(snapshot),
     );
@@ -938,7 +989,7 @@ export default function BattleCanvas({
       game.destroy(true);
       scene.current = null;
     };
-  }, [chapterId]);
+  }, [chapterId, attackStyle]);
   useEffect(() => {
     const state = useGame.getState();
     if (state.snapshot) scene.current?.sync(state.snapshot, state.events);

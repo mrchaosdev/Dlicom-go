@@ -8,7 +8,7 @@ The visual anchor is the supplied Dili mascot: rounded helmet and speech-bubble 
 
 | Asset class | Runtime size | On-screen role |
 | --- | --- | --- |
-| Dili poses | Transparent square PNGs; new poses 512 x 512 | 230 logical px wide on the 760 x 510 battle canvas |
+| Dili poses | Transparent PNGs and 512 px wide WebP weapon variants | 230 logical px wide on the 760 x 510 battle canvas |
 | Normal enemies | Transparent 512 x 512 PNGs | 155 logical px wide, including elites |
 | Bosses | Transparent 768 x 768 PNGs | 245 logical px wide, larger than Dili |
 | Skill archetype icons | Transparent 256 x 256 PNGs | Draft cards, owned-skill list and selected battle effects |
@@ -36,6 +36,8 @@ Pose changes use the same pause and speed clock as the combat presentation queue
 
 Idle has a different source resolution from the other poses. Breathing now animates a relative factor and recalculates the base scale on each texture change, so Attack, Hurt and Ultimate keep their intended on-screen size. This was checked against mobile battle captures.
 
+Encryption Blade and Moderator Hammer each have original transparent idle and attack variants. Their 512 px wide runtime WebPs total 0.26 MB; full-resolution PNG sources are kept outside `public`. The equipped weapon style is captured at run start. Sword basics dash into range with a pooled cyan slash and a dedicated sound; hammer basics lunge and use the heavier hammer impact. Ranged weapons retain the packet projectile. Combat rules remain in the TypeScript engine.
+
 ## Skill art and effects
 
 All eight skill archetypes have original 256 × 256 transparent icons in the central manifest: Packet, Hammer, Firewall, Moderation, Encryption, Viral, Rage, and Heal. Each of the 70 skill definitions also has a distinct semantic glyph layered over its archetype artwork in both draft cards and the owned-skill list. A content test requires exact skill coverage and 70 unique glyphs. Draft entry is staggered; keyboard focus and hover lift the art. Both the game setting and system reduced-motion preference suppress those animations.
@@ -44,7 +46,9 @@ The equipment collection gives all 18 items individual semantic glyphs in the lo
 
 | Effect family | Current battle presentation |
 | --- | --- |
-| Packet / DliClip | Cyan projectile; DliClip projectile is magenta |
+| Packet / DliClip | Cyan projectile for ranged weapons; DliClip projectile is magenta |
+| Encryption Blade basic | Dedicated sword poses, melee dash, reusable cyan slash and sword sound |
+| Moderator Hammer basic | Dedicated hammer poses, heavier melee lunge and magenta hammer impact |
 | Crit | 70 ms yellow source-ring anticipation before the damage cue, Attack pose and stronger hit feedback |
 | Ban Hammer | Hammer art slam, magenta impact ring and stronger shake |
 | Viral Explosion | Viral art expansion and wide magenta ring |

@@ -28,7 +28,7 @@ export function startAudio(settings: SaveFile['settings'], chapterId?: string) {
   if (!enabled) {
     enabled = true;
     sounds = Object.fromEntries(
-      ['attack', 'crit', 'ultimate', 'select', 'dodge', 'heal', 'shield', 'death', 'boss_intro', 'victory', 'defeat', 'reward', 'legendary', 'hammer', 'shield_break', 'boss_king_attack', 'boss_phantom_attack', 'boss_raid_attack', 'boss_null_attack'].map((name) => [
+      ['attack', 'crit', 'ultimate', 'select', 'dodge', 'heal', 'shield', 'death', 'boss_intro', 'victory', 'defeat', 'reward', 'legendary', 'hammer', 'sword', 'shield_break', 'boss_king_attack', 'boss_phantom_attack', 'boss_raid_attack', 'boss_null_attack'].map((name) => [
         name,
         new Howl({
           src: [ASSETS[`sfx_${name}` as keyof typeof ASSETS]],

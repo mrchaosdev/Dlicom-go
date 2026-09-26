@@ -1,4 +1,4 @@
-import { EQUIPMENT, loadoutStats, GEAR, UPGRADE_COSTS, type Slot } from '../../content/equipment';
+import { EQUIPMENT, loadoutStats, GEAR, UPGRADE_COSTS, type Slot, type AttackStyle } from '../../content/equipment';
 import { getChapter } from '../../content/chapters';
 import { NODES, generateEncounter, generateEventElite } from '../../content/encounters';
 import { eventsForChapter, type EventEffect } from '../../content/events';
@@ -19,6 +19,7 @@ export type Phase = 'route' | 'battle' | 'draft' | 'event' | 'rest' | 'summary';
 export class RunSession {
   readonly rng: SeededRng;
   readonly baseStats: Stats;
+  readonly weaponStyle: AttackStyle;
   readonly level: number;
   readonly skills: OwnedSkills = {};
   readonly stats: BattleStats = emptyBattleStats();
@@ -55,6 +56,7 @@ export class RunSession {
     getChapter(chapterId);
     this.rng = new SeededRng(seed);
     this.level = accountLevel(save.account.xp);
+    this.weaponStyle = GEAR[save.account.equipped.weapon].attackStyle ?? 'ranged';
     this.baseStats = loadoutStats(save.account.equipped, save.account.inventory);
     this.hp = this.baseStats.maxHp;
   }

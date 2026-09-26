@@ -78,6 +78,39 @@ test('daily energy claim, five-energy run cost and interrupted-run refund', asyn
   await expect(page.getByRole('button', { name: 'Claimed today' })).toBeDisabled();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+test('blade and hammer loadouts use their own battle poses and finish melee hits', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const [weaponId, prefix] of [
+    ['weapon_encryption_blade', 'dili-sword'],
+    ['weapon_moderator_hammer', 'dili-hammer'],
+  ]) {
+    await page.goto('/');
+    await page.evaluate(async (id) => {
+      const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+        .find((url) => url.includes('/src/services/save.ts'))!;
+      const { defaultSave, SAVE_KEY } = await import(path);
+      const save = defaultSave();
+      save.account.inventory[id] = 1;
+      save.account.equipped.weapon = id;
+      localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+    }, weaponId);
+    await page.reload();
+    await expect(page.locator('.hero-art img').first()).toHaveAttribute('src', new RegExp(`${prefix}-idle`));
+    await expect.poll(() => page.locator('.hero-art img').first().evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+    await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
+    const attack = page.waitForResponse((response) => response.url().includes(`${prefix}-attack.webp`));
+    await page.getByRole('button', { name: /Data lane/ }).click();
+    expect((await attack).status()).toBe(200);
+    await expect(page.locator('.battle-canvas canvas')).toBeVisible();
+    await expect.poll(async () => page.evaluate(async () => {
+      const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+        .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+      const { useGame } = await import(path);
+      return useGame.getState().run?.engine?.stats.damageDealt ?? 0;
+    }), { timeout: 15000 }).toBeGreaterThan(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+});
 test('automatic battle pauses, changes speed and reaches a three-choice draft', async ({
   page,
 }) => {
