@@ -98,8 +98,22 @@ describe('run progression', () => {
     ]));
 });
 describe('save compatibility and recovery', () => {
-  it('roundtrips version 1', () =>
-    expect(migrateSave(JSON.parse(JSON.stringify(defaultSave())))).toEqual(defaultSave()));
+  it('roundtrips version 2 and migrates version 1 without losing progress', () => {
+    const now = 1_700_000_000_000;
+    const current = defaultSave(now);
+    expect(migrateSave(JSON.parse(JSON.stringify(current)), now)).toEqual(current);
+    const legacy = JSON.parse(JSON.stringify(current));
+    legacy.version = 1;
+    legacy.account.bits = 750;
+    delete legacy.account.energy;
+    delete legacy.account.energyUpdatedAt;
+    delete legacy.account.activeRunEnergy;
+    delete legacy.account.dailyClaimedOn;
+    const migrated = migrateSave(legacy, now);
+    expect(migrated.version).toBe(2);
+    expect(migrated.account.bits).toBe(750);
+    expect(migrated.account.energy).toBe(15);
+  });
   it.each([
     '{bad',
     JSON.stringify({ version: 99 }),
@@ -113,8 +127,9 @@ describe('save compatibility and recovery', () => {
         data.set(key, value);
       },
     };
-    const result = loadSave(storage);
-    expect(result.save).toEqual(defaultSave());
+    const now = 1_700_000_000_000;
+    const result = loadSave(storage, now);
+    expect(result.save).toEqual(defaultSave(now));
     expect(result.warning).toBeTruthy();
     expect(data.get(`${SAVE_KEY}_backup`)).toBe(raw);
     warn.mockRestore();

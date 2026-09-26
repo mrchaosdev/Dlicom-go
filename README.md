@@ -21,10 +21,11 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 
 - Mouse/touch only; no aiming or manual movement.
 - Open **Guide** from the main navigation or **How to play** on the home screen for a step-by-step first-run walkthrough.
+- Each run costs 5 Energy. A fresh profile starts with 15/20; 1 Energy restores every 10 minutes, and a daily check-in adds 5 when there is room. Energy and the daily claim are saved locally. Reloading an unfinished run ends it and returns its 5 Energy.
 - Pause and ×1/×2 during battle.
 - Tap a skill/status to inspect it.
 - Music, SFX, reduced motion and default speed in Settings.
-- Equipment, Bits, account unlocks, records and settings save locally. An active run is in memory; refreshing ends it. A malformed save is backed up where storage permits and defaults recover safely.
+- Equipment, Bits, Energy, daily claims, account unlocks, records and settings save locally. An active run is in memory; refreshing ends it and refunds its Energy. A malformed save is backed up where storage permits and defaults recover safely.
 
 ## Included in v0.2
 

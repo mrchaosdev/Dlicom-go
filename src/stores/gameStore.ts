@@ -4,6 +4,7 @@ import { RunSession, equip, upgrade } from '../game/run/RunSession';
 import type { Slot } from '../content/equipment';
 import type { CombatEvent } from '../game/combat/types';
 import type { BattleSnapshot } from '../game/combat/CombatEngine';
+import { RUN_ENERGY_COST, claimDailyEnergy, rechargeEnergy, spendRunEnergy } from '../game/meta/energy';
 function initial() {
   try {
     return loadSave(window.localStorage);
@@ -28,6 +29,8 @@ interface GameStore {
   sequence: number;
   navigate: (screen: GameStore['screen']) => void;
   start: (chapterId?: string) => void;
+  syncEnergy: () => void;
+  claimDailyEnergy: () => void;
   act: (action: 'enter' | 'skill' | 'reroll' | 'rest' | 'event', value?: string | number) => void;
   step: () => void;
   finish: () => void;
@@ -57,14 +60,35 @@ export const useGame = create<GameStore>((set, get) => {
     events: [],
     sequence: 0,
     navigate: (screen) => set({ screen }),
+    syncEnergy: () => {
+      const current = get().save;
+      const account = rechargeEnergy(current.account, Date.now());
+      if (account !== current.account) save({ ...current, account });
+    },
+    claimDailyEnergy: () => {
+      const current = get().save;
+      const account = claimDailyEnergy(current.account, Date.now());
+      if (account) save({ ...current, account });
+    },
     start: (chapterId = 'chapter_feed') => {
       if (get().run && !get().run?.result) {
         set({ screen: 'play' });
         return;
       }
+      const now = Date.now();
+      const current = get().save;
+      const account = spendRunEnergy(current.account, now);
+      if (!account) {
+        const refreshed = rechargeEnergy(current.account, now);
+        if (refreshed !== current.account) save({ ...current, account: refreshed });
+        set({ warning: `A run needs ${RUN_ENERGY_COST} energy. 1 energy returns every 10 minutes.` });
+        return;
+      }
       const seed = crypto.randomUUID();
+      const run = new RunSession(seed, current, chapterId);
+      save({ ...current, account });
       set({
-        run: new RunSession(seed, get().save, chapterId),
+        run,
         screen: 'play',
         paused: false,
         events: [],
@@ -94,7 +118,10 @@ export const useGame = create<GameStore>((set, get) => {
       const run = get().run;
       if (!run?.engine?.outcome || run.phase !== 'battle') return;
       run.finishBattle();
-      if (run.result) save(run.settle(get().save));
+      if (run.result) {
+        const settled = run.settle(get().save);
+        save({ ...settled, account: { ...settled.account, activeRunEnergy: 0 } });
+      }
       refresh();
     },
     togglePause: () => set({ paused: !get().paused }),

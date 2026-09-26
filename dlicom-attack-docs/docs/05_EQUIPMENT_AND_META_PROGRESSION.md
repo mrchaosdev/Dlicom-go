@@ -10,6 +10,12 @@ Equipment gives:
 
 It should not require pet complexity.
 
+## Energy and daily check-in
+
+Per the later human direction, starting a run costs **5 Energy**. Energy restores at **1 point every 10 elapsed minutes**. The current reversible defaults are 15 starting Energy and a cap of 20. A daily local-calendar check-in grants 5 more Energy when there is room for the full reward. Remaining Energy carries forward; there is no paid refill.
+
+Energy is deducted once when a run starts. An unfinished run ends on reload and returns its reserved 5 Energy, so browser interruption does not waste an attempt. Completed wins and defeats keep the cost. Version-1 local saves migrate to the version-2 Energy schema.
+
 ---
 
 ## 2. Equipment slots

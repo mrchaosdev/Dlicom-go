@@ -12,6 +12,7 @@ Source order follows AGENTS.md. Chapter 1 was the first public milestone in `13_
 - Infinite Scroll event costs/heals 15% max HP. Encryption Key gives +4% run Dodge or 30 Bits. Suspicious Plugin uses documented 20% HP cost / Epic+ / Rare+ alternatives, or 20 Bits. Event HP costs cannot kill Dili.
 - Account XP: battle 10, elite 30, boss 80, non-combat node 10; 120 XP per account level, capped at six. Levels unlock the specified families; they give no raw stat power.
 - Three items are the starting loadout; remaining equipment is awarded through chest drops. Weapon/armor base stats gain 20% per upgrade; module upgrades add 3 DEF per level, with passive values fixed. Costs use the exact 100/180/300/500 table. Duplicate chest items convert to 50 Bits. Only winning a run grants a chest.
+- The user-requested Energy loop uses a 20-point cap, 15 starting Energy, 5 per run, and exactly 1 restored every 10 elapsed minutes. These starting/cap values are reversible defaults; the cost and rate are explicit user decisions. The daily local-calendar claim gives 5 Energy and waits until there is room for all 5, so no reward is wasted. There are no purchases or paid refills. The browser save uses version 2 and migrates version-1 profiles while preserving gear, Bits and records. An interrupted in-memory run refunds its reserved 5 Energy on the next load.
 - Upgradeable skills: Packet Boost only, using the supplied 20/35/50% values. Other rule-changing skills remain one-time.
 - Ultimate bonus packets: three at 45% ATK (coefficient unspecified). Repost repeats once at 40% explosion damage; no extra random repeat chance is invented.
 - Network Effect counts damaging skill activations, not each AoE target. Its own generated explosion does not increment its activation count. DliClip bounces to up to two distinct additional living enemies. Status and reflected damage cannot counter.
@@ -33,7 +34,7 @@ Source order follows AGENTS.md. Chapter 1 was the first public milestone in `13_
 
 ## Intentional current limits
 
-Active runs are in memory; only account and settings are saved as specified. Refreshing ends the run, disclosed in Settings. A future run-resume save needs a separate versioned schema including RNG state.
+Active runs remain in memory; account, Energy and settings are saved. Refreshing ends the run and refunds the reserved 5 Energy, disclosed in Settings. A future run-resume save needs a separate versioned schema including RNG state.
 
 All chapters use the documented fixed node sequence with seeded encounters; this does not invent a new branching node topology. Later-chapter art remains placeholder presentation work.
 

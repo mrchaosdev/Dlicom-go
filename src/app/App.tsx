@@ -42,6 +42,7 @@ import { SKILL_GLYPHS, STATUS_GLYPHS } from '../content/skillGlyphs';
 import { ACHIEVEMENTS } from '../content/achievements';
 import { ACHIEVEMENT_GLYPHS, EQUIPMENT_GLYPHS } from '../content/progressionIcons';
 import { accountLevel } from '../services/save';
+import { DAILY_ENERGY_REWARD, ENERGY_MAX, RUN_ENERGY_COST, canClaimDailyEnergy, energyCountdown, localDay } from '../game/meta/energy';
 import { playSound, startAudio, suspendAudio, updateAudio } from '../services/audio';
 import { applyCueVitals, snapshotVitals, turnDuration, type PresentedVitals } from '../game/phaser/presentation';
 const BattleCanvas = lazy(() => import('../game/phaser/BattleCanvas'));
@@ -171,6 +172,46 @@ function HeroPanel() {
     </div>
   );
 }
+function EnergyBadge() {
+  const energy = useGame((state) => state.save.account.energy);
+  useEffect(() => {
+    const id = window.setInterval(() => useGame.getState().syncEnergy(), 5000);
+    return () => window.clearInterval(id);
+  }, []);
+  return (
+    <span className="energy-indicator" aria-label={`Energy ${energy} of ${ENERGY_MAX}`}>
+      <Zap size={15} fill="currentColor" /> {energy}<small>/{ENERGY_MAX}</small>
+    </span>
+  );
+}
+function DailyReward() {
+  const { save, claimDailyEnergy } = useGame();
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const account = save.account;
+  const claimed = account.dailyClaimedOn === localDay(now);
+  const canClaim = canClaimDailyEnergy(account, now);
+  const remaining = energyCountdown(account, now);
+  const remainingSeconds = Math.ceil(remaining / 1000);
+  const minutes = String(Math.floor(remainingSeconds / 60)).padStart(2, '0');
+  const seconds = String(remainingSeconds % 60).padStart(2, '0');
+  return (
+    <section className="panel daily-panel" aria-label="Daily energy check-in">
+      <div className="square-icon"><Zap aria-hidden="true" /></div>
+      <div className="daily-copy">
+        <span className="eyebrow">DAILY CHECK-IN</span>
+        <h3>{account.energy} / {ENERGY_MAX} energy</h3>
+        <p>{account.energy < ENERGY_MAX ? `+1 in ${minutes}:${seconds} · 1 energy every 10 minutes` : 'Energy full · 1 energy restores every 10 minutes'} · {RUN_ENERGY_COST} per run</p>
+      </div>
+      <Button disabled={!canClaim} onClick={claimDailyEnergy}>
+        {claimed ? 'Claimed today' : canClaim ? `Claim +${DAILY_ENERGY_REWARD}` : 'Use energy to claim'}
+      </Button>
+    </section>
+  );
+}
 function HomeScreen() {
   const { save, start, navigate, run } = useGame();
   const level = accountLevel(save.account.xp);
@@ -220,6 +261,7 @@ function HomeScreen() {
         </div>
         <HeroPanel />
       </section>
+      <DailyReward />
       <div className="section-heading">
         <div>
           <span className="eyebrow">CHOOSE YOUR CONNECTION</span>
@@ -292,7 +334,7 @@ function GuideScreen() {
   const { start, navigate, run } = useGame();
   const enter = () => (run && !run.result ? navigate('play') : start());
   const steps = [
-    { number: '01', icon: Cpu, title: 'Prepare your loadout', text: 'Equip a weapon, armor and module before a run. Gear stats apply to your next run, and upgrades spend Bits.' },
+    { number: '01', icon: Cpu, title: 'Prepare your loadout', text: 'Equip a weapon, armor and module before a run. Each run costs 5 energy; 1 restores every 10 minutes and your daily check-in grants 5 more.' },
     { number: '02', icon: ArrowRight, title: 'Choose a route', text: 'Pick a lane at each route map. Battles build your run; events, rest stops and elites offer different risks and rewards.' },
     { number: '03', icon: Swords, title: 'Watch Dili fight automatically', text: 'Attacks, skills and enemy turns resolve on their own. Pause or switch between ×1 and ×2 speed whenever you need.' },
     { number: '04', icon: Sparkles, title: 'Build a skill synergy', text: 'After a battle, choose 1 of 3 skills. Read each effect and tags, then combine skills that reinforce the same strategy. Tap a skill or status to inspect it.' },
@@ -472,7 +514,7 @@ function SettingsScreen() {
         </div>
         <p className="muted">
           Your equipment, Bits, unlocks and settings are saved in this browser. Active runs end when
-          you close or reload the page.
+          you close or reload the page; interrupted runs return their energy next time you open the game.
         </p>
       </section>
     </div>
@@ -1059,6 +1101,7 @@ export default function App() {
           })}
         </nav>
         <div className="header-account">
+          <EnergyBadge />
           <span className="bits">
             <Hexagon size={15} />
             {save.account.bits.toLocaleString()} <small>BITS</small>

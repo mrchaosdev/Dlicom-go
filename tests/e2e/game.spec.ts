@@ -25,6 +25,7 @@ test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => 
   await expect(page.getByRole('heading', { name: /Small hero/ })).toBeVisible();
   await expect(page.getByText('SYSTEM ONLINE · v0.2.0')).toBeVisible();
   for (const [width, height] of [
+    [320, 740],
     [360, 800],
     [390, 844],
     [412, 915],
@@ -61,6 +62,21 @@ test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => 
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(page.getByRole('checkbox')).toBeChecked();
   await expect(page.getByText('0%', { exact: true })).toBeVisible();
+});
+test('daily energy claim, five-energy run cost and interrupted-run refund', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.getByLabel('Energy 15 of 20')).toBeVisible();
+  await page.getByRole('button', { name: 'Claim +5' }).click();
+  await expect(page.getByLabel('Energy 20 of 20')).toBeVisible();
+  await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
+  await expect(page.getByRole('button', { name: /Data lane/ })).toBeVisible();
+  await expect(page.getByLabel('Energy 15 of 20')).toBeVisible();
+  await page.reload();
+  await expect(page.getByLabel('Energy 20 of 20')).toBeVisible();
+  await expect(page.getByText('The interrupted run ended. Its 5 energy was returned.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Claimed today' })).toBeDisabled();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 test('automatic battle pauses, changes speed and reaches a three-choice draft', async ({
   page,
