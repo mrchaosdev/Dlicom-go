@@ -73,6 +73,8 @@ The current media set is checked in under `artifacts/`: desktop home, mobile hom
 
 ## 6. Suggested submission copy
 
+The current paste-ready submission text, media captions, controls, AI disclosure and known limitations are maintained in [`../../SUBMISSION.md`](../../SUBMISSION.md).
+
 ### Title
 **Dlicom Attack**
 
