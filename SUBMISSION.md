@@ -4,23 +4,17 @@
 
 ## Submission fields
 
-**Title**  
-Dlicom Attack
+**Title:** Dlicom Attack
 
-**Version**  
-v0.2.0
+**Version:** v0.2.0
 
-**One-sentence hook**  
-Build an overpowered Dili, chain absurd Dlicom-themed skills, and purge a corrupted social network in a fast browser auto-battle roguelite.
+**One-sentence hook:** Build an overpowered Dili, chain absurd Dlicom-themed skills, and purge a corrupted social network in a fast browser auto-battle roguelite.
 
-**Short description**  
-Dlicom Attack is a browser auto-battle roguelite RPG built for the Dlicom AI Game Jam. Guide Dili through four corrupted social-network chapters, choose one of three skills after battles, forge explosive synergies, defeat elites and bosses, then bring equipment and rewards into the next run. No download, wallet, account, or transaction is required.
+**Short description:** Dlicom Attack is a browser auto-battle roguelite RPG built for the Dlicom AI Game Jam. Guide Dili through four corrupted social-network chapters, choose one of three skills after battles, forge explosive synergies, defeat elites and bosses, then bring equipment and rewards into the next run. No download, wallet, account, or transaction is required.
 
-**Play the game**  
-[ADD PRODUCTION VERCEL URL]
+**Play the game:** [ADD PRODUCTION VERCEL URL]
 
-**Source code**  
-https://github.com/mrchaosdev/Dlicom-go
+**Source code:** https://github.com/mrchaosdev/Dlicom-go
 
 ## Full description
 
@@ -100,24 +94,34 @@ Design, implementation, testing, documentation, and asset production were comple
 
 ## Suggested media order
 
-1. **Hero image — Home and chapter selection**  
-   `artifacts/home-desktop.png`  
+1. **Hero image — Home and chapter selection**
+
+   File: `artifacts/home-desktop.png`
+
    Caption: *Choose a chapter, prepare Dili, and enter the corrupted network.*
 
-2. **Core gameplay — Mobile battle**  
-   `artifacts/battle-mobile.png`  
+2. **Core gameplay — Mobile battle**
+
+   File: `artifacts/battle-mobile.png`
+
    Caption: *Automatic combat leaves the player free to focus on build decisions and skill chains.*
 
-3. **Buildcraft — Skill draft**  
-   `artifacts/skill-draft-desktop.png`  
+3. **Buildcraft — Skill draft**
+
+   File: `artifacts/skill-draft-desktop.png`
+
    Caption: *Choose one of three skills and turn simple attacks into cascading trigger chains.*
 
-4. **Optional mobile overview**  
-   `artifacts/home-mobile.png`  
+4. **Optional mobile overview**
+
+   File: `artifacts/home-mobile.png`
+
    Caption: *The full preparation and progression loop is designed for portrait mobile play.*
 
-5. **Gameplay video — 26 seconds with game soundtrack**  
-   `artifacts/gameplay-clip.webm`  
+5. **Gameplay video — 26 seconds with game soundtrack**
+
+   File: `artifacts/gameplay-clip.webm`
+
    Caption: *A quick look at combat, route progression, skill selection, and the Dlicom network aesthetic.*
 
 ## Suggested tags
@@ -128,6 +132,6 @@ Design, implementation, testing, documentation, and asset production were comple
 
 **Dlicom Attack is ready to enter the network.** Build an overpowered Dili from 70 skills, chain ridiculous effects, defeat four corrupted bosses, and carry upgraded gear into the next run. It is a responsive browser auto-battle roguelite with no download, wallet, or account required.
 
-Play: [ADD PRODUCTION VERCEL URL]  
-Source: https://github.com/mrchaosdev/Dlicom-go
+Play: [ADD PRODUCTION VERCEL URL]
 
+Source: https://github.com/mrchaosdev/Dlicom-go
