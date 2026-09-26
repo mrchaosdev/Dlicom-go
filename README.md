@@ -25,7 +25,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Pause and ×1/×2 during battle.
 - Tap a skill/status to inspect it.
 - Music, SFX, reduced motion and default speed in Settings.
-- Equipment, Bits, Energy, daily claims, account unlocks, records and settings save locally. An active run is in memory; refreshing ends it and refunds its Energy. A malformed save is backed up where storage permits and defaults recover safely.
+- Equipment, Bits, Energy, daily claims, account unlocks, records and settings save locally. Loadout, Inventory and Shop let players buy specific gear with earned Bits, equip it, and upgrade owned gear. An active run is in memory; refreshing ends it and refunds its Energy. A malformed save is backed up where storage permits and defaults recover safely.
 
 ## Included in v0.2
 
@@ -39,6 +39,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Twenty seeded events with choices, run buffs, healing, Bits, skill drafts and optional elite fights.
 - Dili reference-based combat poses, distinct generated sprites for all ten normal enemy kinds and four bosses, four illustrated chapter battle backgrounds, one original synthesized music loop per chapter, bounded VFX/text objects and SFX.
 - Equipping Encryption Blade or Moderator Hammer changes Dili's idle and attack poses and turns basic attacks into a melee slash or heavy smash; their equipment passives also shape the build.
+- Node 10's Signal Bazaar offers an optional Rare-or-better skill draft for 80 run Bits, creating a choice between immediate power and the final Bits payout. Short transitions identify each new run phase.
 - Responsive desktop/mobile UI, keyboard focus states, local fonts and local audio.
 
 ## Architecture

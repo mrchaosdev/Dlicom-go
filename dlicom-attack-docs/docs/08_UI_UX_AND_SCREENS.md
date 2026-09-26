@@ -62,6 +62,8 @@ event art + choices.
 ## Rest
 heal / upgrade / shield.
 
+At Node 10, label the Rest location Signal Bazaar and show the optional 80 run-Bits Rare-or-better draft purchase. Disable this choice when the run cannot afford it.
+
 ## Reward
 drop reveal.
 
@@ -73,6 +75,8 @@ stats + rewards + share.
 
 ## Equipment
 inventory and upgrade.
+
+Use Loadout, Inventory and Shop tabs. Show owned counts and current levels in Inventory; show price and affordability in Shop. Keep the three-slot loadout visible in its own tab. Short node-arrival transitions may mark route, combat, draft, event and rest changes; they must not add page overflow and must respect reduced-motion settings.
 
 ## Settings
 music

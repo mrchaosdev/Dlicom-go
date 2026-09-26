@@ -34,7 +34,8 @@ import type { Archetype, CombatEvent } from '../game/combat/types';
 import type { BattleSnapshot } from '../game/combat/CombatEngine';
 import { useGame } from '../stores/gameStore';
 import { ASSETS, SKILL_ART } from '../content/assets';
-import { EQUIPMENT, GEAR, UPGRADE_COSTS, loadoutStats, type Slot } from '../content/equipment';
+import { EQUIPMENT, GEAR, UPGRADE_COSTS, gearPrice, loadoutStats, type Slot } from '../content/equipment';
+import { RUN_SHOP_COST } from '../game/run/RunSession';
 import { SKILLS, SKILL_BY_ID } from '../content/skills';
 import { NODES, generateEncounter } from '../content/encounters';
 import { CHAPTERS } from '../content/chapters';
@@ -371,14 +372,23 @@ function GuideScreen() {
 }
 function EquipmentScreen() {
   const { save, equip, upgrade, start } = useGame();
+  const [tab, setTab] = useState<'loadout' | 'inventory' | 'shop'>('loadout');
   const stats = loadoutStats(save.account.equipped, save.account.inventory);
   return (
     <>
       <PageHeading
-        kicker="PREPARE YOUR LOADOUT"
-        title="Your loadout"
-        text="Three slots. A different way to break the network."
+        kicker="BUILD YOUR NEXT RUN"
+        title={tab === 'loadout' ? 'Your loadout' : tab === 'inventory' ? 'Your inventory' : 'Gear shop'}
+        text={tab === 'loadout' ? 'Three slots. A different way to break the network.'
+          : tab === 'inventory' ? 'Every item you own, grouped by slot. Upgrade or equip for your next run.'
+            : 'Turn earned Bits into a specific weapon, armor or module.'}
       />
+      <div className="gear-tabs" role="tablist" aria-label="Equipment views">
+        {([['loadout', 'Loadout'], ['inventory', 'Inventory'], ['shop', 'Shop']] as const).map(([id, label]) => (
+          <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>{label}</button>
+        ))}
+      </div>
+      {tab === 'loadout' ? (
       <div className="equipment-layout">
         <div className="equipment-hero">
           <HeroPanel />
@@ -451,7 +461,68 @@ function EquipmentScreen() {
           </p>
         </div>
       </div>
+      ) : tab === 'inventory' ? <InventoryPanel /> : <GearShopPanel onPurchased={() => setTab('inventory')} />}
     </>
+  );
+}
+function InventoryPanel() {
+  const { save, equip, upgradeItem } = useGame();
+  return (
+    <div className="collection-layout">
+      {(['weapon', 'armor', 'module'] as Slot[]).map((slot) => (
+        <section key={slot} className="collection-section">
+          <div className="section-heading"><h2>{title(slot)}s</h2><span className="muted">{EQUIPMENT.filter((item) => item.slot === slot && save.account.inventory[item.id]).length} / {EQUIPMENT.filter((item) => item.slot === slot).length} OWNED</span></div>
+          <div className="collection-grid">
+            {EQUIPMENT.filter((item) => item.slot === slot && save.account.inventory[item.id]).map((item) => {
+              const Glyph = EQUIPMENT_GLYPHS[item.id as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu;
+              const level = save.account.inventory[item.id];
+              const cost = UPGRADE_COSTS[level - 1];
+              const selected = save.account.equipped[slot] === item.id;
+              return (
+                <article className="panel collection-card" key={item.id} data-inventory-id={item.id}>
+                  <div className="collection-icon"><Glyph size={24} aria-hidden="true" /></div>
+                  <div><span className={`chip ${item.rarity ?? 'common'}`}>{(item.rarity ?? 'common').toUpperCase()} · LV {level}</span><h3>{item.name}</h3><p>{item.description}</p></div>
+                  <div className="collection-actions">
+                    <Button disabled={selected} onClick={() => equip(item.id)}>{selected ? 'Equipped' : 'Equip'}</Button>
+                    <Button disabled={!cost || save.account.bits < cost} onClick={() => upgradeItem(item.id)}>{cost ? `Upgrade · ${cost} Bits` : 'Max level'}</Button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
+function GearShopPanel({ onPurchased }: { onPurchased: () => void }) {
+  const { save, buyGear } = useGame();
+  const available = EQUIPMENT.filter((item) => !save.account.inventory[item.id]);
+  return (
+    <div className="collection-layout">
+      <p className="shop-note">Earn Bits from every run, including defeats. A purchase joins your inventory and equips for your next run.</p>
+      {available.length ? (['weapon', 'armor', 'module'] as Slot[]).map((slot) => {
+        const items = available.filter((item) => item.slot === slot);
+        return items.length ? (
+          <section key={slot} className="collection-section">
+            <div className="section-heading"><h2>{title(slot)}s</h2></div>
+            <div className="collection-grid">
+              {items.map((item) => {
+                const Glyph = EQUIPMENT_GLYPHS[item.id as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu;
+                const price = gearPrice(item);
+                return (
+                  <article className="panel collection-card" key={item.id} data-shop-id={item.id}>
+                    <div className="collection-icon"><Glyph size={24} aria-hidden="true" /></div>
+                    <div><span className={`chip ${item.rarity ?? 'common'}`}>{(item.rarity ?? 'common').toUpperCase()}</span><h3>{item.name}</h3><p>{item.description}</p></div>
+                    <div className="collection-actions"><Button disabled={save.account.bits < price} onClick={() => { buyGear(item.id); onPurchased(); }}><Hexagon size={14} /> Buy & equip · {price} Bits</Button></div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        ) : null;
+      }) : <p className="panel collection-empty">Collection complete. Every piece of gear is yours.</p>}
+    </div>
   );
 }
 function PageHeading({
@@ -610,7 +681,7 @@ function RouteScreen() {
           {kind === 'boss'
             ? `${run.chapter.bossName} awaits.`
             : kind === 'rest'
-              ? 'Take a breath. Reconnect.'
+              ? run.node === 9 ? 'The Signal Bazaar is open.' : 'Take a breath. Reconnect.'
               : kind === 'event'
                 ? 'An unexpected connection.'
                 : 'Pick your next connection.'}
@@ -618,7 +689,9 @@ function RouteScreen() {
         <p>
           {kind === 'boss'
             ? run.chapter.bossDescription
-            : 'Dili handles the fighting. You decide what comes next.'}
+            : kind === 'rest' && run.node === 9
+              ? 'Spend run Bits on a stronger skill signal, or use the rest stop.'
+              : 'Dili handles the fighting. You decide what comes next.'}
         </p>
       </div>
       {run.notice && (
@@ -658,7 +731,7 @@ function RouteScreen() {
                   : kind === 'elite'
                     ? `${enemies[0]?.modifier} encounter`
                     : kind === 'rest'
-                      ? 'Safe connection'
+                      ? run.node === 9 ? 'Signal Bazaar' : 'Safe connection'
                       : kind === 'event'
                         ? 'Unknown signal'
                         : ['Data lane', 'Side channel', 'Open frequency'][route]}
@@ -667,7 +740,7 @@ function RouteScreen() {
                 {fighting
                   ? enemies.map((e) => e.name).join(' + ')
                   : kind === 'rest'
-                    ? 'Recover HP, upgrade a skill or prepare Shield.'
+                    ? run.node === 9 ? 'Heal, upgrade, shield or buy a Rare+ skill offer.' : 'Recover HP, upgrade a skill or prepare Shield.'
                     : 'A short choice. An unexpected advantage.'}
               </p>
               <span className="route-reward">
@@ -879,31 +952,34 @@ function ChoiceScreen() {
   const { run, act } = useGame();
   if (!run) return null;
   const rest = run.phase === 'rest';
+  const bazaar = rest && run.node === 9;
   const event = run.phase === 'event' ? run.currentEvent : undefined;
   const choices = rest
     ? [
         ['heal', 'Recover integrity', 'Heal 30% of maximum HP.'],
         ['upgrade', 'Upgrade a skill', 'Rank up an owned skill that has room to grow.'],
         ['shield', 'Prepare a firewall', 'Gain 25% max HP Shield for the next battle.'],
+        ...(bazaar ? [['shop', 'Browse the Signal Bazaar', `Spend ${RUN_SHOP_COST} run Bits for a Rare-or-better skill offer.`]] : []),
       ]
     : (event?.choices ?? []).map((choice, index) => [String(index), choice.label, choice.outcomeText]);
   return (
     <div className="choice-screen">
-      <div className="event-symbol">{iconFor(rest ? 'rest' : 'event', 56)}</div>
+      <div className="event-symbol">{bazaar ? <Hexagon size={56} /> : iconFor(rest ? 'rest' : 'event', 56)}</div>
       <div className="node-intro">
         <span className="eyebrow">
-          NODE {run.node + 1} · {rest ? 'REST CONNECTION' : 'NETWORK EVENT'}
+          NODE {run.node + 1} · {bazaar ? 'SIGNAL BAZAAR' : rest ? 'REST CONNECTION' : 'NETWORK EVENT'}
         </span>
-        <h2>{rest ? 'Room to breathe.' : event?.title}</h2>
-        <p>{rest ? 'Make one choice, then install a new skill.' : event?.body}</p>
+        <h2>{bazaar ? 'Spend your signal.' : rest ? 'Room to breathe.' : event?.title}</h2>
+        <p>{bazaar ? `You have ${run.bits} run Bits. Choose one service, then install a skill.` : rest ? 'Make one choice, then install a new skill.' : event?.body}</p>
       </div>
       <div className="choice-list">
         {choices.map(([value, label, desc]) => (
           <button
             key={value}
             disabled={
-              value === 'upgrade' &&
-              !Object.keys(run.skills).some((id) => run.skills[id] < SKILL_BY_ID[id].maxRank)
+              (value === 'upgrade' &&
+              !Object.keys(run.skills).some((id) => run.skills[id] < SKILL_BY_ID[id].maxRank))
+              || (value === 'shop' && run.bits < RUN_SHOP_COST)
             }
             onClick={() => act(rest ? 'rest' : 'event', value)}
           >
@@ -1010,6 +1086,12 @@ function PlayScreen() {
   const { run } = useGame();
   if (!run) return null;
   if (run.phase === 'summary') return <SummaryScreen />;
+  const transitionName = run.phase === 'battle'
+    ? NODES[run.node] === 'boss' ? 'BOSS SIGNAL' : 'COMBAT LINK'
+    : run.phase === 'draft' ? 'NEW SKILL SIGNAL'
+      : run.phase === 'event' ? 'UNKNOWN CONNECTION'
+        : run.phase === 'rest' && run.node === 9 ? 'SIGNAL BAZAAR'
+          : run.phase === 'rest' ? 'SAFE CONNECTION' : 'NEXT NODE';
   return (
     <>
       <div className="run-heading">
@@ -1023,6 +1105,11 @@ function PlayScreen() {
       </div>
       <div className={`play-layout${run.phase === 'battle' ? ' battle-layout' : ''}`}>
         <section className={`panel play-panel phase-${run.phase}`}>
+          <div className="phase-transition" key={`${run.seed}:${run.node}:${run.phase}`} aria-hidden="true">
+            <span className="phase-transition-icon">{run.phase === 'draft' ? <Sparkles size={34} /> : iconFor(NODES[run.node], 34)}</span>
+            <span className="eyebrow">NODE {String(run.node + 1).padStart(2, '0')} / 12</span>
+            <strong>{transitionName}</strong>
+          </div>
           {run.phase === 'route' ? (
             <RouteScreen />
           ) : run.phase === 'battle' ? (

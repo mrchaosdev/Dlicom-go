@@ -111,6 +111,62 @@ test('blade and hammer loadouts use their own battle poses and finish melee hits
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
 });
+
+test('gear shop purchase appears in inventory, equips and survives reload on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/services/save.ts'))!;
+    const { defaultSave, SAVE_KEY } = await import(path);
+    const save = defaultSave();
+    save.account.bits = 500;
+    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+  });
+  await page.reload();
+  await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
+  await page.getByRole('tab', { name: 'Shop' }).click();
+  const blade = page.locator('[data-shop-id="weapon_encryption_blade"]');
+  await expect(blade).toBeVisible();
+  await blade.getByRole('button', { name: /Buy & equip.*350 Bits/ }).click();
+  await expect(page.getByRole('heading', { name: 'Your inventory' })).toBeVisible();
+  await expect(page.locator('[data-inventory-id="weapon_encryption_blade"]')).toBeVisible();
+  await expect(page.locator('[data-inventory-id="weapon_encryption_blade"] button', { hasText: 'Equipped' })).toBeDisabled();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.reload();
+  await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
+  await page.getByRole('tab', { name: 'Inventory' }).click();
+  await expect(page.locator('[data-inventory-id="weapon_encryption_blade"]')).toBeVisible();
+  await page.getByRole('tab', { name: 'Shop' }).click();
+  await expect(page.locator('[data-shop-id="weapon_encryption_blade"]')).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('Signal Bazaar spends run Bits for a Rare-or-better skill choice', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
+  await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    const { useGame } = await import(path);
+    const run = useGame.getState().run!;
+    run.node = 9;
+    run.bits = 80;
+    run.phase = 'rest';
+    useGame.setState({ run });
+  });
+  await expect(page.getByRole('heading', { name: 'Spend your signal.' })).toBeVisible();
+  await page.getByRole('button', { name: /Browse the Signal Bazaar/ }).click();
+  await expect(page.locator('.skill-card')).toHaveCount(3);
+  expect(await page.locator('.skill-card.common').count()).toBe(0);
+  expect(await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    return (await import(path)).useGame.getState().run.bits;
+  })).toBe(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
 test('automatic battle pauses, changes speed and reaches a three-choice draft', async ({
   page,
 }) => {

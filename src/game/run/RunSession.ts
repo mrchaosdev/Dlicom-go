@@ -1,4 +1,4 @@
-import { EQUIPMENT, loadoutStats, GEAR, UPGRADE_COSTS, type Slot, type AttackStyle } from '../../content/equipment';
+import { EQUIPMENT, loadoutStats, GEAR, UPGRADE_COSTS, gearPrice, type Slot, type AttackStyle } from '../../content/equipment';
 import { getChapter } from '../../content/chapters';
 import { NODES, generateEncounter, generateEventElite } from '../../content/encounters';
 import { eventsForChapter, type EventEffect } from '../../content/events';
@@ -16,6 +16,7 @@ import {
 import { SeededRng } from '../rng/SeededRng';
 import { generateDraft } from './Draft';
 export type Phase = 'route' | 'battle' | 'draft' | 'event' | 'rest' | 'summary';
+export const RUN_SHOP_COST = 80;
 export class RunSession {
   readonly rng: SeededRng;
   readonly baseStats: Stats;
@@ -142,20 +143,28 @@ export class RunSession {
     this.rerolls--;
     this.offer(this.minRarity);
   }
-  rest(choice: 'heal' | 'upgrade' | 'shield') {
+  rest(choice: 'heal' | 'upgrade' | 'shield' | 'shop') {
     if (this.phase !== 'rest') return;
-    if (choice === 'heal') {
+    if (choice === 'shop') {
+      if (this.node !== 9 || this.bits < RUN_SHOP_COST) return;
+      this.bits -= RUN_SHOP_COST;
+      this.notice = 'Signal Bazaar purchase: Rare-or-better skill offer.';
+      this.cleared++;
+      this.xp += 10;
+      this.offer('rare');
+      return;
+    } else if (choice === 'heal') {
       this.hp = Math.min(this.baseStats.maxHp, this.hp + Math.round(this.baseStats.maxHp * 0.3));
       this.notice = 'Recovered 30% max HP.';
     } else if (choice === 'shield') {
       this.shield = Math.round(this.baseStats.maxHp * 0.25);
       this.notice = '25% Shield prepared for the next battle.';
-    } else {
+    } else if (choice === 'upgrade') {
       const id = Object.keys(this.skills).find((id) => this.skills[id] < SKILL_BY_ID[id].maxRank);
       if (!id) return;
       this.skills[id]++;
       this.notice = `${SKILL_BY_ID[id].name} upgraded.`;
-    }
+    } else return;
     this.cleared++;
     this.xp += 10;
     this.offer();
@@ -255,12 +264,26 @@ export function equip(save: SaveFile, id: string): SaveFile {
   return next;
 }
 export function upgrade(save: SaveFile, slot: Slot): SaveFile {
-  const id = save.account.equipped[slot],
-    level = save.account.inventory[id],
-    cost = UPGRADE_COSTS[level - 1];
+  return upgradeItem(save, save.account.equipped[slot]);
+}
+export function upgradeItem(save: SaveFile, id: string): SaveFile {
+  const level = save.account.inventory[id];
+  if (!level) return save;
+  const cost = UPGRADE_COSTS[level - 1];
   if (!cost || save.account.bits < cost) return save;
   const next = structuredClone(save);
   next.account.bits -= cost;
   next.account.inventory[id]++;
+  return next;
+}
+export function buyGear(save: SaveFile, id: string): SaveFile {
+  const item = GEAR[id];
+  if (!item || save.account.inventory[id]) return save;
+  const price = gearPrice(item);
+  if (save.account.bits < price) return save;
+  const next = structuredClone(save);
+  next.account.bits -= price;
+  next.account.inventory[id] = 1;
+  next.account.equipped[item.slot] = id;
   return next;
 }

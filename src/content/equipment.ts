@@ -115,6 +115,13 @@ export const EQUIPMENT: Equipment[] = [
 ];
 export const GEAR = Object.fromEntries(EQUIPMENT.map((e) => [e.id, e]));
 export const UPGRADE_COSTS = [100, 180, 300, 500];
+export const GEAR_PRICES: Record<Rarity, number> = {
+  common: 150,
+  rare: 350,
+  epic: 750,
+  legendary: 1400,
+};
+export const gearPrice = (item: Equipment) => GEAR_PRICES[item.rarity ?? 'common'];
 export function loadoutStats(
   equipped: Record<Slot, string>,
   inventory: Record<string, number>,

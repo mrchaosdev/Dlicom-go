@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { defaultSave, loadSave, migrateSave, SAVE_KEY, writeSave } from '../src/services/save';
-import { equip, RunSession, upgrade } from '../src/game/run/RunSession';
+import { buyGear, equip, RUN_SHOP_COST, RunSession, upgrade, upgradeItem } from '../src/game/run/RunSession';
+import { gearPrice, GEAR } from '../src/content/equipment';
+import { SKILL_BY_ID } from '../src/content/skills';
 import { NODES } from '../src/content/encounters';
 import { CHAPTERS } from '../src/content/chapters';
 const winRun = (chapterId = 'chapter_feed') => {
@@ -80,6 +82,51 @@ describe('run progression', () => {
     const save = defaultSave();
     expect(equip(save, 'weapon_moderator_hammer')).toEqual(save);
     expect(upgrade(save, 'weapon')).toEqual(save);
+  });
+  it('buys a specific item once, equips it, and upgrades owned unequipped gear', () => {
+    const save = defaultSave();
+    expect(buyGear(save, 'unknown_item')).toBe(save);
+    expect(buyGear(save, 'weapon_encryption_blade')).toBe(save);
+    save.account.bits = 500;
+    const bought = buyGear(save, 'weapon_encryption_blade');
+    expect(gearPrice(GEAR.weapon_encryption_blade)).toBe(350);
+    expect(bought.account.bits).toBe(150);
+    expect(bought.account.inventory.weapon_encryption_blade).toBe(1);
+    expect(bought.account.equipped.weapon).toBe('weapon_encryption_blade');
+    expect(buyGear(bought, 'weapon_encryption_blade')).toBe(bought);
+    const upgraded = upgradeItem(bought, 'weapon_packet_blaster');
+    expect(upgraded.account.bits).toBe(50);
+    expect(upgraded.account.inventory.weapon_packet_blaster).toBe(2);
+    expect(upgradeItem(upgraded, 'unknown_item')).toBe(upgraded);
+    expect(upgradeItem(upgraded, 'weapon_packet_blaster')).toBe(upgraded);
+    expect(save.account.bits).toBe(500);
+  });
+  it('spends run Bits at the second rest for a Rare-or-better draft', () => {
+    const run = new RunSession('signal-bazaar', defaultSave());
+    run.node = 4;
+    run.phase = 'rest';
+    run.bits = RUN_SHOP_COST;
+    run.rest('shop');
+    expect(run.phase).toBe('rest');
+    expect(run.bits).toBe(RUN_SHOP_COST);
+    run.node = 9;
+    run.bits = RUN_SHOP_COST - 1;
+    run.rest('shop');
+    expect(run.phase).toBe('rest');
+    expect(run.bits).toBe(RUN_SHOP_COST - 1);
+    run.bits = RUN_SHOP_COST;
+    run.rest('shop');
+    expect(run.bits).toBe(0);
+    expect(run.cleared).toBe(1);
+    expect(run.phase).toBe('draft');
+    expect(run.draft.length).toBeGreaterThan(0);
+    expect(run.draft.every((id) => SKILL_BY_ID[id].rarity !== 'common')).toBe(true);
+    run.reroll();
+    expect(run.draft.every((id) => SKILL_BY_ID[id].rarity !== 'common')).toBe(true);
+    run.rest('shop');
+    expect(run.bits).toBe(0);
+    run.selectSkill(run.draft[0]);
+    expect(run.node).toBe(10);
   });
   it('captures the equipped attack style for the entire run', () => {
     const save = defaultSave();

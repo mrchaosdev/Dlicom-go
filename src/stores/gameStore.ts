@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { defaultSave, loadSave, writeSave, type SaveFile } from '../services/save';
-import { RunSession, equip, upgrade } from '../game/run/RunSession';
+import { RunSession, buyGear, equip, upgrade, upgradeItem } from '../game/run/RunSession';
 import type { Slot } from '../content/equipment';
 import type { CombatEvent } from '../game/combat/types';
 import type { BattleSnapshot } from '../game/combat/CombatEngine';
@@ -39,6 +39,8 @@ interface GameStore {
   settings: (settings: Partial<SaveFile['settings']>) => void;
   equip: (id: string) => void;
   upgrade: (slot: Slot) => void;
+  upgradeItem: (id: string) => void;
+  buyGear: (id: string) => void;
 }
 export const useGame = create<GameStore>((set, get) => {
   const save = (next: SaveFile) => {
@@ -104,7 +106,7 @@ export const useGame = create<GameStore>((set, get) => {
       else if (action === 'skill') run.selectSkill(String(value));
       else if (action === 'reroll') run.reroll();
       else if (action === 'event') run.event(Number(value));
-      else if (action === 'rest') run.rest(value as 'heal' | 'upgrade' | 'shield');
+      else if (action === 'rest') run.rest(value as 'heal' | 'upgrade' | 'shield' | 'shop');
       set({ snapshot: run.engine?.snapshot(), events: [], paused: false });
       refresh();
     },
@@ -133,5 +135,7 @@ export const useGame = create<GameStore>((set, get) => {
     },
     equip: (id) => save(equip(get().save, id)),
     upgrade: (slot) => save(upgrade(get().save, slot)),
+    upgradeItem: (id) => save(upgradeItem(get().save, id)),
+    buyGear: (id) => save(buyGear(get().save, id)),
   };
 });

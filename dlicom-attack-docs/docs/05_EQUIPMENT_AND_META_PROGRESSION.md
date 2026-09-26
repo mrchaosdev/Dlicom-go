@@ -151,6 +151,8 @@ max equipment level 5.
 
 No complex fusion.
 
+Per the later human direction, the loadout screen also has an Inventory and a gear Shop. Inventory groups owned gear by the three existing slots and allows equipping or upgrading any owned item, including items outside the active loadout. The Shop spends earned account Bits to buy a specific unowned item at level 1 and immediately equips it for the next run. Repeated purchases of an owned item are unavailable. Current reversible rarity prices are Common 150, Rare 350, Epic 750 and Legendary 1400 Bits. This adds no extra currency, slots, backend or payment flow.
+
 ---
 
 ## 8. Drop system

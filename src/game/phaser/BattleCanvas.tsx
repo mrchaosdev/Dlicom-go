@@ -966,6 +966,7 @@ export default function BattleCanvas({
   const chapterId = useGame((s) => s.run?.chapterId ?? 'chapter_feed');
   const attackStyle = useGame((s) => s.run?.weaponStyle ?? 'ranged');
   useEffect(() => {
+    const mount = parent.current!;
     const current = new BattleScene(
       chapterId,
       attackStyle,
@@ -975,7 +976,7 @@ export default function BattleCanvas({
     scene.current = current;
     const game = new Phaser.Game({
       type: Phaser.AUTO,
-      parent: parent.current!,
+      parent: mount,
       width: 760,
       height: 510,
       transparent: true,
@@ -987,6 +988,7 @@ export default function BattleCanvas({
     });
     return () => {
       game.destroy(true);
+      mount.replaceChildren();
       scene.current = null;
     };
   }, [chapterId, attackStyle]);

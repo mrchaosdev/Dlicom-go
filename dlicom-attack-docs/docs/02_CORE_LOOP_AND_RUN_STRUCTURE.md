@@ -95,6 +95,8 @@ Choose:
 - upgrade a skill
 - gain shield for next battle
 
+Per the later human direction, Node 10 is also a Signal Bazaar. The player may spend 80 Bits earned during that run instead of taking a normal Rest service. The purchase opens a 1-of-3 Rare-or-better skill draft. This is an in-run build choice, and spent Bits are absent from the end-of-run payout. The other Rest choices remain available at Node 10.
+
 ### Cache
 Choose one:
 - Bits
