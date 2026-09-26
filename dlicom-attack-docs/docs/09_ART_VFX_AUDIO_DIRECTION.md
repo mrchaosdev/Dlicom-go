@@ -24,6 +24,10 @@ Ranged weapons must be identifiable from the battle sprite, not only from UI tex
 
 The exact equipped weapon ID selects the art. Costume colors may affect trim and energy, but the weapon's silhouette and core motif must remain recognizable. Sword and hammer retain their dedicated costume pose sets. Hurt and ultimate presentation must preserve the equipped weapon: Packet Blaster can use its dedicated reaction/ultimate art, while other weapons keep their own idle/attack sprite under the reaction motion and VFX.
 
+## Armor and module presence
+
+Armor and modules remain compatible with every costume through presentation overlays rather than repainting the costume sprite. The equipped armor creates a color-coded double protective aura behind Dili. The equipped module appears as a small orbiting core with its own color and glyph. Their full names appear along the arena edge and the home hero tags always show the actual equipped items. These effects follow Dili's combat movement, respect reduced-motion settings and are captured with the run loadout.
+
 ## 1. Art identity
 
 Use the provided Dili mascot reference as anchor.

@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import { ASSETS, diliWeaponPoses } from '../../content/assets';
 import type { AttackStyle } from '../../content/equipment';
 import type { SkinId } from '../../content/skins';
+import { GEAR } from '../../content/equipment';
 import { getChapter } from '../../content/chapters';
 import { useGame } from '../../stores/gameStore';
 import { playBossAttackSound, playSound } from '../../services/audio';
@@ -66,6 +67,22 @@ const STATUS_COLORS: Record<string, number> = {
   slow: 0x65d9d1,
   marked: 0xffd773,
   corrupted: 0xd081ff,
+};
+const ARMOR_VFX: Record<string, { color: number; accent: number; glyph: string }> = {
+  armor_firewall_shell: { color: 0x67e7ef, accent: 0x2a7fa1, glyph: 'F' },
+  armor_creator_hoodie: { color: 0xff78c8, accent: 0x7d3b7d, glyph: 'C' },
+  armor_zero_knowledge_cloak: { color: 0xa982ff, accent: 0x43327d, glyph: 'Z' },
+  armor_moderator_vest: { color: 0xffb45e, accent: 0x8f4d2f, glyph: 'M' },
+  armor_antispam_plating: { color: 0x9cf777, accent: 0x3e7d58, glyph: 'A' },
+  armor_core_armor: { color: 0xffd773, accent: 0x8b6632, glyph: 'Ω' },
+};
+const MODULE_VFX: Record<string, { color: number; glyph: string }> = {
+  module_viral_chip: { color: 0x83f47a, glyph: 'V' },
+  module_combo_router: { color: 0x67e7ef, glyph: 'C' },
+  module_counter_protocol: { color: 0xffa45e, glyph: '↻' },
+  module_rage_cache: { color: 0xff5d91, glyph: 'R' },
+  module_safe_mode: { color: 0x7bb9ff, glyph: 'S' },
+  module_trust: { color: 0xffd773, glyph: 'T' },
 };
 
 function drawChapterBackground(g: Phaser.GameObjects.Graphics, chapterId: string) {
@@ -144,6 +161,9 @@ class BattleScene extends Phaser.Scene {
   private bossWarningRing!: Phaser.GameObjects.Arc;
   private bossWarningBadge!: Phaser.GameObjects.Container;
   private lowHpAura!: Phaser.GameObjects.Arc;
+  private armorAura!: Phaser.GameObjects.Arc;
+  private armorCore!: Phaser.GameObjects.Arc;
+  private moduleOrb!: Phaser.GameObjects.Container;
   private lowHpActive = false;
   private heroPoseWait = 0;
   private outcomePosePending: 'victory' | 'defeat' | null = null;
@@ -153,6 +173,8 @@ class BattleScene extends Phaser.Scene {
   constructor(
     private readonly chapterId: string,
     private readonly weaponId: string,
+    private readonly armorId: string,
+    private readonly moduleId: string,
     private readonly attackStyle: AttackStyle,
     private readonly skinId: SkinId,
     private readonly onCue: (event: CombatEvent) => void,
@@ -278,6 +300,30 @@ class BattleScene extends Phaser.Scene {
       .setAlpha(0.3)
       .setVisible(false)
       .setDepth(6);
+    const armorVfx = ARMOR_VFX[this.armorId] ?? ARMOR_VFX.armor_firewall_shell;
+    this.armorAura = this.add
+      .circle(197, 312, 106)
+      .setStrokeStyle(3, armorVfx.color, 0.34)
+      .setDepth(4);
+    this.armorCore = this.add
+      .circle(197, 312, 95)
+      .setStrokeStyle(1, armorVfx.accent, 0.48)
+      .setDepth(4);
+    const moduleVfx = MODULE_VFX[this.moduleId] ?? MODULE_VFX.module_viral_chip;
+    const moduleBack = this.add.circle(0, 0, 19, 0x081527, 0.92).setStrokeStyle(3, moduleVfx.color, 0.95);
+    const moduleDot = this.add.circle(0, -25, 4, moduleVfx.color, 0.9);
+    const moduleOrbit = this.add.container(0, 0, [moduleDot]);
+    const moduleGlyph = this.add.text(0, 0, moduleVfx.glyph, {
+      fontFamily: 'monospace', fontSize: '17px', fontStyle: 'bold', color: '#ffffff',
+    }).setOrigin(0.5);
+    this.moduleOrb = this.add.container(112, 211, [moduleBack, moduleOrbit, moduleGlyph]).setDepth(7);
+    if (!useGame.getState().save.settings.reducedMotion) {
+      this.tweens.add({ targets: this.armorAura, scale: 1.05, alpha: 0.62, duration: 1400, yoyo: true, repeat: -1 });
+      this.tweens.add({ targets: moduleOrbit, angle: 360, duration: 1800, repeat: -1 });
+    }
+    this.add.text(18, 482, `${GEAR[this.armorId].name.toUpperCase()}  ◇  ${GEAR[this.moduleId].name.toUpperCase()}`, {
+      fontFamily: 'monospace', fontSize: '10px', color: '#86a9bd',
+    }).setDepth(8);
     this.label = this.add
       .text(380, 420, '', {
         fontFamily: 'monospace',
@@ -912,6 +958,12 @@ class BattleScene extends Phaser.Scene {
       if (sprite)
         sprite.scaleY = breathing.baseScaleY * (state.save.settings.reducedMotion ? 1 : breathing.factor);
     }
+    const hero = this.sprites.get('dili');
+    if (hero) {
+      this.armorAura.setPosition(hero.x, hero.y + 9);
+      this.armorCore.setPosition(hero.x, hero.y + 9);
+      this.moduleOrb.setPosition(hero.x - 85, hero.y - 92);
+    }
     if (state.save.settings.reducedMotion && this.lowHpActive) {
       this.lowHpActive = false;
       this.tweens.killTweensOf(this.lowHpAura);
@@ -955,6 +1007,8 @@ export default function BattleCanvas({
   const sequence = useGame((s) => s.sequence);
   const chapterId = useGame((s) => s.run?.chapterId ?? 'chapter_feed');
   const weaponId = useGame((s) => s.run?.weaponId ?? 'weapon_packet_blaster');
+  const armorId = useGame((s) => s.run?.armorId ?? 'armor_firewall_shell');
+  const moduleId = useGame((s) => s.run?.moduleId ?? 'module_viral_chip');
   const attackStyle = useGame((s) => s.run?.weaponStyle ?? 'ranged');
   const skinId = useGame((s) => s.run?.skinId ?? 'signal_blue');
   useEffect(() => {
@@ -962,6 +1016,8 @@ export default function BattleCanvas({
     const current = new BattleScene(
       chapterId,
       weaponId,
+      armorId,
+      moduleId,
       attackStyle,
       skinId,
       (event) => handlers.current.onCue(event),
@@ -985,7 +1041,7 @@ export default function BattleCanvas({
       mount.replaceChildren();
       scene.current = null;
     };
-  }, [chapterId, weaponId, attackStyle, skinId]);
+  }, [chapterId, weaponId, armorId, moduleId, attackStyle, skinId]);
   useEffect(() => {
     const state = useGame.getState();
     if (state.snapshot) scene.current?.sync(state.snapshot, state.events);
@@ -996,7 +1052,10 @@ export default function BattleCanvas({
       className="battle-canvas"
       ref={parent}
       role="img"
-      aria-label={`Dili automatically battles in ${getChapter(chapterId).name}`}
+      data-weapon-id={weaponId}
+      data-armor-id={armorId}
+      data-module-id={moduleId}
+      aria-label={`Dili automatically battles in ${getChapter(chapterId).name} with ${GEAR[weaponId].name}, ${GEAR[armorId].name}, and ${GEAR[moduleId].name}`}
     />
   );
 }

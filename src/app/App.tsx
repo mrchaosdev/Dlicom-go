@@ -155,18 +155,24 @@ function Meter({
 }
 function HeroPanel() {
   const weaponId = useGame((state) => state.save.account.equipped.weapon);
+  const armorId = useGame((state) => state.save.account.equipped.armor);
+  const moduleId = useGame((state) => state.save.account.equipped.module);
   const skinId = useGame((state) => state.save.account.skinId);
   const weapon = GEAR[weaponId];
+  const armor = GEAR[armorId];
+  const module = GEAR[moduleId];
+  const ArmorGlyph = EQUIPMENT_GLYPHS[armorId as keyof typeof EQUIPMENT_GLYPHS] ?? Shield;
+  const ModuleGlyph = EQUIPMENT_GLYPHS[moduleId as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu;
   const preview = diliWeaponPoses(skinId, weaponId).idle;
   return (
     <div className="hero-art">
       <div className="orbit orbit-one" />
       <div className="orbit orbit-two" />
-      <span className="float-tag tag-one">
-        <Shield size={15} /> FIREWALL ONLINE
+      <span className="float-tag tag-one" data-equipped-armor={armorId}>
+        <ArmorGlyph size={15} /> {armor.name.toUpperCase()}
       </span>
-      <span className="float-tag tag-two">
-        <Zap size={15} /> OVERDRIVE READY
+      <span className="float-tag tag-two" data-equipped-module={moduleId}>
+        <ModuleGlyph size={15} /> {module.name.toUpperCase()}
       </span>
       <div className="hero-glow" />
       <img

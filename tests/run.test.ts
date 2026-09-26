@@ -134,10 +134,18 @@ describe('run progression', () => {
     save.account.equipped.weapon = 'weapon_encryption_blade';
     const run = new RunSession('blade-style', save);
     expect(run.weaponId).toBe('weapon_encryption_blade');
+    expect(run.armorId).toBe('armor_firewall_shell');
+    expect(run.moduleId).toBe('module_viral_chip');
     expect(run.weaponStyle).toBe('blade');
     save.account.inventory.weapon_moderator_hammer = 1;
     save.account.equipped.weapon = 'weapon_moderator_hammer';
+    save.account.inventory.armor_zero_knowledge_cloak = 1;
+    save.account.equipped.armor = 'armor_zero_knowledge_cloak';
+    save.account.inventory.module_combo_router = 1;
+    save.account.equipped.module = 'module_combo_router';
     expect(run.weaponId).toBe('weapon_encryption_blade');
+    expect(run.armorId).toBe('armor_firewall_shell');
+    expect(run.moduleId).toBe('module_viral_chip');
     expect(run.weaponStyle).toBe('blade');
     expect(new RunSession('hammer-style', save).weaponStyle).toBe('hammer');
   });

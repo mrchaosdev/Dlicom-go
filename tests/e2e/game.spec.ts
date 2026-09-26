@@ -78,6 +78,32 @@ test('daily energy claim, five-energy run cost and interrupted-run refund', asyn
   await expect(page.getByRole('button', { name: 'Claimed today' })).toBeDisabled();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+test('equipped armor and module drive hero tags and battle presentation', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/services/save.ts'))!;
+    const { defaultSave, SAVE_KEY } = await import(path);
+    const save = defaultSave();
+    save.account.inventory.armor_zero_knowledge_cloak = 1;
+    save.account.inventory.module_combo_router = 1;
+    save.account.equipped.armor = 'armor_zero_knowledge_cloak';
+    save.account.equipped.module = 'module_combo_router';
+    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+  });
+  await page.reload();
+  await expect(page.locator('[data-equipped-armor="armor_zero_knowledge_cloak"]')).toContainText('ZERO-KNOWLEDGE CLOAK');
+  await expect(page.locator('[data-equipped-module="module_combo_router"]')).toContainText('COMBO ROUTER');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'Enter the Network', exact: false }).first().click();
+  await page.getByRole('button', { name: /Data lane/ }).click();
+  const battle = page.locator('.battle-canvas');
+  await expect(battle).toHaveAttribute('data-armor-id', 'armor_zero_knowledge_cloak');
+  await expect(battle).toHaveAttribute('data-module-id', 'module_combo_router');
+  await expect(battle).toHaveAttribute('aria-label', /Zero-Knowledge Cloak, and Combo Router/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
 test('blade and hammer loadouts use their own battle poses and finish melee hits', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const [weaponId, prefix] of [

@@ -22,6 +22,8 @@ export class RunSession {
   readonly rng: SeededRng;
   readonly baseStats: Stats;
   readonly weaponId: string;
+  readonly armorId: string;
+  readonly moduleId: string;
   readonly weaponStyle: AttackStyle;
   readonly skinId: SkinId;
   readonly starterSkill: string;
@@ -62,6 +64,8 @@ export class RunSession {
     this.rng = new SeededRng(seed);
     this.level = accountLevel(save.account.xp);
     this.weaponId = save.account.equipped.weapon;
+    this.armorId = save.account.equipped.armor;
+    this.moduleId = save.account.equipped.module;
     this.weaponStyle = weaponAttackStyle(this.weaponId);
     this.skinId = save.account.skinId;
     this.starterSkill = save.account.queuedSkill;

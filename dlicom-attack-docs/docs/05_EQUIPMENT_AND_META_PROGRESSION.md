@@ -30,7 +30,7 @@ Only 3 slots.
 
 This keeps UI manageable.
 
-A run always has exactly one owned weapon equipped. Every weapon definition must declare its presentation style as `ranged`, `blade` or `hammer`; there is no implicit fallback weapon. Dili's home preview, costume gallery, battle pose, melee movement and attack sound all derive from that equipped weapon. Packet Blaster, Overdrive Core, Viral Launcher and DliClip Cannon have distinct ranged silhouettes and attack effects for every costume. The run captures the exact weapon ID at startup, so equipment changes during an active run apply on the next run.
+A run always has exactly one owned item equipped in each of the three slots. Every weapon definition must declare its presentation style as `ranged`, `blade` or `hammer`; there is no implicit fallback weapon. Dili's home preview, costume gallery, battle pose, melee movement and attack sound all derive from that equipped weapon. Packet Blaster, Overdrive Core, Viral Launcher and DliClip Cannon have distinct ranged silhouettes and attack effects for every costume. Home tags show the actual armor and module instead of fixed placeholder labels. In battle, armor controls the protective aura and the module controls the orbiting core glyph. The run captures all three exact equipment IDs at startup, so equipment changes during an active run apply on the next run.
 
 ---
 
