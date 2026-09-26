@@ -105,3 +105,34 @@ Avoid:
 - random costume redesign
 - illegible text
 - watermark
+
+---
+
+# 14. Dili costume set
+
+Use the matching generated idle master in `assets/skin-source/` as the costume reference and the original Signal Blue pose as the action reference. Preserve the action reference's pose, expression, framing and proportions while carrying every structural costume detail into the new pose. Require a genuine transparent alpha background with no floor, scenery, text, logo, watermark, border or cast shadow.
+
+Generate all eight poses for each costume:
+
+```text
+idle
+attack
+sword-idle
+sword-attack
+hammer-idle
+hammer-attack
+hurt
+ultimate
+```
+
+## Night Operative
+
+> Same Dili mascot wearing charcoal-black tactical armor with a high collar, short split stealth mantle, segmented forearm and shin guards, belt pouches, magenta helmet rim and sharp magenta signal circuitry. Black-metal weapons share magenta energy cores. Ultimate creates a magenta-black signal burst with sharp digital arcs. Preserve Dili's blue face, round transparent helmet, antenna and cute proportions. Polished 2D game sprite, thick clean outline, readable silhouette, transparent background.
+
+## Solar Vanguard
+
+> Same Dili mascot wearing sculpted white and warm-gold modular command armor, broad angular shoulder guards, orange split cape, sunburst chest badge, gold bracers and boots, white-gold helmet crown and amber energy seams. White-gold weapons share radiant amber cores. Ultimate creates an angular amber-gold solar flare. Preserve Dili's blue face, round transparent helmet, antenna and cute proportions. Polished 2D game sprite, thick clean outline, readable silhouette, transparent background.
+
+## Glitch Phantom
+
+> Same Dili mascot wearing a deep midnight-teal hooded data-cloak with an asymmetric torn pixel hem, floating data shards, faceted jade armor, luminous circuit cracks, one angular shoulder guard and jade headset details. Dark weapons split into jade data effects. Ultimate creates a teal-jade data rupture with pixel shards and broken circuit arcs. Preserve Dili's blue face, round transparent helmet, antenna and cute proportions. Polished 2D game sprite, thick clean outline, readable silhouette, transparent background.

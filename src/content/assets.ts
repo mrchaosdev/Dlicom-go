@@ -78,7 +78,7 @@ export const SKILL_ART: Record<Archetype, string> = {
 };
 
 export type DiliPose = 'idle' | 'attack' | 'sword_idle' | 'sword_attack' | 'hammer_idle' | 'hammer_attack' | 'hurt' | 'ultimate';
-const palette = (name: string): Record<DiliPose, string> => ({
+const costumeAssetSet = (name: string): Record<DiliPose, string> => ({
   idle: asset(`dili-skin-${name}-idle.webp`),
   attack: asset(`dili-skin-${name}-attack.webp`),
   sword_idle: asset(`dili-skin-${name}-sword-idle.webp`),
@@ -99,7 +99,7 @@ export const DILI_SKIN_ASSETS: Record<SkinId, Record<DiliPose, string>> = {
     hurt: ASSETS.dili_hurt,
     ultimate: ASSETS.dili_ultimate,
   },
-  neon_rose: palette('rose'),
-  solar_circuit: palette('solar'),
-  jade_glitch: palette('jade'),
+  neon_rose: costumeAssetSet('rose'),
+  solar_circuit: costumeAssetSet('solar'),
+  jade_glitch: costumeAssetSet('jade'),
 };

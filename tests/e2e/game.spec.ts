@@ -120,6 +120,9 @@ test('Dili skin gallery saves a cosmetic choice and uses it in ranged battle', a
   await expect(page.locator('[data-skin-id]')).toHaveCount(4);
   await expect(page.locator('[data-skin-id="signal_blue"] button')).toBeDisabled();
   const rose = page.locator('[data-skin-id="neon_rose"]');
+  await expect(rose.getByRole('heading', { name: 'Night Operative' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Solar Vanguard' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Glitch Phantom' })).toBeVisible();
   await rose.getByRole('button', { name: 'Use this skin' }).click();
   await expect(rose.getByRole('button', { name: 'Selected' })).toBeDisabled();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

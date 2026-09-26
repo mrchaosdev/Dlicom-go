@@ -6,9 +6,13 @@ The equipment and skill chests have original transparent cyber-fantasy illustrat
 
 ## Dili cosmetic skins
 
-Dili has four selectable visual palettes: the original Signal Blue plus Neon Rose, Solar Circuit and Jade Glitch. Each alternate palette is derived consistently from the existing Dili pose artwork and includes ranged idle/attack, sword idle/attack, hammer idle/attack, hurt and ultimate. These are compressed transparent WebP assets in `public/assets/`. Skins alter only presentation; combat rules and stats are unchanged. The selected skin is saved locally and captured when a run starts, so changing it while a run is active affects the next run.
+Dili has four selectable costumes: the original Signal Blue, Night Operative, Solar Vanguard and Glitch Phantom. These are complete outfit designs rather than color transforms. Every costume includes ranged idle/attack, sword idle/attack, hammer idle/attack, hurt and ultimate. The generated transparent PNG masters live in `assets/skin-source/`; 512 x 512 transparent runtime WebP files live in `public/assets/`. Skins alter only presentation; combat rules and stats are unchanged. The selected skin is saved locally and captured when a run starts, so changing it while a run is active affects the next run.
 
-The palette transforms are hue rotations of 85°, 170° and 265° respectively, at 1.1/1.08/1.08 saturation. Source poses are resized to 512 px width and encoded as transparent WebP at quality 88. Keep the full eight-pose set aligned when adjusting a palette.
+- **Night Operative** uses charcoal tactical armor, a high collar, split stealth mantle, segmented guards, belt pouches and magenta signal circuitry. Its gun, sword, hammer and ultimate share black-metal construction with magenta energy.
+- **Solar Vanguard** uses sculpted white-gold command armor, broad shoulder guards, an orange split cape and a sun-core badge. Its weapons and ultimate use radiant amber energy.
+- **Glitch Phantom** uses a midnight-teal hooded data-cloak, asymmetric pixel-torn hem, faceted jade armor, circuit cracks and floating data shards. Its weapons and ultimate break into jade data effects.
+
+Preserve Dili's blue face, speech-bubble head, round transparent helmet, antenna and friendly proportions across all costumes. Keep a costume's silhouette, materials, weapon design and energy language consistent through its complete eight-pose set. Runtime assets are encoded as transparent WebP at quality 86.
 
 ## 1. Art identity
 

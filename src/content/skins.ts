@@ -8,8 +8,8 @@ export interface SkinDefinition {
 }
 export const SKINS: SkinDefinition[] = [
   { id: 'signal_blue', name: 'Signal Blue', description: 'Dili\'s original network armor.', accent: '#67e7ef' },
-  { id: 'neon_rose', name: 'Neon Rose', description: 'A bright magenta signal for every pose.', accent: '#f58ae8' },
-  { id: 'solar_circuit', name: 'Solar Circuit', description: 'Warm orange plating with a live-wire glow.', accent: '#ffad70' },
-  { id: 'jade_glitch', name: 'Jade Glitch', description: 'A green pulse through Dili\'s whole kit.', accent: '#9cf777' },
+  { id: 'neon_rose', name: 'Night Operative', description: 'Tactical stealth armor with a magenta signal edge.', accent: '#ff46dc' },
+  { id: 'solar_circuit', name: 'Solar Vanguard', description: 'White-gold command armor powered by a sun core.', accent: '#ffb52e' },
+  { id: 'jade_glitch', name: 'Glitch Phantom', description: 'A hooded data-cloak breaking into jade pixels.', accent: '#45f2c0' },
 ];
 export const SKIN_BY_ID: Record<SkinId, SkinDefinition> = Object.fromEntries(SKINS.map((skin) => [skin.id, skin])) as Record<SkinId, SkinDefinition>;

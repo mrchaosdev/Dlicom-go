@@ -387,7 +387,7 @@ function EquipmentScreen() {
         text={tab === 'loadout' ? 'Three slots. A different way to break the network.'
           : tab === 'inventory' ? 'Every item you own, grouped by slot. Upgrade or equip for your next run.'
             : tab === 'shop' ? 'Spend earned Bits on a known item or open a gear or skill chest.'
-              : 'Choose a look for Dili. Skins change visuals only, across every combat pose.'}
+              : 'Choose Dili\'s costume. Every outfit has unique armor, weapons and effects across all combat poses.'}
       />
       <div className="gear-tabs" role="tablist" aria-label="Equipment views">
         {([['loadout', 'Loadout'], ['inventory', 'Inventory'], ['shop', 'Shop'], ['skins', 'Skins']] as const).map(([id, label]) => (
@@ -511,14 +511,14 @@ function SkinPanel() {
   const { save, selectSkin, run } = useGame();
   return (
     <section className="skin-collection" aria-label="Dili skins">
-      <p className="shop-note">All skins are available. Your choice is saved locally and applies to the next run{run && !run.result ? '; the active run keeps its current look' : ''}.</p>
+      <p className="shop-note">All costumes are available and cosmetic only. Your choice is saved locally and applies to the next run{run && !run.result ? '; the active run keeps its current outfit' : ''}.</p>
       <div className="skin-grid">
         {SKINS.map((skin) => {
           const selected = save.account.skinId === skin.id;
           return (
             <article className="panel skin-card" key={skin.id} data-skin-id={skin.id} data-selected={selected} style={{ '--skin-color': skin.accent } as CSSProperties}>
               <div className="skin-card-art"><img src={DILI_SKIN_ASSETS[skin.id].idle} alt={`Dili wearing ${skin.name}`} loading="lazy" /></div>
-              <div><span className="eyebrow">DILI SKIN</span><h2>{skin.name}</h2><p>{skin.description}</p></div>
+              <div><span className="eyebrow">DILI COSTUME</span><h2>{skin.name}</h2><p>{skin.description}</p></div>
               <Button disabled={selected} onClick={() => selectSkin(skin.id)}>{selected ? 'Selected' : 'Use this skin'}</Button>
             </article>
           );
