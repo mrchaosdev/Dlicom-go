@@ -23,7 +23,7 @@ test.afterEach(async ({ page }) => {
 test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Small hero/ })).toBeVisible();
-  await expect(page.getByText('SYSTEM ONLINE · v0.2.5')).toBeVisible();
+  await expect(page.getByText('SYSTEM ONLINE · v0.2.6')).toBeVisible();
   for (const [width, height] of [
     [320, 740],
     [360, 800],
@@ -606,6 +606,15 @@ test('all run screens, boss rewards, upgrade and save reload integrate', async (
   const sharedResult = await page.evaluate(() => localStorage.getItem('dlicom-test-clipboard'));
   expect(sharedResult).toContain('SPAM KING DEFEATED');
   expect(sharedResult).toContain('Seed:');
+  const cardDownload = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Save share card', exact: true }).click();
+  const card = await cardDownload;
+  expect(card.suggestedFilename()).toMatch(/^dlicom-attack-the-feed-\d+\.webp$/);
+  const cardStream = await card.createReadStream();
+  let cardBytes = 0;
+  if (cardStream) for await (const chunk of cardStream) cardBytes += chunk.length;
+  expect(cardBytes).toBeGreaterThan(20_000);
+  await expect(page.getByRole('button', { name: 'Card saved!', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Upgrade equipment', exact: true }).click();
   await page.getByRole('button', { name: 'Upgrade · 100 Bits', exact: true }).first().click();
   await expect(page.getByText('LEVEL 2 / 5')).toBeVisible();

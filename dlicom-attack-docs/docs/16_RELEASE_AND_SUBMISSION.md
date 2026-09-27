@@ -124,8 +124,8 @@ PLAY DLICOM ATTACK.
 - [x] runtime asset validator finds no missing or disallowed production assets; browser tests load each chapter's battle assets
 - [x] music and SFX settings controls are present; music-volume setting persists across reload
 - [x] mobile layouts fit documented phone viewports without page overflow
-- [x] result screen and text/seed copy action work in the browser flow (clipboard is isolated by the test harness)
-- [x] version `v0.2.5` is displayed in the game UI
+- [x] result screen, text/seed copy, and lightweight WebP share-card download work across the automated browser flows (clipboard is isolated by the test harness)
+- [x] version `v0.2.6` is displayed in the game UI
 - [ ] submission posted before deadline
 
 The automated checks above verify the repository build and browser contexts. They do not substitute for production URL smoke testing, physical Android/iOS checks, human readability and pacing playtests, or posting the submission package.

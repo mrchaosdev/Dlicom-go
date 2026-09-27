@@ -11,6 +11,7 @@ import {
   Cpu,
   Crosshair,
   Crown,
+  Download,
   Gauge,
   Gift,
   Heart,
@@ -34,7 +35,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import type { Archetype, CombatEvent } from '../game/combat/types';
 import type { BattleSnapshot } from '../game/combat/CombatEngine';
 import { useGame } from '../stores/gameStore';
-import { ASSETS, EQUIPMENT_ART, SKILL_ART, diliWeaponPoses } from '../content/assets';
+import { ASSETS, CHAPTER_BACKGROUNDS, EQUIPMENT_ART, SKILL_ART, diliWeaponPoses } from '../content/assets';
 import { SKINS, SKIN_BY_ID } from '../content/skins';
 import { EQUIPMENT, GEAR, UPGRADE_COSTS, gearPrice, loadoutStats, type Slot } from '../content/equipment';
 import { NODE_REWARDS, RUN_SHOP_COST } from '../game/run/RunSession';
@@ -49,6 +50,7 @@ import { ACHIEVEMENT_GLYPHS } from '../content/progressionIcons';
 import { accountLevel } from '../services/save';
 import { DAILY_ENERGY_REWARD, ENERGY_MAX, RUN_ENERGY_COST, canClaimDailyEnergy, energyCountdown, localDay } from '../game/meta/energy';
 import { playSound, startAudio, suspendAudio, updateAudio } from '../services/audio';
+import { downloadShareCard } from '../services/shareCard';
 import { applyCueVitals, snapshotVitals, turnDuration, type PresentedVitals } from '../game/phaser/presentation';
 const BattleCanvas = lazy(() => import('../game/phaser/BattleCanvas'));
 const iconFor = (tag: string, size = 22) => {
@@ -1215,7 +1217,9 @@ function ChoiceScreen() {
 function SummaryScreen() {
   const { run, start, navigate } = useGame();
   const [copied, setCopied] = useState(false);
+  const [cardState, setCardState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   if (!run) return null;
+  const duration = `${Math.floor((run.endedAt - run.startedAt) / 60000)}m ${Math.floor((run.endedAt - run.startedAt) / 1000) % 60}s`;
   const share = `Dlicom Attack — ${run.chapter.name}\n${run.result === 'victory' ? `${run.chapter.bossName.toUpperCase()} DEFEATED` : 'RUN ENDED'}\nScore: ${run.score}\n${Object.keys(
     run.skills,
   )
@@ -1249,7 +1253,7 @@ function SummaryScreen() {
           ['Nodes cleared', `${run.cleared} / 12`],
           [
             'Duration',
-            `${Math.floor((run.endedAt - run.startedAt) / 60000)}m ${Math.floor((run.endedAt - run.startedAt) / 1000) % 60}s`,
+            duration,
           ],
           ['Bits earned', run.bits],
         ].map(([label, value]) => (
@@ -1291,7 +1295,40 @@ function SummaryScreen() {
         >
           {copied ? 'Copied!' : 'Copy result'}
         </Button>
+        <Button
+          disabled={cardState === 'saving'}
+          onClick={async () => {
+            setCardState('saving');
+            try {
+              const skin = SKIN_BY_ID[run.skinId];
+              await downloadShareCard({
+                outcome: run.result ?? 'defeat',
+                chapter: run.chapter.name,
+                boss: run.chapter.bossName,
+                score: run.score,
+                damageDealt: run.stats.damageDealt,
+                highestHit: run.stats.highestHit,
+                kills: run.stats.kills,
+                bits: run.bits,
+                duration,
+                seed: run.seed,
+                skin: skin.name,
+                weapon: GEAR[run.weaponId].name,
+                skills: Object.keys(run.skills).map((id) => SKILL_BY_ID[id].name),
+                accent: skin.accent,
+                backgroundUrl: CHAPTER_BACKGROUNDS[run.chapterId],
+                heroUrl: diliWeaponPoses(run.skinId, run.weaponId)[run.result === 'victory' ? 'ultimate' : 'hurt'],
+              });
+              setCardState('saved');
+            } catch {
+              setCardState('error');
+            }
+          }}
+        >
+          <Download size={17} /> {cardState === 'saving' ? 'Creating card...' : cardState === 'saved' ? 'Card saved!' : 'Save share card'}
+        </Button>
       </div>
+      {cardState === 'error' && <p className="share-error" role="alert">Could not create the card in this browser. The result text is still available below.</p>}
       <details className="share-text">
         <summary>Result text & seed</summary>
         <pre>{share}</pre>
@@ -1458,7 +1495,7 @@ export default function App() {
       </main>
       <footer>
         <span>
-          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.2.5
+          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.2.6
         </span>
         <span>
           {inRun

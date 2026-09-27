@@ -4,7 +4,7 @@ Build an overpowered Dili, chain Dlicom-themed skills, and fight through a corru
 
 **Play now:** https://dlicom-attack.vercel.app
 
-**Version 0.2.5 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
+**Version 0.2.6 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
 
 ![Dlicom Attack home](artifacts/home-desktop.webp)
 
@@ -44,6 +44,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Four selectable Dili costumes include distinct armor, weapons and effects across ranged, sword, hammer, hurt and ultimate poses. Costume choice saves locally and never changes combat stats.
 - Node 10's Signal Bazaar offers an optional Rare-or-better skill draft for 80 run Bits, creating a choice between immediate power and the final Bits payout. Short transitions identify each new run phase.
 - Responsive desktop/mobile UI, keyboard focus states, local fonts and local audio.
+- The final result can be copied as reproducible text or exported as a lightweight 1200 × 630 WebP share card containing the run's chapter art, Dili skin, equipped weapon, score, build and seed.
 
 ## Architecture
 
@@ -84,7 +85,6 @@ Import `mrchaosdev/Dlicom-go` into Vercel. Root directory: repository root. Buil
 - Character-specific pose polish remains conditional on physical-device readability checks. The [art and animation matrix](docs/ART_ANIMATION_MATRIX.md) tracks state coverage and remaining device QA.
 - Human balance/pacing pass: a deterministic 500-run stress bot with max-level gear won 38.8% of DliClips, 27.0% of Dili Rooms, and 36.0% of Core Network runs; it does not model human build choices. Core tuning now gets nearly every run to Null.exe, where the boss remains the main win gate. The overall 8–15 minute target has **not** been met or verified; human playtesting and a deliberate pacing pass remain necessary.
 - Human pacing, balance and readability playtests; physical Android/iOS device testing; Edge and long-session performance checks; trailer and final submission. The 10,000-run simulation's combat-only medians are 148–181 seconds; the 8–15 minute full-session target is not verified.
-- Share result copies the score, build and seed as text. A graphical share-card export is not implemented.
 
 ## Specification and provenance
 

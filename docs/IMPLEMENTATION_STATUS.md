@@ -1,4 +1,4 @@
-# Implementation and verification — v0.2.5
+# Implementation and verification — v0.2.6
 
 ## Implemented
 
@@ -20,13 +20,15 @@ Ban Hammer and Viral Explosion also flash their archetype art directly on impact
 
 Critical hits now get a 70 ms yellow source-ring anticipation before the hit cue. Ultimate also gets a 150 ms Rage-art burst just before the existing network wave. These cues are presentation-only and share the turn timing calculation, so combat results and pause/speed controls remain deterministic.
 
+The run summary now exports a 1200 × 630 share card generated locally in the browser. It combines the chapter backdrop, selected Dili costume and equipped weapon pose with the result, score, combat stats, skills and replay seed. Export prefers WebP to keep the downloaded image small and falls back only when a browser cannot encode WebP. The existing plain-text copy remains available.
+
 ## Verification
 
 Boss attacks use chapter-colored impact sparks and projectiles so each boss has a distinct combat identity. DliClip projectiles retain their pink signal color. Each boss also has a distinct synthesized attack cue, generated reproducibly with the existing audio script.
 
 Burn ticks and reflected damage present their impacts without replaying the source's attack sound, lunge, or projectile.
 
-- 82 unit/integration tests pass. The 45 end-to-end cases run across Chromium, Firefox, and WebKit and fail on uncaught app exceptions or unexpected console errors. Coverage includes fresh isolated profiles, persisted settings, gear and skin ownership, weapon and equipment presentation, both chest types, audio assets, share-result output, responsive battle layouts, pause/speed/draft, impact-synchronized HUD, status readability, all chapter art and soundtracks, and a complete first-chapter run.
+- 88 unit/integration tests pass. The 45 end-to-end cases run across Chromium, Firefox, and WebKit and fail on uncaught app exceptions or unexpected console errors. Coverage includes fresh isolated profiles, persisted settings, gear and skin ownership, weapon and equipment presentation, both chest types, audio assets, text and WebP share-result output, responsive battle layouts, pause/speed/draft, impact-synchronized HUD, status readability, all chapter art and soundtracks, and a complete first-chapter run.
 - ESLint, TypeScript, production build, and content validation pass.
 - CI runs a deterministic balance regression: 2,500 full runs per chapter (10,000 total), with level-6 unlocks and max-level equipment, covering 80,997 battles. It verifies each chapter's median winning boss-fight time against the design target. The current heuristic produced 91.8% wins for The Feed, 55.7% for DliClips, 43.6% for Dili Rooms, and 24.8% for Core Network; all bosses were defeated in the sample. Later chapters remain materially harder for this basic damage-priority bot, which does not model human build choices. A separate 2,500-run Chapter 1 sample using only the starting loadout won 73.5% of runs, consistent with the target of winning within one to three reasonable attempts.
 - With all equipment unlocked, median winning boss-fight time was 59s (Feed), 70s (DliClips), 68s (Rooms), and 61s (Core), inside the documented 45–60s first-boss and 60–90s later-boss bands. These figures exclude route transitions, player decisions, menus, and first-battle delay, so they do not verify the 8–15 minute full-session target. Human pacing and balance playtests remain required.
