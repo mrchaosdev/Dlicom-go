@@ -1520,84 +1520,66 @@ This keeps UI manageable.
 ## 3. Weapon examples
 
 ### Packet Blaster
-+ATK
-Passive:
-basic attack damage +10%.
++10 ATK. Basic damage +8% and Combo +5%.
 
 ### Moderator Hammer
-+ATK
-Passive:
-Ban Hammer triggers every 3 attacks instead of 4.
++10 ATK. Every third basic adds a 55% ATK Ban Hammer.
 
 ### Viral Launcher
-+ATK
-Passive:
-Viral explosion damage +20%.
++10 ATK. Every fourth basic detonates a 60% ATK Viral Explosion against all enemies.
 
 ### Encryption Blade
-+ATK
-Passive:
-after Dodge, next attack +30%.
++10 ATK and +5% Dodge. After Dodge, the next slash deals +80% damage.
 
 ### Overdrive Core
-+ATK
-Passive:
-start battle +20 Rage.
++8 ATK. Start with 20 Rage and gain 5 additional Rage from every basic.
 
 ### DliClip Cannon
-+ATK
-Passive:
-critical hit DliClip damage +25%.
++12 ATK and +4% Crit. Critical basics launch a 90% ATK DliClip.
 
 ---
 
 ## 4. Armor examples
 
 ### Firewall Shell
-+HP
-Shield generation +15%.
++110 HP. Shield generation +20%.
 
 ### Creator Hoodie
-+HP
-Healing +10%.
++80 HP. Healing +18% and Lifesteal +2%.
 
 ### Moderator Vest
-+DEF
-Debuffed enemies deal -8% damage.
++6 DEF. Debuffed enemies deal -12% damage.
 
 ### Zero-Knowledge Cloak
-+HP
-Dodge +4%.
++80 HP. Dodge +5%.
 
 ### Anti-Spam Plating
-+DEF
-Bot enemies deal -10% damage.
++10 DEF. Bot enemies deal -15% damage.
 
 ### Core Armor
-+HP/+DEF
-Below 25% HP gain temporary DR.
++80 HP and +7 DEF. Below 25% HP gain 20% damage reduction.
 
 ---
 
 ## 5. Module examples
 
 ### Viral Chip
-Crit +4%.
+Crit +3% and Viral Explosion damage +12%.
 
 ### Combo Router
-Combo +6%.
+Combo +7%.
 
 ### Counter Protocol
-Counter +6%.
+Counter +7%.
 
 ### Rage Cache
-start battle +10 Rage.
+Start battle +15 Rage.
 
 ### Safe Mode
-damage reduction +4%.
+Damage reduction +6%.
 
 ### Trust Module
-boss damage +8%.
+Boss damage +15% and Elite damage +8%.
 
 ---
 

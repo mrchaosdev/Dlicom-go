@@ -1,6 +1,6 @@
 {
   "name": "dlicom-attack",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -14,6 +14,7 @@
     "validate:content": "tsx scripts/validate.ts",
     "simulate": "tsx scripts/simulate.ts",
     "capture:release": "tsx scripts/captureRelease.ts",
+    "audit:equipment": "tsx scripts/auditEquipment.ts",
     "simulate:balance": "tsx scripts/verifyBalance.ts"
   },
   "dependencies": {

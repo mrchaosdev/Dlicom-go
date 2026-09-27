@@ -100,10 +100,29 @@ const equipmentBase = z.object({
   rarity: z.enum(['common', 'rare', 'epic', 'legendary']).optional(),
   stats: z.record(z.number().finite()),
 });
+const weaponProc = z.object({
+  trigger: z.enum(['basic_count', 'crit']),
+  every: z.number().int().positive().optional(),
+  damage: z.number().positive(),
+  target: z.enum(['target', 'all']),
+  label: z.enum(['Ban Hammer', 'Viral Explosion', 'DliClip Repost']),
+});
 const equipmentSchema = z.discriminatedUnion('slot', [
-  equipmentBase.extend({ slot: z.literal('weapon'), attackStyle: z.enum(['ranged', 'blade', 'hammer']) }),
-  equipmentBase.extend({ slot: z.literal('armor'), attackStyle: z.never().optional() }),
-  equipmentBase.extend({ slot: z.literal('module'), attackStyle: z.never().optional() }),
+  equipmentBase.extend({
+    slot: z.literal('weapon'),
+    attackStyle: z.enum(['ranged', 'blade', 'hammer']),
+    combat: z.object({ basicLabel: z.string().min(1), proc: weaponProc.optional() }),
+  }),
+  equipmentBase.extend({
+    slot: z.literal('armor'),
+    attackStyle: z.never().optional(),
+    combat: z.never().optional(),
+  }),
+  equipmentBase.extend({
+    slot: z.literal('module'),
+    attackStyle: z.never().optional(),
+    combat: z.never().optional(),
+  }),
 ]);
 export function validateContent(skills: SkillDefinition[] = SKILLS) {
   const ids = new Set<string>();

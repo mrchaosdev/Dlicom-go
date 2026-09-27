@@ -2,6 +2,17 @@ export type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
 export type Archetype =
   'packet' | 'hammer' | 'firewall' | 'viral' | 'moderation' | 'encryption' | 'rage' | 'heal';
 export type DamageTag = 'basic' | 'skill' | 'ultimate' | 'status' | 'reflect' | 'true';
+export interface WeaponProcDefinition {
+  trigger: 'basic_count' | 'crit';
+  every?: number;
+  damage: number;
+  target: 'target' | 'all';
+  label: 'Ban Hammer' | 'Viral Explosion' | 'DliClip Repost';
+}
+export interface WeaponCombatProfile {
+  basicLabel: string;
+  proc?: WeaponProcDefinition;
+}
 export type StatusId =
   'burn' | 'glitch' | 'vulnerable' | 'silence' | 'slow' | 'corrupted' | 'marked';
 export interface Status {

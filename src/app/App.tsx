@@ -348,7 +348,7 @@ function GuideScreen() {
   const { start, navigate, run } = useGame();
   const enter = () => (run && !run.result ? navigate('play') : start());
   const steps = [
-    { number: '01', icon: Cpu, title: 'Prepare your loadout', text: 'Equip a weapon, armor and module, then choose Dili\'s skin. Each run costs 5 energy; 1 restores every 10 minutes and your daily check-in grants 5 more.' },
+    { number: '01', icon: Cpu, title: 'Prepare your loadout', text: 'Weapons change Dili\'s attacks and combat passive; armor and modules shape defense and synergy. Each run costs 5 energy, with 1 restored every 10 minutes.' },
     { number: '02', icon: ArrowRight, title: 'Choose a route', text: 'Pick a lane at each route map. Battles build your run; events, rest stops and elites offer different risks and rewards.' },
     { number: '03', icon: Swords, title: 'Watch Dili fight automatically', text: 'Attacks, skills and enemy turns resolve on their own. Pause or switch between ×1 and ×2 speed whenever you need.' },
     { number: '04', icon: Sparkles, title: 'Build a skill synergy', text: 'After a battle, choose 1 of 3 skills. Read each effect and tags, then combine skills that reinforce the same strategy. Tap a skill or status to inspect it.' },
@@ -1322,7 +1322,7 @@ export default function App() {
       </main>
       <footer>
         <span>
-          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.2.0
+          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.2.1
         </span>
         <span>
           {inRun

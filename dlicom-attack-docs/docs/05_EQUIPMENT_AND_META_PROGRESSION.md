@@ -37,84 +37,80 @@ A run always has exactly one owned item equipped in each of the three slots. Eve
 ## 3. Weapon examples
 
 ### Packet Blaster
-+ATK
-Passive:
-basic attack damage +10%.
++10 ATK.
+Basic attack damage +8% and Combo chance +5%. Its rapid-fire basics are the reliable generalist option.
 
 ### Moderator Hammer
-+ATK
-Passive:
-Ban Hammer triggers every 3 attacks instead of 4.
++10 ATK.
+Every third basic adds a 55% ATK Ban Hammer hit even before the Ban Hammer skill is drafted.
 
 ### Viral Launcher
-+ATK
-Passive:
-Viral explosion damage +20%.
++10 ATK.
+Every fourth basic detonates a 60% ATK Viral Explosion against all living enemies. Existing Viral Explosion bonuses also scale this payload.
 
 ### Encryption Blade
-+ATK
-Passive:
-after Dodge, next attack +30%.
++10 ATK and +5% Dodge.
+After a Dodge, the next slash deals +80% damage.
 
 ### Overdrive Core
-+ATK
-Passive:
-start battle +20 Rage.
++8 ATK.
+Start battle with 20 Rage and gain 5 additional Rage from every basic attack.
 
 ### DliClip Cannon
-+ATK
-Passive:
-critical hit DliClip damage +25%.
++12 ATK and +4% Crit.
+Every critical basic launches a 90% ATK DliClip follow-up. DliClip bonuses scale the follow-up.
 
 ---
 
 ## 4. Armor examples
 
 ### Firewall Shell
-+HP
-Shield generation +15%.
++110 HP.
+Shield generation +20%.
 
 ### Creator Hoodie
-+HP
-Healing +10%.
++80 HP.
+Healing +18% and Lifesteal +2%.
 
 ### Moderator Vest
 +DEF
-Debuffed enemies deal -8% damage.
+Debuffed enemies deal -12% damage.
 
 ### Zero-Knowledge Cloak
-+HP
-Dodge +4%.
++80 HP.
+Dodge +5%.
 
 ### Anti-Spam Plating
-+DEF
-Bot enemies deal -10% damage.
++10 DEF.
+Bot enemies deal -15% damage.
 
 ### Core Armor
-+HP/+DEF
-Below 25% HP gain temporary DR.
++80 HP and +7 DEF.
+Below 25% HP gain 20% damage reduction.
 
 ---
 
 ## 5. Module examples
 
 ### Viral Chip
-Crit +4%.
+Crit +3% and Viral Explosion damage +12%.
 
 ### Combo Router
-Combo +6%.
+Combo +7%.
 
 ### Counter Protocol
-Counter +6%.
+Counter +7%.
 
 ### Rage Cache
-start battle +10 Rage.
+Start battle +15 Rage.
 
 ### Safe Mode
-damage reduction +4%.
+Damage reduction +6%.
 
 ### Trust Module
-boss damage +8%.
+Boss damage +15% and Elite damage +8%.
+
+All six weapons have a unique basic-attack label and presentation color. Weapon procs resolve in the pure combat domain and emit normal combat events, so Phaser only presents the result. A deterministic equipment audit compares 500 samples over 24 turns per weapon; current no-skill damage stays within roughly 9%, while Overdrive produces more Ultimates and Encryption Blade takes less damage.
 
 ---
 

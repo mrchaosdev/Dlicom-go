@@ -12,6 +12,7 @@ import {
   type Stats,
   type StatusId,
   type Trigger,
+  type WeaponCombatProfile,
 } from './types';
 export const MAX_COMBO_CHAIN = 5;
 export const MAX_TRIGGER_DEPTH = 12;
@@ -24,6 +25,7 @@ export interface BattleOptions {
   enemies: Actor[];
   skills?: OwnedSkills;
   consumed?: string[];
+  weapon?: WeaponCombatProfile;
 }
 export function makeActor(
   id: string,
@@ -41,6 +43,7 @@ export class CombatEngine {
   readonly enemies: Actor[];
   readonly stats = emptyBattleStats();
   readonly consumed: Set<string>;
+  readonly weapon: WeaponCombatProfile;
   turn = 0;
   rage = 0;
   outcome: 'victory' | 'defeat' | null = null;
@@ -49,6 +52,7 @@ export class CombatEngine {
   private used = new Set<string>();
   private events: CombatEvent[] = [];
   private basicCount = 0;
+  private weaponBasics = 0;
   private nextCrit = 0;
   private scrollBonus = 0;
   private bandwidth = 0;
@@ -67,6 +71,7 @@ export class CombatEngine {
   constructor(options: BattleOptions) {
     this.rng = new SeededRng(options.seed);
     this.consumed = new Set(options.consumed);
+    this.weapon = options.weapon ?? { basicLabel: 'Packet Shot' };
     const stats = { ...BASE_STATS, ...options.stats };
     for (const [id, rank] of Object.entries(options.skills ?? {})) {
       const skill = SKILL_BY_ID[id];
@@ -257,7 +262,7 @@ export class CombatEngine {
     depth = 0,
     counter = false,
     guaranteed = false,
-  ) {
+  ): { crit: boolean } | undefined {
     if (source.hp <= 0 || target.hp <= 0 || !this.allowed(depth)) return;
     const direct = tag === 'basic' || tag === 'skill' || tag === 'ultimate';
     const heroHit = target === this.hero;
@@ -411,21 +416,36 @@ export class CombatEngine {
         }
       }
     }
+    return { crit };
   }
   private basic(target: Actor | undefined, depth = 0, counter = false) {
     if (!target || target.hp <= 0 || this.hero.hp <= 0 || !this.allowed(depth)) return;
     this.basicCount++;
+    if (!counter) this.weaponBasics++;
     const targets = this.rule('overflow') && this.basicCount % 5 === 0 ? this.living() : [target];
-    for (const enemy of targets)
+    const hits = targets.map((enemy) =>
       this.hit(
         this.hero,
         enemy,
         1,
         'basic',
-        counter ? 'Auto Reply' : targets.length > 1 ? 'Packet Overflow' : 'Packet Shot',
+        counter ? 'Auto Reply' : targets.length > 1 ? 'Packet Overflow' : this.weapon.basicLabel,
         depth,
         counter,
-      );
+      ),
+    );
+    const proc = this.weapon.proc;
+    const procReady = !counter && proc && (
+      (proc.trigger === 'basic_count' && this.weaponBasics % (proc.every ?? 1) === 0)
+      || (proc.trigger === 'crit' && hits.some((hit) => hit?.crit))
+    );
+    if (procReady) {
+      const victims = proc.target === 'all'
+        ? this.living()
+        : [target.hp > 0 ? target : this.target()].filter((actor): actor is Actor => !!actor);
+      for (const victim of victims)
+        this.skillHit(victim, proc.damage, proc.label, depth + 1);
+    }
     this.trigger('basic', target, depth + 1);
     this.gainRage(this.hero.stats.ragePerAttack);
   }

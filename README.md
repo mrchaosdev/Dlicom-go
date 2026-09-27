@@ -4,7 +4,7 @@ Build an overpowered Dili, chain Dlicom-themed skills, and fight through a corru
 
 **Play now:** https://dlicom-attack.vercel.app
 
-**Version 0.2.0 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
+**Version 0.2.1 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
 
 ![Dlicom Attack home](artifacts/home-desktop.webp)
 
@@ -40,7 +40,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Three equipment slots, 18 equipment items across four rarities, five upgrade levels and a chest on victory.
 - Twenty seeded events with choices, run buffs, healing, Bits, skill drafts and optional elite fights.
 - Dili reference-based combat poses, distinct generated sprites for all ten normal enemy kinds and four bosses, four illustrated chapter battle backgrounds, one original synthesized music loop per chapter, bounded VFX/text objects and SFX.
-- Equipping Encryption Blade or Moderator Hammer changes Dili's idle and attack poses and turns basic attacks into a melee slash or heavy smash; their equipment passives also shape the build.
+- All six weapons change Dili's basic attack identity and passive: rapid Packet combos, periodic Hammer slams, faster Overdrive Ultimates, Viral area detonations, Dodge-powered Encryption slashes, or Crit-triggered DliClip follow-ups. Each weapon also has matching art, projectile color, pose and impact treatment.
 - Four selectable Dili costumes include distinct armor, weapons and effects across ranged, sword, hammer, hurt and ultimate poses. Costume choice saves locally and never changes combat stats.
 - Node 10's Signal Bazaar offers an optional Rare-or-better skill draft for 80 run Bits, creating a choice between immediate power and the final Bits payout. Short transitions identify each new run phase.
 - Responsive desktop/mobile UI, keyboard focus states, local fonts and local audio.
@@ -71,7 +71,7 @@ npm run test:e2e
 npm run simulate
 ```
 
-CI runs types, lint, content validation, unit/integration tests, a deterministic 10,000-run balance check, a production build, and all seven browser flows on Chromium, Firefox and WebKit. The balance check uses a simple damage-priority draft bot and verifies each chapter's median winning boss-fight time against the documented target; it is a regression signal, not a human playtest. The browser tests cover isolated fresh profiles, local save reload, all four chapter battle assets, mobile/desktop viewport layouts, settings, result sharing (with clipboard isolated in the test context), combat timing and a complete first-chapter run. They fail on uncaught app exceptions and unexpected console errors; Firefox's `InvalidStateError: Navigated away from page` during explicit test reloads is an expected browser cancellation and is ignored. Set `SIM_RUNS`, `SIM_CHAPTER`, and `SIM_UNLOCKED=1` to sample a particular chapter with unlocked equipment. The output includes median and 90th-percentile combat time, plus the share spent between presented events; menu and decision time is excluded.
+CI runs types, lint, content validation, unit/integration tests, a deterministic 10,000-run balance check, a production build, and all browser flows on Chromium, Firefox and WebKit. `npm run audit:equipment` also compares 500 deterministic 24-turn samples for every weapon. The full-run balance check uses a simple damage-priority draft bot and verifies each chapter's median winning boss-fight time against the documented target; it is a regression signal, not a human playtest. Browser tests cover isolated fresh profiles, local save reload, all four chapter battle assets, mobile/desktop viewport layouts, settings, result sharing, combat timing and a complete first-chapter run. They fail on uncaught app exceptions and unexpected console errors. Set `SIM_RUNS`, `SIM_CHAPTER`, and `SIM_UNLOCKED=1` to sample a particular chapter with unlocked equipment. The output includes median and 90th-percentile combat time, plus the share spent between presented events; menu and decision time is excluded.
 
 See [verification and balance report](docs/IMPLEMENTATION_STATUS.md) for measured results and limitations.
 

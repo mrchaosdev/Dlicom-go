@@ -1,7 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import { defaultSave, loadSave, migrateSave, SAVE_KEY, writeSave } from '../src/services/save';
 import { buyGear, equip, RUN_SHOP_COST, RunSession, upgrade, upgradeItem } from '../src/game/run/RunSession';
-import { EQUIPMENT, gearPrice, GEAR, weaponAttackStyle } from '../src/content/equipment';
+import {
+  EQUIPMENT,
+  gearPrice,
+  GEAR,
+  weaponAttackStyle,
+  weaponCombatProfile,
+} from '../src/content/equipment';
 import { SKILL_BY_ID } from '../src/content/skills';
 import { NODES } from '../src/content/encounters';
 import { CHAPTERS } from '../src/content/chapters';
@@ -154,7 +160,12 @@ describe('run progression', () => {
       'ranged', 'hammer', 'ranged', 'ranged', 'blade', 'ranged',
     ]);
     expect(weaponAttackStyle('weapon_encryption_blade')).toBe('blade');
+    expect(new Set(
+      EQUIPMENT.filter((item) => item.slot === 'weapon').map((item) => item.combat.basicLabel),
+    ).size).toBe(6);
+    expect(weaponCombatProfile('weapon_viral_launcher').proc?.label).toBe('Viral Explosion');
     expect(() => weaponAttackStyle('armor_firewall_shell')).toThrow('Expected an equipped weapon');
+    expect(() => weaponCombatProfile('armor_firewall_shell')).toThrow('Expected an equipped weapon');
   });
   it('captures a cosmetic skin for the entire run without changing combat stats', () => {
     const save = defaultSave();

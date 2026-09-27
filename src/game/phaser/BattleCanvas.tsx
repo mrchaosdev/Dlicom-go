@@ -59,6 +59,14 @@ const BOSS_ATTACK_COLORS: Record<string, number> = {
   boss_raid_master: 0xf0a16e,
   boss_null_exe: 0x8d88fa,
 };
+const WEAPON_ATTACK_COLORS: Record<string, number> = {
+  weapon_packet_blaster: 0x76f5ff,
+  weapon_moderator_hammer: 0xff78c8,
+  weapon_overdrive_core: 0xffc45e,
+  weapon_viral_launcher: 0x9cf777,
+  weapon_encryption_blade: 0x65e8ff,
+  weapon_dliclip_cannon: 0xff78c8,
+};
 const STATUS_COLORS: Record<string, number> = {
   burn: 0xff9858,
   glitch: 0xb67cff,
@@ -681,6 +689,7 @@ class BattleScene extends Phaser.Scene {
       const bossAttack = event.source.startsWith('boss_') && !indirectDamage;
       const bladeBasic = event.source === 'dili' && event.tag === 'basic' && this.attackStyle === 'blade';
       const hammerBasic = event.source === 'dili' && event.tag === 'basic' && this.attackStyle === 'hammer';
+      const weaponColor = WEAPON_ATTACK_COLORS[this.weaponId] ?? 0x76f5ff;
       if (event.source === 'dili' && !indirectDamage)
         this.showHeroPose('dili_attack', event.crit ? 300 : 230);
       const impact = () => {
@@ -704,7 +713,7 @@ class BattleScene extends Phaser.Scene {
             ? 0xc879ff
             : statusColor ?? (bossAttack
               ? BOSS_ATTACK_COLORS[event.source] ?? 0x76f5ff
-              : event.crit ? 0xffd773 : 0x76f5ff);
+              : event.crit ? 0xffd773 : weaponColor);
         const reducedScale = reduced && (hammer || viralExplosion);
         this.tweens.killTweensOf(this.impactRing);
         this.impactRing
@@ -820,9 +829,11 @@ class BattleScene extends Phaser.Scene {
           .setFillStyle(
             event.label.startsWith('DliClip')
               ? 0xff78c8
+              : event.label === 'Viral Explosion'
+                ? 0x9cf777
               : bossAttack
                 ? (BOSS_ATTACK_COLORS[event.source] ?? 0x7bffff)
-                : 0x7bffff,
+                : weaponColor,
           )
           .setPosition(source.x, source.y)
           .setVisible(true)

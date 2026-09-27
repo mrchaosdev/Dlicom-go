@@ -1,4 +1,14 @@
-import { EQUIPMENT, loadoutStats, GEAR, UPGRADE_COSTS, gearPrice, weaponAttackStyle, type Slot, type AttackStyle } from '../../content/equipment';
+import {
+  EQUIPMENT,
+  loadoutStats,
+  GEAR,
+  UPGRADE_COSTS,
+  gearPrice,
+  weaponAttackStyle,
+  weaponCombatProfile,
+  type Slot,
+  type AttackStyle,
+} from '../../content/equipment';
 import { getChapter } from '../../content/chapters';
 import { NODES, generateEncounter, generateEventElite } from '../../content/encounters';
 import { eventsForChapter, type EventEffect } from '../../content/events';
@@ -91,6 +101,7 @@ export class RunSession {
         shield: this.shield,
         skills: this.skills,
         consumed: this.consumed,
+        weapon: weaponCombatProfile(this.weaponId),
         enemies: generateEncounter(this.seed, this.node, route, this.chapterId),
       });
       this.battleBuffs = this.battleBuffs.map(buff => ({ ...buff, battles: buff.battles - 1 })).filter(buff => buff.battles > 0);
@@ -209,6 +220,7 @@ export class RunSession {
       this.engine = new CombatEngine({
         seed: `${this.seed}:${this.chapterId}:event-elite:${this.node}`,
         stats, hp: this.hp, shield: this.shield, skills: this.skills, consumed: this.consumed,
+        weapon: weaponCombatProfile(this.weaponId),
         enemies: generateEventElite(this.seed, this.node, this.chapterId),
       });
       this.battleBuffs = this.battleBuffs.map(buff => ({ ...buff, battles: buff.battles - 1 })).filter(buff => buff.battles > 0);

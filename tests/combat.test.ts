@@ -4,6 +4,7 @@ import { absorbDamage, damageAmount } from '../src/game/combat/DamageResolver';
 import { SeededRng } from '../src/game/rng/SeededRng';
 import { generateDraft, eligibleSkills } from '../src/game/run/Draft';
 import { SKILLS, SKILL_BY_ID } from '../src/content/skills';
+import { weaponCombatProfile } from '../src/content/equipment';
 const dummy = (atk = 1) => makeActor('bot', 'Spam Bot', { maxHp: 100000, atk, def: 0 });
 const battle = (extra: Partial<ConstructorParameters<typeof CombatEngine>[0]> = {}) =>
   new CombatEngine({
@@ -188,6 +189,37 @@ describe('combat rules', () => {
     e.applyStatus(e.enemies[0], 'marked', 3, 0.1);
     expect(e.step().find((x) => x.label === 'Ban Hammer')).toMatchObject({ amount: 350 });
     expect(e.enemies[0].statuses.some((x) => x.id === 'marked')).toBe(false);
+  });
+  it('Moderator Hammer adds its own heavy hit every third basic without a skill', () => {
+    const engine = battle({ weapon: weaponCombatProfile('weapon_moderator_hammer') });
+    expect(engine.step().some((event) => event.label === 'Ban Hammer')).toBe(false);
+    expect(engine.step().some((event) => event.label === 'Ban Hammer')).toBe(false);
+    expect(engine.step().find((event) => event.label === 'Ban Hammer')).toMatchObject({
+      amount: 55,
+      tag: 'skill',
+    });
+  });
+  it('Viral Launcher detonates against every living enemy every fourth basic', () => {
+    const engine = battle({
+      weapon: weaponCombatProfile('weapon_viral_launcher'),
+      enemies: [dummy(), { ...dummy(), id: 'other' }],
+    });
+    engine.step();
+    engine.step();
+    engine.step();
+    const explosions = engine.step().filter((event) => event.label === 'Viral Explosion');
+    expect(explosions).toHaveLength(2);
+    expect(new Set(explosions.map((event) => event.target))).toEqual(new Set(['bot', 'other']));
+  });
+  it('DliClip Cannon launches a follow-up packet whenever its basic crits', () => {
+    const engine = battle({
+      stats: { critRate: 1, dodgeRate: 0 },
+      weapon: weaponCombatProfile('weapon_dliclip_cannon'),
+    });
+    expect(engine.step().find((event) => event.label === 'DliClip Repost')).toMatchObject({
+      amount: 90,
+      tag: 'skill',
+    });
   });
   it('firewall triggers every four turns and caps shield at max HP', () => {
     const e = battle({ skills: { firewall: 1, reinforced_firewall: 1 }, stats: { dodgeRate: 1 } });
