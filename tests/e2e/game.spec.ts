@@ -23,7 +23,7 @@ test.afterEach(async ({ page }) => {
 test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Small hero/ })).toBeVisible();
-  await expect(page.getByText('SYSTEM ONLINE · v0.2.4')).toBeVisible();
+  await expect(page.getByText('SYSTEM ONLINE · v0.2.5')).toBeVisible();
   for (const [width, height] of [
     [320, 740],
     [360, 800],
@@ -253,7 +253,7 @@ test('shop chests reveal persistent gear and character skins through reload', as
       .find((url) => url.includes('/src/services/save.ts'))!;
     const { defaultSave, SAVE_KEY } = await import(path);
     const save = defaultSave();
-    save.account.bits = 1000;
+    save.account.bits = 1500;
     localStorage.setItem(SAVE_KEY, JSON.stringify(save));
   });
   await page.reload();
@@ -275,7 +275,7 @@ test('shop chests reveal persistent gear and character skins through reload', as
   await page.getByRole('button', { name: 'View in inventory' }).click();
   await expect(page.locator(`[data-inventory-id="${gearId}"]`)).toBeVisible();
   await page.getByRole('tab', { name: 'Shop' }).click();
-  await page.locator('[data-chest-kind="skin"]').getByRole('button', { name: /Open.*200 Bits/ }).click();
+  await page.locator('[data-chest-kind="skin"]').getByRole('button', { name: /Open.*800 Bits/ }).click();
   await expect(page.getByText('SKIN UNLOCKED · PERMANENT')).toBeVisible();
   await expect(page.locator('[data-chest-reward-art="skin"] .skin-reward-art')).toBeVisible();
   const skinId = await page.evaluate(async () => {

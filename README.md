@@ -4,7 +4,7 @@ Build an overpowered Dili, chain Dlicom-themed skills, and fight through a corru
 
 **Play now:** https://dlicom-attack.vercel.app
 
-**Version 0.2.4 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
+**Version 0.2.5 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
 
 ![Dlicom Attack home](artifacts/home-desktop.webp)
 

@@ -7,7 +7,7 @@ import type { Rarity } from '../combat/types';
 export type ChestKind = 'gear' | 'skin';
 export interface ChestReward { kind: ChestKind; id: string }
 export const GEAR_CHEST_COST = 250;
-export const SKIN_CHEST_COST = 200;
+export const SKIN_CHEST_COST = 800;
 const rarityWeight: Record<Rarity, number> = { common: 55, rare: 30, epic: 12, legendary: 3 };
 const rarities: Rarity[] = ['common', 'rare', 'epic', 'legendary'];
 function drawRarity(rng: SeededRng, available: Rarity[]): Rarity {

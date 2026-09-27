@@ -25,6 +25,8 @@ describe('shop chests', () => {
     expect(canOpenChest(save, 'gear')).toBe(false);
     expect(canOpenChest(save, 'skin')).toBe(false);
     expect(openChest(save, 'gear', 'seed')).toEqual({ save });
+    save.account.bits = SKIN_CHEST_COST - 1;
+    expect(canOpenChest(save, 'skin')).toBe(false);
     save.account.bits = 10000;
     for (const item of EQUIPMENT) save.account.inventory[item.id] = 1;
     expect(canOpenChest(save, 'gear')).toBe(false);
@@ -32,13 +34,13 @@ describe('shop chests', () => {
   });
   it('unlocks and equips an unowned skin deterministically without duplicates', () => {
     const save = defaultSave();
-    save.account.bits = 500;
+    save.account.bits = SKIN_CHEST_COST;
     const result = openChest(save, 'skin', 'skin-seed');
     expect(result.reward?.kind).toBe('skin');
     const id = result.reward!.id;
     expect(SKIN_BY_ID[id as keyof typeof SKIN_BY_ID]).toBeTruthy();
     expect(save.account.ownedSkins).not.toContain(id);
-    expect(result.save.account.bits).toBe(500 - SKIN_CHEST_COST);
+    expect(result.save.account.bits).toBe(0);
     expect(result.save.account.ownedSkins).toContain(id);
     expect(result.save.account.skinId).toBe(id);
     const second = openChest(result.save, 'skin', 'skin-seed');

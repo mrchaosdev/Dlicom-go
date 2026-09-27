@@ -1329,7 +1329,7 @@ export default function App() {
       </main>
       <footer>
         <span>
-          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.2.4
+          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.2.5
         </span>
         <span>
           {inRun

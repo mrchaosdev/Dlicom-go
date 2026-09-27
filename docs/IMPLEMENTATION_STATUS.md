@@ -1,10 +1,10 @@
-# Implementation and verification — v0.2.4
+# Implementation and verification — v0.2.5
 
 ## Implemented
 
 The complete four-chapter route is playable: The Feed / Spam King, DliClips / Loop Phantom, Dili Rooms / Raid Master, and Core Network / Null.exe. A chapter becomes available after victory in the preceding chapter. Chapters use seeded enemy and event selection, chapter-specific enemy pools, boss actions, event pools, chapter unlocks, and distinct encounter scaling. The account save schema safely defaults older version-1 saves to one unlocked chapter.
 
-The content set now contains 70 skills, 18 equipment items, 4 collectible Dili skins, and 20 events. Gear Chest drops roll by the included rarity categories. The 200-Bit Skin Chest unlocks one unowned costume without duplicates and equips it for the next run. Save version 5 persists skin ownership and safely migrates version-4 saves by retaining Signal Blue and the selected costume. Event choices cover rewards, healing, shield, short-run buffs, skill drafts, and optional elite encounters.
+The content set now contains 70 skills, 18 equipment items, 4 collectible Dili skins, and 20 events. Gear Chest drops roll by the included rarity categories. The 800-Bit Skin Chest makes permanent costumes a longer-term progression goal, unlocks one unowned costume without duplicates, and equips it for the next run. Save version 5 persists skin ownership and safely migrates version-4 saves by retaining Signal Blue and the selected costume. Event choices cover rewards, healing, shield, short-run buffs, skill drafts, and optional elite encounters.
 
 The six weapons now have content-defined combat profiles instead of relying only on passive stat bonuses. Packet Blaster accelerates basics and Combos; Moderator Hammer adds an intrinsic third-hit slam; Overdrive Core starts charged and gains extra Rage; Viral Launcher creates periodic area explosions; Encryption Blade adds Dodge and an empowered follow-up slash; DliClip Cannon fires an extra packet after critical basics. Triggered weapon passives now emit a short deterministic combat event, in-battle callout, and combat-log entry; Encryption's empowered strike is explicitly named `Encryption Riposte`. Armor and module values were also rebalanced so narrow passives pay a larger premium. A repeatable 500-sample, 24-turn equipment audit keeps no-skill weapon damage within roughly 9% while separately reporting defensive value, Ultimate cadence, and proc frequency.
 
