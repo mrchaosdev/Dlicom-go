@@ -1,7 +1,9 @@
 import { SKILLS } from '../../content/skills';
 import type { OwnedSkills, Rarity, SkillDefinition } from '../combat/types';
 import { SeededRng } from '../rng/SeededRng';
-const weights: Record<Rarity, number> = { common: 58, rare: 28, epic: 11, legendary: 3 };
+export const DRAFT_RARITY_WEIGHTS: Record<Rarity, number> = { common: 58, rare: 28, epic: 11, legendary: 3 };
+export const ELITE_DRAFT_BONUS = 1.5;
+export const DRAFT_PITY_THRESHOLD = 3;
 export function eligibleSkills(owned: OwnedSkills, level: number) {
   return SKILLS.filter(
     (s) =>
@@ -26,12 +28,12 @@ export function generateDraft(
   const result: SkillDefinition[] = [];
   for (let i = 0; i < 3 && pool.length; i++) {
     const candidates =
-      i === 0 && pity >= 3 && pool.some((s) => s.rarity !== 'common')
+      i === 0 && pity >= DRAFT_PITY_THRESHOLD && pool.some((s) => s.rarity !== 'common')
         ? pool.filter((s) => s.rarity !== 'common')
         : pool;
     const rarity = rng.weighted(
       order.filter((r) => candidates.some((s) => s.rarity === r)),
-      (r) => weights[r] * (elite && r !== 'common' ? 1.5 : 1),
+      (r) => DRAFT_RARITY_WEIGHTS[r] * (elite && r !== 'common' ? ELITE_DRAFT_BONUS : 1),
     );
     const selected = rng.weighted(
       candidates.filter((s) => s.rarity === rarity),

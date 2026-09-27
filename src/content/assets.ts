@@ -67,6 +67,33 @@ export const ASSETS = {
   sfx_boss_null_attack: asset('boss-null-attack.mp3'),
 };
 
+export const CHAPTER_BACKGROUNDS: Record<string, string> = {
+  chapter_feed: ASSETS.background_feed_city,
+  chapter_dliclips: ASSETS.background_dliclip_stream,
+  chapter_rooms: ASSETS.background_dili_rooms,
+  chapter_core: ASSETS.background_core_network,
+};
+
+export const ENEMY_SPRITES: Record<string, string> = {
+  spam_bot: ASSETS.enemy_spam_bot_idle,
+  scam_link: ASSETS.enemy_scam_link_idle,
+  bug: ASSETS.enemy_bug_idle,
+  raid_bot: ASSETS.enemy_raid_bot_idle,
+  fake_account: ASSETS.enemy_fake_account_idle,
+  data_leech: ASSETS.enemy_data_leech_idle,
+  corrupted_clip: ASSETS.enemy_corrupted_clip_idle,
+  toxic_reply: ASSETS.enemy_toxic_reply_idle,
+  popup: ASSETS.enemy_popup_idle,
+  null_fragment: ASSETS.enemy_null_fragment_idle,
+};
+
+export const BOSS_ART: Record<string, string> = {
+  boss_spam_king: ASSETS.enemy_boss_spam_king_idle,
+  boss_loop_phantom: ASSETS.enemy_boss_loop_phantom_idle,
+  boss_raid_master: ASSETS.enemy_boss_raid_master_idle,
+  boss_null_exe: ASSETS.enemy_boss_null_exe_idle,
+};
+
 export const SKILL_ART: Record<Archetype, string> = {
   packet: ASSETS.skill_packet,
   hammer: ASSETS.skill_hammer,

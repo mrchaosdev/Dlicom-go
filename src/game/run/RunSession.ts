@@ -28,6 +28,17 @@ import { generateDraft } from './Draft';
 import type { SkinId } from '../../content/skins';
 export type Phase = 'route' | 'battle' | 'draft' | 'event' | 'rest' | 'summary';
 export const RUN_SHOP_COST = 80;
+export const NODE_REWARDS = {
+  battle: { bits: 20, xp: 10 },
+  elite: { bits: 50, xp: 30 },
+  boss: { bits: 250, xp: 80 },
+} as const;
+export const NONCOMBAT_NODE_XP = 10;
+export const EMPTY_DRAFT_BITS = 20;
+export const DUPLICATE_GEAR_BITS = 50;
+export const REST_HEAL_FRACTION = 0.3;
+export const REST_SHIELD_FRACTION = 0.25;
+export const STARTING_REROLLS = 1;
 export class RunSession {
   readonly rng: SeededRng;
   readonly baseStats: Stats;
@@ -48,7 +59,7 @@ export class RunSession {
   xp = 0;
   elites = 0;
   cleared = 0;
-  rerolls = 1;
+  rerolls = STARTING_REROLLS;
   pity = 0;
   draft: string[] = [];
   consumed: string[] = [];
@@ -123,16 +134,17 @@ export class RunSession {
     }
     if (this.eventFight) {
       this.eventFight = false;
-      this.xp += 30;
-      this.bits += 50;
+      this.xp += NODE_REWARDS.elite.xp;
+      this.bits += NODE_REWARDS.elite.bits;
       this.elites++;
       this.offer('rare');
       return;
     }
     const type = NODES[this.node];
+    const reward = NODE_REWARDS[type === 'boss' ? 'boss' : type === 'elite' ? 'elite' : 'battle'];
     this.cleared++;
-    this.xp += type === 'boss' ? 80 : type === 'elite' ? 30 : 10;
-    this.bits += type === 'boss' ? 250 : type === 'elite' ? 50 : 20;
+    this.xp += reward.xp;
+    this.bits += reward.bits;
     if (type === 'elite') this.elites++;
     if (type === 'boss') this.end('victory');
     else this.offer();
@@ -148,7 +160,7 @@ export class RunSession {
       minimum,
     ).map((s) => s.id);
     if (!this.draft.length) {
-      this.bits += 20;
+      this.bits += EMPTY_DRAFT_BITS;
       this.advance();
       return;
     }
@@ -173,14 +185,14 @@ export class RunSession {
       this.bits -= RUN_SHOP_COST;
       this.notice = 'Signal Bazaar purchase: Rare-or-better skill offer.';
       this.cleared++;
-      this.xp += 10;
+      this.xp += NONCOMBAT_NODE_XP;
       this.offer('rare');
       return;
     } else if (choice === 'heal') {
-      this.hp = Math.min(this.baseStats.maxHp, this.hp + Math.round(this.baseStats.maxHp * 0.3));
+      this.hp = Math.min(this.baseStats.maxHp, this.hp + Math.round(this.baseStats.maxHp * REST_HEAL_FRACTION));
       this.notice = 'Recovered 30% max HP.';
     } else if (choice === 'shield') {
-      this.shield = Math.round(this.baseStats.maxHp * 0.25);
+      this.shield = Math.round(this.baseStats.maxHp * REST_SHIELD_FRACTION);
       this.notice = '25% Shield prepared for the next battle.';
     } else if (choice === 'upgrade') {
       const id = Object.keys(this.skills).find((id) => this.skills[id] < SKILL_BY_ID[id].maxRank);
@@ -189,7 +201,7 @@ export class RunSession {
       this.notice = `${SKILL_BY_ID[id].name} upgraded.`;
     } else return;
     this.cleared++;
-    this.xp += 10;
+    this.xp += NONCOMBAT_NODE_XP;
     this.offer();
   }
   event(choice: number) {
@@ -197,7 +209,7 @@ export class RunSession {
     const selected = this.currentEvent.choices[choice];
     if (!selected) return;
     this.cleared++;
-    this.xp += 10;
+    this.xp += NONCOMBAT_NODE_XP;
     this.notice = selected.outcomeText;
     for (const effect of selected.effects) if (this.applyEventEffect(effect)) return;
     this.advance();
@@ -270,7 +282,7 @@ export class RunSession {
     a.xp += this.xp;
     a.bestScore = Math.max(a.bestScore, this.score);
     if (this.rewardGear) {
-      if (a.inventory[this.rewardGear]) a.bits += 50;
+      if (a.inventory[this.rewardGear]) a.bits += DUPLICATE_GEAR_BITS;
       else a.inventory[this.rewardGear] = 1;
     }
     if (this.cleared && !a.achievements.includes(ACHIEVEMENT_IDS.firstBattle))

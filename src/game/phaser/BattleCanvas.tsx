@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
-import { ASSETS, diliWeaponPoses } from '../../content/assets';
+import { ASSETS, CHAPTER_BACKGROUNDS, ENEMY_SPRITES, diliWeaponPoses } from '../../content/assets';
 import type { AttackStyle } from '../../content/equipment';
 import type { SkinId } from '../../content/skins';
 import { GEAR } from '../../content/equipment';
@@ -23,29 +23,11 @@ const BACKGROUND_PALETTES: Record<string, [number, number, number, number]> = {
   chapter_rooms: [0x321b38, 0x4b2542, 0x17182b, 0x21172b],
   chapter_core: [0x091c35, 0x0c3150, 0x080e24, 0x12122d],
 };
-const BACKGROUND_SPRITES: Record<string, string> = {
-  chapter_feed: ASSETS.background_feed_city,
-  chapter_dliclips: ASSETS.background_dliclip_stream,
-  chapter_rooms: ASSETS.background_dili_rooms,
-  chapter_core: ASSETS.background_core_network,
-};
 const BOSS_SPRITES: Record<string, { key: string; asset: string }> = {
   chapter_feed: { key: 'king', asset: ASSETS.enemy_boss_spam_king_idle },
   chapter_dliclips: { key: 'loop_phantom', asset: ASSETS.enemy_boss_loop_phantom_idle },
   chapter_rooms: { key: 'raid_master', asset: ASSETS.enemy_boss_raid_master_idle },
   chapter_core: { key: 'null_exe', asset: ASSETS.enemy_boss_null_exe_idle },
-};
-const ENEMY_SPRITES: Record<string, string> = {
-  spam_bot: ASSETS.enemy_spam_bot_idle,
-  scam_link: ASSETS.enemy_scam_link_idle,
-  bug: ASSETS.enemy_bug_idle,
-  raid_bot: ASSETS.enemy_raid_bot_idle,
-  fake_account: ASSETS.enemy_fake_account_idle,
-  data_leech: ASSETS.enemy_data_leech_idle,
-  corrupted_clip: ASSETS.enemy_corrupted_clip_idle,
-  toxic_reply: ASSETS.enemy_toxic_reply_idle,
-  popup: ASSETS.enemy_popup_idle,
-  null_fragment: ASSETS.enemy_null_fragment_idle,
 };
 const PARALLAX_COLORS: Record<string, number> = {
   chapter_feed: 0x46c5d9,
@@ -192,7 +174,7 @@ class BattleScene extends Phaser.Scene {
   }
   preload() {
     const weaponPoses = diliWeaponPoses(this.skinId, this.weaponId);
-    this.load.image('battle_background', BACKGROUND_SPRITES[this.chapterId]);
+    this.load.image('battle_background', CHAPTER_BACKGROUNDS[this.chapterId]);
     this.load.image('dili_idle', weaponPoses.idle);
     this.load.image('dili_attack', weaponPoses.attack);
     this.load.image('dili_hurt', weaponPoses.hurt);

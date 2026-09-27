@@ -173,4 +173,6 @@ export function writeSave(storage: Pick<Storage, 'setItem'>, save: SaveFile): st
     return 'Progress is available this session, but browser storage could not save it.';
   }
 }
-export const accountLevel = (xp: number) => Math.min(6, 1 + Math.floor(xp / 120));
+export const XP_PER_LEVEL = 120;
+export const MAX_ACCOUNT_LEVEL = 6;
+export const accountLevel = (xp: number) => Math.min(MAX_ACCOUNT_LEVEL, 1 + Math.floor(xp / XP_PER_LEVEL));

@@ -37,7 +37,8 @@ import { useGame } from '../stores/gameStore';
 import { ASSETS, EQUIPMENT_ART, SKILL_ART, diliWeaponPoses } from '../content/assets';
 import { SKINS, SKIN_BY_ID } from '../content/skins';
 import { EQUIPMENT, GEAR, UPGRADE_COSTS, gearPrice, loadoutStats, type Slot } from '../content/equipment';
-import { RUN_SHOP_COST } from '../game/run/RunSession';
+import { NODE_REWARDS, RUN_SHOP_COST } from '../game/run/RunSession';
+import { GUIDE_BANNER, GUIDE_SECTIONS, GUIDE_STEPS } from '../content/guide';
 import { canOpenChest, GEAR_CHEST_COST, SKIN_CHEST_COST } from '../game/meta/chests';
 import { SKILLS, SKILL_BY_ID } from '../content/skills';
 import { NODES, generateEncounter } from '../content/encounters';
@@ -355,31 +356,71 @@ function HomeScreen() {
     </>
   );
 }
+const GUIDE_STEP_ICONS = [Cpu, ArrowRight, Swords, Sparkles, Crown];
+const GUIDE_SECTION_ICONS: Record<string, typeof Zap> = {
+  route: Radio,
+  combat: Swords,
+  statuses: Sparkles,
+  skills: Hexagon,
+  archetypes: BookOpen,
+  enemies: Skull,
+  bosses: Crown,
+  gear: Cpu,
+  progress: Trophy,
+  controls: Gauge,
+  tips: Zap,
+};
 function GuideScreen() {
-  const { start, navigate, run } = useGame();
+  const { start, navigate, run, save } = useGame();
+  const [open, setOpen] = useState<Set<string>>(() => new Set());
   const enter = () => (run && !run.result ? navigate('play') : start());
-  const steps = [
-    { number: '01', icon: Cpu, title: 'Prepare your loadout', text: 'Weapons change Dili\'s attacks and combat passive; armor and modules shape defense and synergy. Each run costs 5 energy, with 1 restored every 10 minutes.' },
-    { number: '02', icon: ArrowRight, title: 'Choose a route', text: 'Pick a lane at each route map. Battles build your run; events, rest stops and elites offer different risks and rewards.' },
-    { number: '03', icon: Swords, title: 'Watch Dili fight automatically', text: 'Attacks, skills and enemy turns resolve on their own. Pause or switch between ×1 and ×2 speed whenever you need.' },
-    { number: '04', icon: Sparkles, title: 'Build a skill synergy', text: 'After a battle, choose 1 of 3 skills. Read each effect and tags, then combine skills that reinforce the same strategy. Tap a skill or status to inspect it.' },
-    { number: '05', icon: Crown, title: 'Reach the boss and improve', text: 'Clear 12 nodes to face the chapter boss. Spend earned Bits on gear, upgrades or chests in Shop. Skin chests permanently unlock new Dili costumes.' },
-  ];
+  const allOpen = open.size === GUIDE_SECTIONS.length;
+  const setSection = (id: string, isOpen: boolean) =>
+    setOpen((current) => {
+      if (current.has(id) === isOpen) return current;
+      const next = new Set(current);
+      if (isOpen) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  const jump = (id: string) => {
+    setSection(id, true);
+    requestAnimationFrame(() =>
+      document.getElementById(`guide-${id}`)?.scrollIntoView({
+        behavior: save.settings.reducedMotion ? 'auto' : 'smooth',
+        block: 'start',
+      }),
+    );
+  };
   return (
     <div className="guide-page">
       <PageHeading kicker="YOUR FIRST RUN, DECODED" title="How to play" text="No reflex tests or manual aiming. Make a few sharp choices and let Dili handle the fight." />
+      <figure className="guide-banner" style={{ backgroundImage: `url(${GUIDE_BANNER.backdrop})` }}>
+        <img
+          className="guide-banner-hero"
+          src={diliWeaponPoses(save.account.skinId, save.account.equipped.weapon).attack}
+          alt={`Dili attacking with ${GEAR[save.account.equipped.weapon].name}`}
+          draggable={false}
+        />
+        <span className="guide-banner-vs" aria-hidden="true"><Swords size={16} /> AUTO</span>
+        <img className="guide-banner-enemy" src={GUIDE_BANNER.enemy} alt="Spam Bot" draggable={false} />
+        <figcaption>Dili fights on its own. You choose the route, the skills and the gear.</figcaption>
+      </figure>
       <section className="guide-steps" aria-label="How to play steps">
-        {steps.map(({ number, icon: Icon, title: stepTitle, text }) => (
-          <article className="panel guide-step" key={number}>
-            <span className="guide-number">{number}</span>
-            <span className="square-icon"><Icon size={21} /></span>
-            <div><h3>{stepTitle}</h3><p>{text}</p></div>
-          </article>
-        ))}
+        {GUIDE_STEPS.map(({ title: stepTitle, text }, index) => {
+          const Icon = GUIDE_STEP_ICONS[index] ?? Hexagon;
+          return (
+            <article className="panel guide-step" key={stepTitle}>
+              <span className="guide-number">{String(index + 1).padStart(2, '0')}</span>
+              <span className="square-icon"><Icon size={21} /></span>
+              <div><h3>{stepTitle}</h3><p>{text}</p></div>
+            </article>
+          );
+        })}
       </section>
       <section className="panel guide-tip">
         <div className="square-icon"><Zap size={21} /></div>
-        <div><span className="eyebrow">QUICK TIP</span><p>Skills with matching tags can trigger each other. Check your active skills during a run and look for a build taking shape.</p></div>
+        <div><span className="eyebrow">QUICK TIP</span><p>Skills from the same family trigger and boost each other. Open Build during a run to see which family is taking shape.</p></div>
       </section>
       <div className="guide-actions">
         <Button className="primary" audioChapterId={run && !run.result ? run.chapterId : 'chapter_feed'} onClick={enter}>
@@ -387,6 +428,94 @@ function GuideScreen() {
         </Button>
         <Button onClick={() => navigate('equipment')}><Cpu size={17} /> View loadout</Button>
       </div>
+      <section className="guide-manual" aria-labelledby="guide-manual-title">
+        <div className="guide-manual-head">
+          <div>
+            <span className="eyebrow">FIELD MANUAL</span>
+            <h2 id="guide-manual-title">Every rule, explained<span>.</span></h2>
+          </div>
+          <Button
+            className="compact"
+            onClick={() => setOpen(allOpen ? new Set() : new Set(GUIDE_SECTIONS.map((section) => section.id)))}
+          >
+            {allOpen ? 'Collapse all' : 'Expand all'}
+          </Button>
+        </div>
+        <nav className="guide-jump" aria-label="Guide topics">
+          {GUIDE_SECTIONS.map((section) => (
+            <button key={section.id} onClick={() => jump(section.id)}>{section.title}</button>
+          ))}
+        </nav>
+        {GUIDE_SECTIONS.map((section) => {
+          const Icon = GUIDE_SECTION_ICONS[section.id] ?? Hexagon;
+          return (
+            <details
+              className="panel guide-section"
+              id={`guide-${section.id}`}
+              key={section.id}
+              open={open.has(section.id)}
+              onToggle={(event) => setSection(section.id, event.currentTarget.open)}
+            >
+              <summary>
+                <span className="square-icon"><Icon size={20} /></span>
+                <span className="guide-section-copy">
+                  <h3>{section.title}</h3>
+                  <small>{section.summary}</small>
+                </span>
+                <ChevronRight className="guide-chevron" size={20} aria-hidden="true" />
+              </summary>
+              {section.id === 'route' && (
+                <ol className="guide-route" aria-label="Route order">
+                  {NODES.map((node, index) => (
+                    <li className={`guide-node ${node}`} key={index}>
+                      <span>{iconFor(node, 15)}</span>
+                      <small>{String(index + 1).padStart(2, '0')}</small>
+                      <b>{title(node)}</b>
+                    </li>
+                  ))}
+                </ol>
+              )}
+              {section.gallery && (
+                <ul className={`guide-gallery ${section.gallery.style}`}>
+                  {section.gallery.items.map((item) => (
+                    <li key={item.label}>
+                      <img src={item.image} alt="" loading="lazy" draggable={false} />
+                      <span>{item.caption && <small>{item.caption}</small>}<b>{item.label}</b></span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <dl className="guide-entries">
+                {section.entries.map((entry) => {
+                  const StatusGlyph = entry.status ? STATUS_GLYPHS[entry.status] : undefined;
+                  return (
+                    <div key={`${entry.term}:${entry.meta ?? ''}`} className={entry.image || StatusGlyph ? 'has-thumb' : undefined}>
+                      <dt>
+                        {entry.image && (
+                          <span
+                            className={`guide-thumb ${entry.imageStyle ?? 'art'}`}
+                            style={entry.backdrop ? { backgroundImage: `url(${entry.backdrop})` } : undefined}
+                            aria-hidden="true"
+                          >
+                            <img src={entry.image} alt="" loading="lazy" draggable={false} />
+                          </span>
+                        )}
+                        {StatusGlyph && (
+                          <span className="guide-thumb status" data-status={entry.status} aria-hidden="true">
+                            <StatusGlyph size={22} />
+                          </span>
+                        )}
+                        <span className="guide-term">{entry.term}{entry.meta && <small>{entry.meta}</small>}</span>
+                      </dt>
+                      <dd>{entry.text}</dd>
+                    </div>
+                  );
+                })}
+              </dl>
+            </details>
+          );
+        })}
+      </section>
     </div>
   );
 }
@@ -833,11 +962,11 @@ function RouteScreen() {
               </p>
               <span className="route-reward">
                 {kind === 'boss'
-                  ? '250 Bits + equipment chest'
+                  ? `${NODE_REWARDS.boss.bits} Bits + equipment chest`
                   : kind === 'elite'
-                    ? '50 Bits + boosted skill draft'
+                    ? `${NODE_REWARDS.elite.bits} Bits + boosted skill draft`
                     : kind === 'battle'
-                      ? '20 Bits + choose a skill'
+                      ? `${NODE_REWARDS.battle.bits} Bits + choose a skill`
                       : 'Make your next move'}{' '}
                 <ArrowRight size={17} />
               </span>
