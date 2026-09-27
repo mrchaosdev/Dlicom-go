@@ -23,7 +23,7 @@ test.afterEach(async ({ page }) => {
 test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Small hero/ })).toBeVisible();
-  await expect(page.getByText('SYSTEM ONLINE · v0.2.1')).toBeVisible();
+  await expect(page.getByText('SYSTEM ONLINE · v0.2.2')).toBeVisible();
   for (const [width, height] of [
     [320, 740],
     [360, 800],

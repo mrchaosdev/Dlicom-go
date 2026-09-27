@@ -35,6 +35,7 @@ export const eventDuration = (event: PresentationCue): number => {
   if (event.type === 'crit_anticipation') return 70;
   if (event.type === 'rage_burst') return 150;
   if (event.type === 'warning') return 600;
+  if (event.type === 'weapon_proc') return 140;
   if (event.type === 'ultimate') return 800;
   if (event.type === 'damage') {
     if (event.tag === 'status' || event.tag === 'reflect') return 220;

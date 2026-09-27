@@ -194,10 +194,18 @@ describe('combat rules', () => {
     const engine = battle({ weapon: weaponCombatProfile('weapon_moderator_hammer') });
     expect(engine.step().some((event) => event.label === 'Ban Hammer')).toBe(false);
     expect(engine.step().some((event) => event.label === 'Ban Hammer')).toBe(false);
-    expect(engine.step().find((event) => event.label === 'Ban Hammer')).toMatchObject({
+    const events = engine.step();
+    expect(events.find((event) => event.type === 'weapon_proc')).toMatchObject({
+      label: 'HAMMER CHARGED',
+      target: 'dili',
+    });
+    expect(events.find((event) => event.label === 'Ban Hammer')).toMatchObject({
       amount: 55,
       tag: 'skill',
     });
+    expect(events.findIndex((event) => event.type === 'weapon_proc')).toBeLessThan(
+      events.findIndex((event) => event.label === 'Ban Hammer'),
+    );
   });
   it('Viral Launcher detonates against every living enemy every fourth basic', () => {
     const engine = battle({
@@ -219,6 +227,22 @@ describe('combat rules', () => {
     expect(engine.step().find((event) => event.label === 'DliClip Repost')).toMatchObject({
       amount: 90,
       tag: 'skill',
+    });
+  });
+  it('Encryption Blade announces and names its Dodge-powered follow-up slash', () => {
+    const engine = battle({
+      stats: { dodgeRate: 1, dodgeFollowup: 0.8, critRate: 0 },
+      weapon: weaponCombatProfile('weapon_encryption_blade'),
+    });
+    engine.step();
+    const events = engine.step();
+    expect(events.find((event) => event.type === 'weapon_proc')).toMatchObject({
+      label: 'ENCRYPTION RIPOSTE',
+    });
+    expect(events.find((event) => event.label === 'Encryption Riposte')).toMatchObject({
+      type: 'damage',
+      source: 'dili',
+      tag: 'basic',
     });
   });
   it('firewall triggers every four turns and caps shield at max HP', () => {

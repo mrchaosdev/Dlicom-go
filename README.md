@@ -4,7 +4,7 @@ Build an overpowered Dili, chain Dlicom-themed skills, and fight through a corru
 
 **Play now:** https://dlicom-attack.vercel.app
 
-**Version 0.2.1 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
+**Version 0.2.2 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
 
 ![Dlicom Attack home](artifacts/home-desktop.webp)
 
@@ -40,7 +40,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Three equipment slots, 18 equipment items across four rarities, five upgrade levels and a chest on victory.
 - Twenty seeded events with choices, run buffs, healing, Bits, skill drafts and optional elite fights.
 - Dili reference-based combat poses, distinct generated sprites for all ten normal enemy kinds and four bosses, four illustrated chapter battle backgrounds, one original synthesized music loop per chapter, bounded VFX/text objects and SFX.
-- All six weapons change Dili's basic attack identity and passive: rapid Packet combos, periodic Hammer slams, faster Overdrive Ultimates, Viral area detonations, Dodge-powered Encryption slashes, or Crit-triggered DliClip follow-ups. Each weapon also has matching art, projectile color, pose and impact treatment.
+- All six weapons change Dili's basic attack identity and passive: rapid Packet combos, periodic Hammer slams, faster Overdrive Ultimates, Viral area detonations, Dodge-powered Encryption slashes, or Crit-triggered DliClip follow-ups. Each weapon also has matching art, projectile color, pose and impact treatment; triggered weapon passives receive a brief in-battle callout and combat-log entry.
 - Four selectable Dili costumes include distinct armor, weapons and effects across ranged, sword, hammer, hurt and ultimate poses. Costume choice saves locally and never changes combat stats.
 - Node 10's Signal Bazaar offers an optional Rare-or-better skill draft for 80 run Bits, creating a choice between immediate power and the final Bits payout. Short transitions identify each new run phase.
 - Responsive desktop/mobile UI, keyboard focus states, local fonts and local audio.

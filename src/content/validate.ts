@@ -106,12 +106,20 @@ const weaponProc = z.object({
   damage: z.number().positive(),
   target: z.enum(['target', 'all']),
   label: z.enum(['Ban Hammer', 'Viral Explosion', 'DliClip Repost']),
+  cueLabel: z.string().min(1),
 });
 const equipmentSchema = z.discriminatedUnion('slot', [
   equipmentBase.extend({
     slot: z.literal('weapon'),
     attackStyle: z.enum(['ranged', 'blade', 'hammer']),
-    combat: z.object({ basicLabel: z.string().min(1), proc: weaponProc.optional() }),
+    combat: z.object({
+      basicLabel: z.string().min(1),
+      proc: weaponProc.optional(),
+      dodgeFollowup: z.object({
+        cueLabel: z.string().min(1),
+        attackLabel: z.string().min(1),
+      }).optional(),
+    }),
   }),
   equipmentBase.extend({
     slot: z.literal('armor'),

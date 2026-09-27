@@ -422,6 +422,15 @@ export class CombatEngine {
     if (!target || target.hp <= 0 || this.hero.hp <= 0 || !this.allowed(depth)) return;
     this.basicCount++;
     if (!counter) this.weaponBasics++;
+    const dodgeFollowup = !counter && this.dodgeDamage > 0 ? this.weapon.dodgeFollowup : undefined;
+    if (dodgeFollowup)
+      this.emit({
+        type: 'weapon_proc',
+        source: 'dili',
+        target: 'dili',
+        amount: 0,
+        label: dodgeFollowup.cueLabel,
+      });
     const targets = this.rule('overflow') && this.basicCount % 5 === 0 ? this.living() : [target];
     const hits = targets.map((enemy) =>
       this.hit(
@@ -429,7 +438,13 @@ export class CombatEngine {
         enemy,
         1,
         'basic',
-        counter ? 'Auto Reply' : targets.length > 1 ? 'Packet Overflow' : this.weapon.basicLabel,
+        counter
+          ? 'Auto Reply'
+          : dodgeFollowup
+            ? dodgeFollowup.attackLabel
+            : targets.length > 1
+              ? 'Packet Overflow'
+              : this.weapon.basicLabel,
         depth,
         counter,
       ),
@@ -443,6 +458,14 @@ export class CombatEngine {
       const victims = proc.target === 'all'
         ? this.living()
         : [target.hp > 0 ? target : this.target()].filter((actor): actor is Actor => !!actor);
+      if (victims.length)
+        this.emit({
+          type: 'weapon_proc',
+          source: 'dili',
+          target: 'dili',
+          amount: 0,
+          label: proc.cueLabel,
+        });
       for (const victim of victims)
         this.skillHit(victim, proc.damage, proc.label, depth + 1);
     }

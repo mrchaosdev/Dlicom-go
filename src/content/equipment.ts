@@ -46,6 +46,7 @@ export const EQUIPMENT: Equipment[] = [
         damage: 0.55,
         target: 'target',
         label: 'Ban Hammer',
+        cueLabel: 'HAMMER CHARGED',
       },
     },
   },
@@ -74,6 +75,7 @@ export const EQUIPMENT: Equipment[] = [
         damage: 0.6,
         target: 'all',
         label: 'Viral Explosion',
+        cueLabel: 'VIRAL PAYLOAD',
       },
     },
   },
@@ -85,7 +87,13 @@ export const EQUIPMENT: Equipment[] = [
     description: '+10 ATK · Dodge +5% · After Dodge, next slash +80%',
     stats: { atk: 10, dodgeRate: 0.05, dodgeFollowup: 0.8 },
     attackStyle: 'blade',
-    combat: { basicLabel: 'Encryption Slash' },
+    combat: {
+      basicLabel: 'Encryption Slash',
+      dodgeFollowup: {
+        cueLabel: 'ENCRYPTION RIPOSTE',
+        attackLabel: 'Encryption Riposte',
+      },
+    },
   },
   {
     id: 'weapon_dliclip_cannon',
@@ -102,6 +110,7 @@ export const EQUIPMENT: Equipment[] = [
         damage: 0.9,
         target: 'target',
         label: 'DliClip Repost',
+        cueLabel: 'DLICLIP REPOST',
       },
     },
   },

@@ -625,9 +625,27 @@ class BattleScene extends Phaser.Scene {
       });
       return;
     }
+    if (event.type === 'weapon_proc' && source) {
+      const color = WEAPON_ATTACK_COLORS[this.weaponId] ?? 0x76f5ff;
+      this.tweens.killTweensOf(this.label);
+      this.label
+        .setText(event.label)
+        .setPosition(source.x, source.y - 118)
+        .setColor(`#${color.toString(16).padStart(6, '0')}`)
+        .setScale(reduced ? 0.82 : 0.72)
+        .setAlpha(1);
+      this.tweens.add({
+        targets: this.label,
+        alpha: 0,
+        scale: reduced ? 0.82 : 0.9,
+        y: source.y - (reduced ? 118 : 132),
+        duration: reduced ? 100 : 180,
+      });
+      return;
+    }
     if (event.type === 'warning' || event.type === 'ultimate') {
       this.tweens.killTweensOf(this.label);
-      this.label.setText(event.label).setPosition(380, 420).setColor('#d2fbff').setAlpha(1);
+      this.label.setText(event.label).setPosition(380, 420).setColor('#d2fbff').setScale(1).setAlpha(1);
       this.tweens.add({ targets: this.label, alpha: 0, delay: 450, duration: 250 });
       if (event.type === 'ultimate') {
         this.showHeroPose('dili_ultimate', 700);
@@ -887,6 +905,7 @@ class BattleScene extends Phaser.Scene {
         .setText(event.label)
         .setPosition(target.x, target.y - 105)
         .setColor('#72e5ff')
+        .setScale(1)
         .setAlpha(1);
       this.tweens.add({
         targets: this.label,

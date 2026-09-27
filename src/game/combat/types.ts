@@ -8,10 +8,15 @@ export interface WeaponProcDefinition {
   damage: number;
   target: 'target' | 'all';
   label: 'Ban Hammer' | 'Viral Explosion' | 'DliClip Repost';
+  cueLabel: string;
 }
 export interface WeaponCombatProfile {
   basicLabel: string;
   proc?: WeaponProcDefinition;
+  dodgeFollowup?: {
+    cueLabel: string;
+    attackLabel: string;
+  };
 }
 export type StatusId =
   'burn' | 'glitch' | 'vulnerable' | 'silence' | 'slow' | 'corrupted' | 'marked';
@@ -188,6 +193,7 @@ export interface CombatEvent {
     | 'death'
     | 'summon'
     | 'warning'
+    | 'weapon_proc'
     | 'revive'
     | 'shield_break'
     | 'rage';

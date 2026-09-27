@@ -32,6 +32,14 @@ describe('combat presentation cues', () => {
     expect(buildPresentationQueue(events)).toEqual([events[1]]);
   });
 
+  it('presents weapon passive cues briefly without filtering them out', () => {
+    const cue: CombatEvent = {
+      type: 'weapon_proc', source: 'dili', target: 'dili', amount: 0, label: 'VIRAL PAYLOAD',
+    };
+    expect(buildPresentationQueue([cue])).toEqual([cue]);
+    expect(eventDuration(cue)).toBe(140);
+  });
+
   it('keeps each damage cue open until its projectile and impact finish', () => {
     const hit: CombatEvent = {
       type: 'damage', source: 'dili', target: 'spam_bot_1', amount: 100, label: 'Packet',

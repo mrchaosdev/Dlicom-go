@@ -35,8 +35,7 @@ const report = weapons.map((weapon) => {
     });
     for (let turn = 0; turn < TURNS; turn++) {
       const events = engine.step();
-      if (weapon.combat.proc)
-        procs += events.filter((event) => event.label === weapon.combat.proc?.label).length;
+      procs += events.filter((event) => event.type === 'weapon_proc').length;
     }
     damage += engine.stats.damageDealt;
     damageTaken += engine.stats.damageTaken;
