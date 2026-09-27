@@ -1,0 +1,12 @@
+node_modules/
+dist/
+artifacts/
+ci-artifacts/
+test-results/
+playwright-report/
+dlicom-attack-docs/
+docs/
+tests/
+.git/
+.github/
+.kilo/
