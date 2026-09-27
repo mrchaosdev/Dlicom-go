@@ -23,7 +23,7 @@ test.afterEach(async ({ page }) => {
 test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Small hero/ })).toBeVisible();
-  await expect(page.getByText('SYSTEM ONLINE · v0.2.2')).toBeVisible();
+  await expect(page.getByText('SYSTEM ONLINE · v0.2.3')).toBeVisible();
   for (const [width, height] of [
     [320, 740],
     [360, 800],
@@ -48,8 +48,8 @@ test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => 
   await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
   await expect(page.getByRole('heading', { name: 'Packet Blaster' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await expect(page.locator('[data-equipment-icon]')).toHaveCount(3);
-  await expect(page.locator('[data-equipment-option-icon]')).toHaveCount(3);
+  await expect(page.locator('.gear-title [data-equipment-art]')).toHaveCount(3);
+  await expect(page.locator('.gear-options [data-equipment-art]')).toHaveCount(3);
   await page.getByRole('navigation').getByRole('button', { name: 'Records' }).click();
   await expect(page.locator('[data-achievement-icon]')).toHaveCount(2);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
@@ -213,9 +213,15 @@ test('gear shop purchase appears in inventory, equips and survives reload on mob
   await page.getByRole('tab', { name: 'Shop' }).click();
   const blade = page.locator('[data-shop-id="weapon_encryption_blade"]');
   await expect(blade).toBeVisible();
+  await blade.scrollIntoViewIfNeeded();
+  await expect(blade.getByText('WEAPON · RARE', { exact: true })).toBeVisible();
+  await expect.poll(() => blade.locator('[data-equipment-art] img').evaluate(
+    (img: HTMLImageElement) => img.complete && img.naturalWidth === 512,
+  )).toBe(true);
   await blade.getByRole('button', { name: /Buy & equip.*350 Bits/ }).click();
   await expect(page.getByRole('heading', { name: 'Your inventory' })).toBeVisible();
   await expect(page.locator('[data-inventory-id="weapon_encryption_blade"]')).toBeVisible();
+  await expect(page.locator('[data-inventory-id="weapon_encryption_blade"] [data-equipment-art] img')).toBeVisible();
   await expect(page.locator('[data-inventory-id="weapon_encryption_blade"] button', { hasText: 'Equipped' })).toBeDisabled();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.reload();

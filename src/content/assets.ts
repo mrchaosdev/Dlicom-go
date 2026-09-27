@@ -78,6 +78,27 @@ export const SKILL_ART: Record<Archetype, string> = {
   heal: ASSETS.skill_heal,
 };
 
+export const EQUIPMENT_ART: Record<string, string> = {
+  weapon_packet_blaster: asset('equipment/weapon-packet-blaster.webp'),
+  weapon_moderator_hammer: asset('equipment/weapon-moderator-hammer.webp'),
+  weapon_overdrive_core: asset('equipment/weapon-overdrive-core.webp'),
+  weapon_viral_launcher: asset('equipment/weapon-viral-launcher.webp'),
+  weapon_encryption_blade: asset('equipment/weapon-encryption-blade.webp'),
+  weapon_dliclip_cannon: asset('equipment/weapon-dliclip-cannon.webp'),
+  armor_firewall_shell: asset('equipment/armor-firewall-shell.webp'),
+  armor_creator_hoodie: asset('equipment/armor-creator-hoodie.webp'),
+  armor_zero_knowledge_cloak: asset('equipment/armor-zero-knowledge-cloak.webp'),
+  armor_moderator_vest: asset('equipment/armor-moderator-vest.webp'),
+  armor_antispam_plating: asset('equipment/armor-antispam-plating.webp'),
+  armor_core_armor: asset('equipment/armor-core-armor.webp'),
+  module_viral_chip: asset('equipment/module-viral-chip.webp'),
+  module_combo_router: asset('equipment/module-combo-router.webp'),
+  module_counter_protocol: asset('equipment/module-counter-protocol.webp'),
+  module_rage_cache: asset('equipment/module-rage-cache.webp'),
+  module_safe_mode: asset('equipment/module-safe-mode.webp'),
+  module_trust: asset('equipment/module-trust.webp'),
+};
+
 export type DiliPose = 'idle' | 'attack' | 'sword_idle' | 'sword_attack' | 'hammer_idle' | 'hammer_attack' | 'hurt' | 'ultimate';
 const costumeAssetSet = (name: string): Record<DiliPose, string> => ({
   idle: asset(`dili-skin-${name}-idle.webp`),

@@ -34,7 +34,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import type { Archetype, CombatEvent } from '../game/combat/types';
 import type { BattleSnapshot } from '../game/combat/CombatEngine';
 import { useGame } from '../stores/gameStore';
-import { ASSETS, SKILL_ART, diliWeaponPoses } from '../content/assets';
+import { ASSETS, EQUIPMENT_ART, SKILL_ART, diliWeaponPoses } from '../content/assets';
 import { SKINS, SKIN_BY_ID } from '../content/skins';
 import { EQUIPMENT, GEAR, UPGRADE_COSTS, gearPrice, loadoutStats, type Slot } from '../content/equipment';
 import { RUN_SHOP_COST } from '../game/run/RunSession';
@@ -44,7 +44,7 @@ import { NODES, generateEncounter } from '../content/encounters';
 import { CHAPTERS } from '../content/chapters';
 import { SKILL_GLYPHS, STATUS_GLYPHS } from '../content/skillGlyphs';
 import { ACHIEVEMENTS } from '../content/achievements';
-import { ACHIEVEMENT_GLYPHS, EQUIPMENT_GLYPHS } from '../content/progressionIcons';
+import { ACHIEVEMENT_GLYPHS } from '../content/progressionIcons';
 import { accountLevel } from '../services/save';
 import { DAILY_ENERGY_REWARD, ENERGY_MAX, RUN_ENERGY_COST, canClaimDailyEnergy, energyCountdown, localDay } from '../game/meta/energy';
 import { playSound, startAudio, suspendAudio, updateAudio } from '../services/audio';
@@ -88,6 +88,19 @@ function SkillIcon({ skillId, tag }: { skillId: string; tag: Archetype }) {
 function StatusIcon({ status }: { status: string }) {
   const Glyph = STATUS_GLYPHS[status as keyof typeof STATUS_GLYPHS] ?? Sparkles;
   return <Glyph className="status-icon" size={12} aria-hidden="true" />;
+}
+function EquipmentArt({ itemId, className = '' }: { itemId: string; className?: string }) {
+  const item = GEAR[itemId];
+  return (
+    <span
+      className={`equipment-art ${className}`}
+      data-equipment-art={itemId}
+      data-slot={item.slot}
+      aria-hidden="true"
+    >
+      <img src={EQUIPMENT_ART[itemId]} alt="" draggable={false} loading="lazy" />
+    </span>
+  );
 }
 const title = (text: string) => text.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 function Button({
@@ -161,24 +174,22 @@ function HeroPanel() {
   const weapon = GEAR[weaponId];
   const armor = GEAR[armorId];
   const module = GEAR[moduleId];
-  const ArmorGlyph = EQUIPMENT_GLYPHS[armorId as keyof typeof EQUIPMENT_GLYPHS] ?? Shield;
-  const ModuleGlyph = EQUIPMENT_GLYPHS[moduleId as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu;
   const preview = diliWeaponPoses(skinId, weaponId).idle;
   return (
     <div className="hero-art">
       <div className="orbit orbit-one" />
       <div className="orbit orbit-two" />
-      <span className="float-tag tag-one" data-equipped-armor={armorId}>
-        <ArmorGlyph size={15} /> {armor.name.toUpperCase()}
-      </span>
-      <span className="float-tag tag-two" data-equipped-module={moduleId}>
-        <ModuleGlyph size={15} /> {module.name.toUpperCase()}
-      </span>
       <div className="hero-glow" />
       <img
         src={preview}
         alt={`Dili in ${SKIN_BY_ID[skinId].name}, holding ${weapon.name}`}
       />
+      <span className="float-tag tag-one" data-equipped-armor={armorId}>
+        <EquipmentArt itemId={armorId} className="tag-art" /> {armor.name.toUpperCase()}
+      </span>
+      <span className="float-tag tag-two" data-equipped-module={moduleId}>
+        <EquipmentArt itemId={moduleId} className="tag-art" /> {module.name.toUpperCase()}
+      </span>
       <div className="hero-platform" />
       <span className="hero-caption">
         DILI <i /> READY TO CONNECT
@@ -427,7 +438,6 @@ function EquipmentScreen() {
           {(['weapon', 'armor', 'module'] as Slot[]).map((slot) => {
             const id = save.account.equipped[slot],
               item = GEAR[id],
-              GearGlyph = EQUIPMENT_GLYPHS[id as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu,
               level = save.account.inventory[id],
               cost = UPGRADE_COSTS[level - 1];
             return (
@@ -440,9 +450,7 @@ function EquipmentScreen() {
                   </div>
                 </div>
                 <div className="gear-title">
-                  <div className="square-icon" data-equipment-icon={id}>
-                    <GearGlyph aria-hidden="true" />
-                  </div>
+                  <EquipmentArt itemId={id} className="loadout-art" />
                   <div>
                     <h3>{item.name}</h3>
                     <p>{item.description}</p>
@@ -451,14 +459,13 @@ function EquipmentScreen() {
                 <div className="gear-options">
                   {EQUIPMENT.filter((e) => e.slot === slot && save.account.inventory[e.id]).map(
                     (e) => {
-                      const OptionGlyph = EQUIPMENT_GLYPHS[e.id as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu;
                       return (
                       <button
                         className={e.id === id ? 'selected' : ''}
                         key={e.id}
                         onClick={() => equip(e.id)}
                       >
-                        <OptionGlyph size={15} aria-hidden="true" data-equipment-option-icon={e.id} />
+                        <EquipmentArt itemId={e.id} className="option-art" />
                         {e.id === id && <Check size={13} />} {e.name}
                       </button>
                       );
@@ -490,14 +497,13 @@ function InventoryPanel() {
           <div className="section-heading"><h2>{title(slot)}s</h2><span className="muted">{EQUIPMENT.filter((item) => item.slot === slot && save.account.inventory[item.id]).length} / {EQUIPMENT.filter((item) => item.slot === slot).length} OWNED</span></div>
           <div className="collection-grid">
             {EQUIPMENT.filter((item) => item.slot === slot && save.account.inventory[item.id]).map((item) => {
-              const Glyph = EQUIPMENT_GLYPHS[item.id as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu;
               const level = save.account.inventory[item.id];
               const cost = UPGRADE_COSTS[level - 1];
               const selected = save.account.equipped[slot] === item.id;
               return (
-                <article className="panel collection-card" key={item.id} data-inventory-id={item.id}>
-                  <div className="collection-icon"><Glyph size={24} aria-hidden="true" /></div>
-                  <div><span className={`chip ${item.rarity ?? 'common'}`}>{(item.rarity ?? 'common').toUpperCase()} · LV {level}</span><h3>{item.name}</h3><p>{item.description}</p></div>
+                <article className="panel collection-card" key={item.id} data-inventory-id={item.id} data-selected={selected} data-rarity={item.rarity ?? 'common'}>
+                  <EquipmentArt itemId={item.id} className="collection-art" />
+                  <div className="collection-copy"><span className={`chip ${item.rarity ?? 'common'}`}>{slot.toUpperCase()} · {(item.rarity ?? 'common').toUpperCase()} · LV {level}</span><h3>{item.name}</h3><p>{item.description}</p></div>
                   <div className="collection-actions">
                     <Button disabled={selected} onClick={() => equip(item.id)}>{selected ? 'Equipped' : 'Equip'}</Button>
                     <Button disabled={!cost || save.account.bits < cost} onClick={() => upgradeItem(item.id)}>{cost ? `Upgrade · ${cost} Bits` : 'Max level'}</Button>
@@ -538,7 +544,6 @@ function GearShopPanel({ onPurchased }: { onPurchased: () => void }) {
   const available = EQUIPMENT.filter((item) => !save.account.inventory[item.id]);
   const rewardItem = chestReward?.kind === 'gear' ? GEAR[chestReward.id] : undefined;
   const rewardSkill = chestReward?.kind === 'skill' ? SKILL_BY_ID[chestReward.id] : undefined;
-  const RewardGearGlyph = rewardItem ? EQUIPMENT_GLYPHS[rewardItem.id as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu : Cpu;
   return (
     <div className="collection-layout">
       <p className="shop-note">Earn Bits from every run, including defeats. Buy a known item below or open a chest for a surprise.</p>
@@ -548,7 +553,7 @@ function GearShopPanel({ onPurchased }: { onPurchased: () => void }) {
             <div className="chest-reveal-burst"><img src={chestReward.kind === 'gear' ? ASSETS.chest_gear : ASSETS.chest_skill} alt="" /></div>
             <ArrowRight size={18} aria-hidden="true" />
             <div className="chest-reveal-reward" data-chest-reward-art={chestReward.kind}>
-              {rewardSkill ? <SkillIcon skillId={rewardSkill.id} tag={rewardSkill.tags[0]} /> : <RewardGearGlyph size={52} aria-hidden="true" />}
+              {rewardSkill ? <SkillIcon skillId={rewardSkill.id} tag={rewardSkill.tags[0]} /> : rewardItem ? <EquipmentArt itemId={rewardItem.id} className="reward-art" /> : null}
             </div>
           </div>
           <div>
@@ -589,12 +594,11 @@ function GearShopPanel({ onPurchased }: { onPurchased: () => void }) {
             <div className="section-heading"><h2>{title(slot)}s</h2></div>
             <div className="collection-grid">
               {items.map((item) => {
-                const Glyph = EQUIPMENT_GLYPHS[item.id as keyof typeof EQUIPMENT_GLYPHS] ?? Cpu;
                 const price = gearPrice(item);
                 return (
-                  <article className="panel collection-card" key={item.id} data-shop-id={item.id}>
-                    <div className="collection-icon"><Glyph size={24} aria-hidden="true" /></div>
-                    <div><span className={`chip ${item.rarity ?? 'common'}`}>{(item.rarity ?? 'common').toUpperCase()}</span><h3>{item.name}</h3><p>{item.description}</p></div>
+                  <article className="panel collection-card" key={item.id} data-shop-id={item.id} data-rarity={item.rarity ?? 'common'}>
+                    <EquipmentArt itemId={item.id} className="collection-art" />
+                    <div className="collection-copy"><span className={`chip ${item.rarity ?? 'common'}`}>{slot.toUpperCase()} · {(item.rarity ?? 'common').toUpperCase()}</span><h3>{item.name}</h3><p>{item.description}</p></div>
                     <div className="collection-actions"><Button disabled={save.account.bits < price} onClick={() => { buyGear(item.id); onPurchased(); }}><Hexagon size={14} /> Buy & equip · {price} Bits</Button></div>
                   </article>
                 );
@@ -1322,7 +1326,7 @@ export default function App() {
       </main>
       <footer>
         <span>
-          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.2.2
+          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.2.3
         </span>
         <span>
           {inRun

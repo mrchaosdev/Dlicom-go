@@ -148,3 +148,34 @@ Use the matching costume idle or attack master as the only image reference. Pres
 - **DliClip Cannon:** compact cinematic data-projector cannon, triangular play-button muzzle aperture, two clip-frame cartridges, glowing timeline rail, angular broadcast fins and a rectangular video-data projectile with frame echoes.
 
 Always require genuine alpha transparency and exclude scenery, floor, text, letters, logos, watermarks, borders, extra limbs, swords and hammers.
+
+---
+
+# 16. Equipment inventory art
+
+Generate each item as a separate square image using the built-in image generation workflow. Shared prompt:
+
+> Polished 2D browser RPG inventory equipment art for Dlicom Attack, chunky hand-painted shapes, subtle cel shading, crisp readable edges, neon cyber-social-network roguelite style. Exactly one complete item centered in a three-quarter view with generous transparent margin. Dramatic clean neon rim light. Genuinely transparent background. No character, hands, mannequin, pedestal, frame, environment, text, letters, numbers, logo or watermark. The item must remain legible at 160 pixels.
+
+Item subjects and palettes:
+
+- **Packet Blaster:** compact cyan data blaster with a glowing packet chamber and restrained magenta accents.
+- **Moderator Hammer:** oversized mechanical moderation hammer with a broad head, magenta impact core and cyan circuit accents.
+- **Overdrive Core:** compact hand cannon built around an amber reactor, vented barrel and energy rings.
+- **Viral Launcher:** chunky wide-muzzle launcher with a translucent green bio-digital canister and purple accents.
+- **Encryption Blade:** one-handed cyan energy sword made from interlocking encrypted segments with a dark tech hilt.
+- **DliClip Cannon:** sleek magenta broadcast cannon with pulse rails and a circular media-reel chamber.
+- **Firewall Shell:** heavy cyan chest armor with layered shield plates and a glowing hexagonal core.
+- **Creator Hoodie:** oversized navy hooded jacket with magenta stream seams and light shoulder armor.
+- **Zero-Knowledge Cloak:** angular midnight-violet hooded cloak with translucent encrypted patterns and cyan edges.
+- **Moderator Vest:** charcoal tactical vest with orange straps, utility panels and a luminous shield plate.
+- **Anti-Spam Plating:** bulky segmented gunmetal armor with green pulse barriers.
+- **Core Armor:** prestigious heavy navy armor with gold reactor ribs and broad shoulders.
+- **Viral Chip:** hexagonal dark circuit chip with a contained neon-green spreading core.
+- **Combo Router:** triangular cyan router with multiple packet ports and two linked energy loops.
+- **Counter Protocol:** circular armored processor with opposing amber curved energy shapes.
+- **Rage Cache:** reinforced memory cartridge with a blazing red-magenta core and heat vents.
+- **Safe Mode:** square blue safety processor with layered shield shutters around a calm luminous core.
+- **Trust Module:** rare diamond-shaped navy processor with two interlocking gold energy links.
+
+Export each selected transparent master at 512 × 512 WebP, quality 82 and alpha quality 92. Keep source PNG files outside `public`; runtime files belong in `public/assets/equipment/`.

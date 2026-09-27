@@ -786,19 +786,53 @@ footer i {
 }
 .collection-card {
   display: grid;
-  grid-template-columns: 46px minmax(0, 1fr);
-  gap: 13px;
+  grid-template-columns: 132px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  overflow: hidden;
   padding: 19px;
 }
-.collection-icon {
+.collection-card[data-selected='true'] {
+  border-color: #5bdce2;
+  box-shadow: inset 0 0 0 1px #5bdce244;
+}
+.equipment-art {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
+  flex: none;
+  overflow: hidden;
   border: 1px solid #3b5667;
-  border-radius: 9px;
-  color: var(--cyan);
-  background: #203348;
+  border-radius: 12px;
+  background: radial-gradient(circle at 50% 45%, #28526188, #0a1728 72%);
+}
+.equipment-art[data-slot='armor'] {
+  background: radial-gradient(circle at 50% 42%, #31505f99, #0a1728 72%);
+}
+.equipment-art[data-slot='module'] {
+  background: radial-gradient(circle at 50% 45%, #45396c88, #0a1728 72%);
+}
+.equipment-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 9px 13px #0009);
+  transition: transform 180ms ease, filter 180ms ease;
+}
+.collection-art {
+  width: 132px;
+  height: 132px;
+}
+.collection-card:is(:hover, :focus-within) .collection-art img {
+  transform: translateY(-3px) scale(1.06);
+  filter: drop-shadow(0 11px 17px #000a) brightness(1.08);
+}
+.collection-card[data-rarity='rare'] .collection-art { border-color: #4ab7c8; }
+.collection-card[data-rarity='epic'] .collection-art { border-color: #8c73d8; }
+.collection-card[data-rarity='legendary'] .collection-art { border-color: #c69b4e; }
+.collection-copy {
+  min-width: 0;
 }
 .collection-card h3 {
   margin: 8px 0 3px;
@@ -819,6 +853,31 @@ footer i {
   min-height: 44px;
   white-space: nowrap;
   font-size: 11px;
+}
+.loadout-art {
+  width: 82px;
+  height: 82px;
+}
+.option-art {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border-color: #314c60;
+}
+.tag-art {
+  width: 28px;
+  height: 28px;
+  margin: -6px 0 -6px -7px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+}
+.tag-art img { filter: drop-shadow(0 3px 4px #0008); }
+.reward-art {
+  width: 82px;
+  height: 82px;
+  border: 0;
+  background: transparent;
 }
 .collection-empty {
   padding: 24px;
@@ -934,9 +993,11 @@ footer i {
 }
 .reduced-motion .chest-reveal { animation: none; }
 .reduced-motion .chest-card:is(:hover, :focus-within) .chest-art img { transform: none; }
+.reduced-motion .collection-card:is(:hover, :focus-within) .collection-art img { transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .chest-reveal { animation: none; }
   .chest-card:is(:hover, :focus-within) .chest-art img { transform: none; }
+  .collection-card:is(:hover, :focus-within) .collection-art img { transform: none; }
 }
 .equipment-hero .hero-art {
   height: 480px;
@@ -971,6 +1032,7 @@ footer i {
   gap: 15px;
   margin: 20px 0 15px;
 }
+.gear-title > div:last-child { min-width: 0; }
 .gear-title p {
   font-size: 12px;
 }
@@ -2515,6 +2577,17 @@ footer i {
   }
 }
 @media (max-width: 480px) {
+  .collection-card {
+    grid-template-columns: 100px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+  }
+  .collection-art {
+    width: 100px;
+    height: 100px;
+  }
+  .collection-card h3 { font-size: 20px; }
+  .collection-card .chip { font-size: 8px; padding: 4px 6px; }
   .site-header {
     padding: 0 15px;
     height: 70px;

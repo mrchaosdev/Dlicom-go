@@ -1,4 +1,4 @@
-# Implementation and verification — v0.2.2
+# Implementation and verification — v0.2.3
 
 ## Implemented
 
@@ -10,7 +10,7 @@ The six weapons now have content-defined combat profiles instead of relying only
 
 Each chapter now has its own 1024 x 680 WebP battle backdrop, low-detail procedural fallback, two subtle accent-colored parallax grid layers, and original synthesized music loop. The four runtime backgrounds total 0.43 MB, down from 5.89 MB as PNG, with source PNGs kept outside `public` so Vercel does not send both formats. All runtime raster art now uses WebP: converting the remaining 26 hero, enemy, boss and skill PNGs reduced that group from 8.79 MB to 1.60 MB and reduced the complete `public` asset payload from 12.7 MB to 5.49 MB. All 24 runtime music/SFX files are compressed MP3s at 96 kbps mono, totaling 0.51 MB. The parallax textures are generated once per scene and move at separate speeds; they pause with combat. All ten normal enemy kinds and four bosses have distinct transparent sprites; Raid Master's summoned minions share Raid Bot art. Encryption Blade and Moderator Hammer now each have dedicated idle and attack variants; further pose polish remains conditional on device playtests.
 
-Skill drafts and the owned-skill list use eight original archetype artworks plus 70 distinct semantic skill glyphs, one for every definition. All 18 equipment items and both achievements also have distinct symbols; route-node categories, currency, and seven status conditions have dedicated marks alongside readable labels. Draft cards enter with a short stagger and the art lifts on hover or keyboard focus; the reduced-motion setting and system preference suppress these motions.
+Skill drafts and the owned-skill list use eight original archetype artworks plus 70 distinct semantic skill glyphs, one for every definition. All 18 equipment items now use dedicated 512 × 512 transparent WebP art in Inventory, Shop, Loadout choices, equipped tags, and chest reveals. The complete equipment set is 0.89 MB, each file is content-validated below 85 KB, and every card explicitly labels its slot, rarity, level, name, stats, and passive. The two achievements retain distinct symbols; route-node categories, currency, and seven status conditions have dedicated marks alongside readable labels. Draft cards enter with a short stagger and the art lifts on hover or keyboard focus; the reduced-motion setting and system preference suppress these motions.
 
 Dili now has dedicated Attack, Hurt and Ultimate pose sprites in addition to Idle. Combat events switch poses and return to Idle on the pause/speed-aware presentation clock; Crit, Dodge and Low HP build on those poses with existing impact effects. Victory and Defeat receive short end-of-battle reactions. The [art and animation matrix](ART_ANIMATION_MATRIX.md) records all nine required states, effect coverage and remaining art work.
 

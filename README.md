@@ -4,7 +4,7 @@ Build an overpowered Dili, chain Dlicom-themed skills, and fight through a corru
 
 **Play now:** https://dlicom-attack.vercel.app
 
-**Version 0.2.2 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
+**Version 0.2.3 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
 
 ![Dlicom Attack home](artifacts/home-desktop.webp)
 
@@ -37,7 +37,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Crit, capped combo, counter, dodge, shields, statuses, lifesteal, Rage/Ultimate, lethal prevention and once-per-run revive.
 - All 70 starter skill definitions; prerequisites, four skill rarities, affinity weighting, Rare+ pity, Packet Boost ranks and one free reroll.
 - Six build families unlock across account levels 1–6, following the supplied progression order.
-- Three equipment slots, 18 equipment items across four rarities, five upgrade levels and a chest on victory.
+- Three equipment slots, 18 equipment items across four rarities, five upgrade levels and a chest on victory. Every item has dedicated lightweight WebP inventory art instead of a generic slot icon.
 - Twenty seeded events with choices, run buffs, healing, Bits, skill drafts and optional elite fights.
 - Dili reference-based combat poses, distinct generated sprites for all ten normal enemy kinds and four bosses, four illustrated chapter battle backgrounds, one original synthesized music loop per chapter, bounded VFX/text objects and SFX.
 - All six weapons change Dili's basic attack identity and passive: rapid Packet combos, periodic Hammer slams, faster Overdrive Ultimates, Viral area detonations, Dodge-powered Encryption slashes, or Crit-triggered DliClip follow-ups. Each weapon also has matching art, projectile color, pose and impact treatment; triggered weapon passives receive a brief in-battle callout and combat-log entry.

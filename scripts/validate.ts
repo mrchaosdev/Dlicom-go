@@ -117,6 +117,14 @@ for (const file of ['chest-gear.webp', 'chest-skill.webp']) {
   const bytes = statSync(`public/assets/${file}`).size;
   if (bytes > 100_000) throw new Error(`Compressed chest art too large: ${file} (${bytes} > 100000)`);
 }
+for (const item of EQUIPMENT) {
+  const file = `equipment/${item.id.replaceAll('_', '-')}.webp`;
+  if (!existsSync(`public/assets/${file}`)) throw new Error(`Equipment art missing: ${file}`);
+  const bytes = statSync(`public/assets/${file}`).size;
+  if (bytes > 85_000) throw new Error(`Compressed equipment art too large: ${file} (${bytes} > 85000)`);
+}
+for (const file of readdirSync('public/assets/equipment'))
+  if (!file.endsWith('.webp')) throw new Error(`Equipment runtime art must be WebP: ${file}`);
 for (const file of [
   'dliclips-loop.mp3', 'rooms-loop.mp3', 'core-loop.mp3', 'feed-loop.mp3',
   'attack.mp3', 'crit.mp3', 'ultimate.mp3', 'select.mp3', 'dodge.mp3', 'heal.mp3',
