@@ -195,7 +195,7 @@ describe('run progression', () => {
     ]));
 });
 describe('save compatibility and recovery', () => {
-  it('roundtrips version 4 and migrates versions 1, 2 and 3 without losing progress', () => {
+  it('roundtrips version 5 and migrates versions 1 through 4 without losing progress', () => {
     const now = 1_700_000_000_000;
     const current = defaultSave(now);
     expect(migrateSave(JSON.parse(JSON.stringify(current)), now)).toEqual(current);
@@ -207,17 +207,18 @@ describe('save compatibility and recovery', () => {
     delete legacy.account.activeRunEnergy;
     delete legacy.account.dailyClaimedOn;
     const migrated = migrateSave(legacy, now);
-    expect(migrated.version).toBe(4);
+    expect(migrated.version).toBe(5);
     expect(migrated.account.bits).toBe(750);
     expect(migrated.account.energy).toBe(15);
     expect(migrated.account.queuedSkill).toBe('');
     expect(migrated.account.skinId).toBe('signal_blue');
+    expect(migrated.account.ownedSkins).toEqual(['signal_blue']);
     const previous = JSON.parse(JSON.stringify(current));
     previous.version = 2;
     previous.account.bits = 420;
     delete previous.account.queuedSkill;
     const migratedPrevious = migrateSave(previous, now);
-    expect(migratedPrevious.version).toBe(4);
+    expect(migratedPrevious.version).toBe(5);
     expect(migratedPrevious.account.bits).toBe(420);
     expect(migratedPrevious.account.energy).toBe(current.account.energy);
     expect(migratedPrevious.account.queuedSkill).toBe('');
@@ -226,9 +227,17 @@ describe('save compatibility and recovery', () => {
     chestVersion.account.queuedSkill = 'packet_boost';
     delete chestVersion.account.skinId;
     const migratedChestVersion = migrateSave(chestVersion, now);
-    expect(migratedChestVersion.version).toBe(4);
+    expect(migratedChestVersion.version).toBe(5);
     expect(migratedChestVersion.account.queuedSkill).toBe('packet_boost');
     expect(migratedChestVersion.account.skinId).toBe('signal_blue');
+    const skinVersion = JSON.parse(JSON.stringify(current));
+    skinVersion.version = 4;
+    skinVersion.account.skinId = 'neon_rose';
+    delete skinVersion.account.ownedSkins;
+    const migratedSkinVersion = migrateSave(skinVersion, now);
+    expect(migratedSkinVersion.version).toBe(5);
+    expect(migratedSkinVersion.account.skinId).toBe('neon_rose');
+    expect(migratedSkinVersion.account.ownedSkins).toEqual(['signal_blue', 'neon_rose']);
   });
   it.each([
     '{bad',
@@ -259,6 +268,11 @@ describe('save compatibility and recovery', () => {
     const save = defaultSave();
     (save.account as { skinId: string }).skinId = 'unknown_skin';
     expect(() => migrateSave(save)).toThrow();
+  });
+  it('rejects selecting a skin that the account does not own', () => {
+    const save = defaultSave();
+    save.account.skinId = 'neon_rose';
+    expect(() => migrateSave(save)).toThrow('Selected skin must be owned');
   });
   it('keeps the game playable when storage quota is exhausted', () => {
     expect(

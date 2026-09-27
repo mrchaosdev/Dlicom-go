@@ -80,7 +80,7 @@ Use Loadout, Inventory and Shop tabs. Show owned counts and current levels in In
 
 The Loadout area also includes a Skins tab with four Dili costume previews. Night Operative, Solar Vanguard and Glitch Phantom must read as different outfits through silhouette, armor, clothing, weapons and effects rather than palette swaps. Every preview must use the currently equipped weapon pose; it must never show a sword or hammer merely because that pose exists in the costume asset set. Show the equipped weapon name, selected costume state, preserved choice after reload, and explain that changes to an active run's appearance apply next run. The four tabs must fit a 320 CSS-pixel viewport without horizontal scrolling.
 
-The Shop also offers Gear and Skill chests. Show exact Bits prices, the gear chest's base rarity weights, the one-skill queue limit, and a visible reward reveal. The queued skill must be visible from Loadout before starting a run. Chest reveal animation respects reduced motion and must not introduce horizontal overflow on small phones.
+The Shop also offers Gear and Skin Chests. Show exact Bits prices, the Gear Chest's base rarity weights, the Skin Chest's no-duplicate rule, collection-complete states, and a visible reward reveal. A revealed skin is marked unlocked, selected immediately, and remains available in the Skins tab. Locked skin cards remain previewable but cannot be selected. Chest reveal animation respects reduced motion and must not introduce horizontal overflow on small phones.
 
 ## Settings
 music

@@ -2,7 +2,7 @@
 
 ## Shop chest art
 
-The equipment and skill chests have original transparent cyber-fantasy illustrations in `assets/chest-source/`, with compressed runtime WebP assets in `public/assets/`. Equipment uses navy metal with cyan and magenta circuitry; the skill chest uses a violet translucent core. The Shop shows these as large objects, then reveals the chest beside the actual gear icon or skill art. The reward reveal is decorative and respects reduced motion; text remains the source of reward information.
+The Gear and Skin Chests use original transparent cyber-fantasy illustrations, with compressed runtime WebP assets in `public/assets/`. The Gear Chest uses navy metal with cyan and magenta circuitry. The Skin Chest resembles a premium cyber wardrobe filled with cyan, magenta, gold, and jade costume materials. The Shop shows these as large objects, then reveals the chest beside the actual equipment art or unlocked Dili costume. Runtime does not ship the heavier PNG source. The reward reveal is decorative and respects reduced motion; text remains the source of reward information.
 
 ## Dili cosmetic skins
 

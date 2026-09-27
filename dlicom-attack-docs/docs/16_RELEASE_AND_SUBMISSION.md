@@ -125,7 +125,7 @@ PLAY DLICOM ATTACK.
 - [x] music and SFX settings controls are present; music-volume setting persists across reload
 - [x] mobile layouts fit documented phone viewports without page overflow
 - [x] result screen and text/seed copy action work in the browser flow (clipboard is isolated by the test harness)
-- [x] version `v0.2.3` is displayed in the game UI
+- [x] version `v0.2.4` is displayed in the game UI
 - [ ] submission posted before deadline
 
 The automated checks above verify the repository build and browser contexts. They do not substitute for production URL smoke testing, physical Android/iOS checks, human readability and pacing playtests, or posting the submission package.

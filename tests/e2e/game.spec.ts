@@ -23,7 +23,7 @@ test.afterEach(async ({ page }) => {
 test('fresh profile, loadout, settings and mobile layouts', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Small hero/ })).toBeVisible();
-  await expect(page.getByText('SYSTEM ONLINE · v0.2.3')).toBeVisible();
+  await expect(page.getByText('SYSTEM ONLINE · v0.2.4')).toBeVisible();
   for (const [width, height] of [
     [320, 740],
     [360, 800],
@@ -141,6 +141,15 @@ test('blade and hammer loadouts use their own battle poses and finish melee hits
 test('Dili skin gallery saves a cosmetic choice and uses it in ranged battle', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 740 });
   await page.goto('/');
+  await page.evaluate(async () => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/services/save.ts'))!;
+    const { defaultSave, SAVE_KEY } = await import(path);
+    const save = defaultSave();
+    save.account.ownedSkins.push('neon_rose');
+    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+  });
+  await page.reload();
   await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
   await page.getByRole('tab', { name: 'Skins' }).click();
   await expect(page.locator('[data-skin-id]')).toHaveCount(4);
@@ -149,6 +158,7 @@ test('Dili skin gallery saves a cosmetic choice and uses it in ranged battle', a
   await expect(rose.getByRole('heading', { name: 'Night Operative' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Solar Vanguard' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Glitch Phantom' })).toBeVisible();
+  await expect(page.locator('[data-skin-id="solar_circuit"] button')).toHaveText('Unlock in Shop');
   await rose.getByRole('button', { name: 'Use this skin' }).click();
   await expect(rose.getByRole('button', { name: 'Selected' })).toBeDisabled();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -178,6 +188,8 @@ test('cosmetic skins retain matching equipped weapon poses in gallery and battle
       const { defaultSave, SAVE_KEY } = await import(path);
       const save = defaultSave();
       save.account.skinId = skinId as typeof save.account.skinId;
+      if (!save.account.ownedSkins.includes(skinId as typeof save.account.skinId))
+        save.account.ownedSkins.push(skinId as typeof save.account.skinId);
       save.account.inventory[weaponId] = 1;
       save.account.equipped.weapon = weaponId;
       localStorage.setItem(SAVE_KEY, JSON.stringify(save));
@@ -233,7 +245,7 @@ test('gear shop purchase appears in inventory, equips and survives reload on mob
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
-test('shop chests reveal gear and queue a starter skill through reload and settlement', async ({ page }) => {
+test('shop chests reveal persistent gear and character skins through reload', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto('/');
   await page.evaluate(async () => {
@@ -247,7 +259,7 @@ test('shop chests reveal gear and queue a starter skill through reload and settl
   await page.reload();
   await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
   await page.getByRole('tab', { name: 'Shop' }).click();
-  for (const kind of ['gear', 'skill']) {
+  for (const kind of ['gear', 'skin']) {
     const art = page.locator(`[data-chest-kind="${kind}"] img`);
     await art.scrollIntoViewIfNeeded();
     await expect.poll(() => art.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
@@ -263,42 +275,34 @@ test('shop chests reveal gear and queue a starter skill through reload and settl
   await page.getByRole('button', { name: 'View in inventory' }).click();
   await expect(page.locator(`[data-inventory-id="${gearId}"]`)).toBeVisible();
   await page.getByRole('tab', { name: 'Shop' }).click();
-  await page.locator('[data-chest-kind="skill"]').getByRole('button', { name: /Open.*200 Bits/ }).click();
-  await expect(page.locator('[data-chest-reward-art="skill"] [data-skill-icon]')).toBeVisible();
-  const skillId = await page.evaluate(async () => {
+  await page.locator('[data-chest-kind="skin"]').getByRole('button', { name: /Open.*200 Bits/ }).click();
+  await expect(page.getByText('SKIN UNLOCKED · PERMANENT')).toBeVisible();
+  await expect(page.locator('[data-chest-reward-art="skin"] .skin-reward-art')).toBeVisible();
+  const skinId = await page.evaluate(async () => {
     const path = performance.getEntriesByType('resource').map((entry) => entry.name)
       .find((url) => url.includes('/src/stores/gameStore.ts'))!;
     return (await import(path)).useGame.getState().chestReward.id;
   });
-  await expect(page.locator('[data-chest-kind="skill"] button')).toBeDisabled();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.reload();
-  await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
-  await expect(page.getByText('Next run starts with', { exact: false })).toBeVisible();
-  await page.getByRole('button', { name: 'Enter the Feed' }).click();
-  const runSkill = await page.evaluate(async () => {
-    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
-      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
-    const { useGame } = await import(path);
-    return { skills: useGame.getState().run.skills, queued: useGame.getState().save.account.queuedSkill };
-  });
-  expect(runSkill.skills[skillId]).toBe(1);
-  expect(runSkill.queued).toBe(skillId);
-  await page.evaluate(async () => {
-    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
-      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
-    const { useGame } = await import(path);
-    const state = useGame.getState();
-    state.run.enterNode();
-    state.run.engine.outcome = 'defeat';
-    state.run.engine.hero.hp = 0;
-    state.finish();
-  });
   expect(await page.evaluate(async () => {
     const path = performance.getEntriesByType('resource').map((entry) => entry.name)
       .find((url) => url.includes('/src/stores/gameStore.ts'))!;
-    return (await import(path)).useGame.getState().save.account.queuedSkill;
-  })).toBe('');
+    const account = (await import(path)).useGame.getState().save.account;
+    return account.ownedSkins.includes(account.skinId) && account.skinId;
+  })).toBe(skinId);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'View skins' }).click();
+  await expect(page.locator(`[data-skin-id="${skinId}"]`)).toHaveAttribute('data-owned', 'true');
+  await expect(page.locator(`[data-skin-id="${skinId}"] button`)).toBeDisabled();
+  await page.reload();
+  await page.getByRole('navigation').getByRole('button', { name: 'Loadout' }).click();
+  await page.getByRole('tab', { name: 'Skins' }).click();
+  await expect(page.locator(`[data-skin-id="${skinId}"]`)).toHaveAttribute('data-owned', 'true');
+  expect(await page.evaluate(async (expectedSkinId) => {
+    const path = performance.getEntriesByType('resource').map((entry) => entry.name)
+      .find((url) => url.includes('/src/stores/gameStore.ts'))!;
+    const account = (await import(path)).useGame.getState().save.account;
+    return account.skinId === expectedSkinId && account.ownedSkins.includes(expectedSkinId);
+  }, skinId)).toBe(true);
 });
 
 test('Signal Bazaar spends run Bits for a Rare-or-better skill choice', async ({ page }) => {

@@ -25,7 +25,7 @@ for (const file of [
   'skill-rage.webp',
   'skill-heal.webp',
   'chest-gear.webp',
-  'chest-skill.webp',
+  'chest-skin.webp',
   'spam-bot.svg',
   'spam-bot.webp',
   'scam-link.webp',
@@ -113,7 +113,7 @@ for (const weapon of ['overdrive', 'viral', 'dliclip']) {
     }
   }
 }
-for (const file of ['chest-gear.webp', 'chest-skill.webp']) {
+for (const file of ['chest-gear.webp', 'chest-skin.webp']) {
   const bytes = statSync(`public/assets/${file}`).size;
   if (bytes > 100_000) throw new Error(`Compressed chest art too large: ${file} (${bytes} > 100000)`);
 }

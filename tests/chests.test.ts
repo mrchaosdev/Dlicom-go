@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { EQUIPMENT } from '../src/content/equipment';
-import { SKILL_BY_ID } from '../src/content/skills';
-import { canOpenChest, GEAR_CHEST_COST, openChest, SKILL_CHEST_COST } from '../src/game/meta/chests';
-import { RunSession } from '../src/game/run/RunSession';
+import { SKIN_BY_ID, SKINS } from '../src/content/skins';
+import { canOpenChest, GEAR_CHEST_COST, openChest, SKIN_CHEST_COST } from '../src/game/meta/chests';
 import { defaultSave, loadSave, migrateSave, SAVE_KEY } from '../src/services/save';
 
 describe('shop chests', () => {
@@ -24,27 +23,34 @@ describe('shop chests', () => {
   it('does not sell empty or unaffordable chests', () => {
     const save = defaultSave();
     expect(canOpenChest(save, 'gear')).toBe(false);
-    expect(canOpenChest(save, 'skill')).toBe(false);
+    expect(canOpenChest(save, 'skin')).toBe(false);
     expect(openChest(save, 'gear', 'seed')).toEqual({ save });
     save.account.bits = 10000;
     for (const item of EQUIPMENT) save.account.inventory[item.id] = 1;
     expect(canOpenChest(save, 'gear')).toBe(false);
     expect(openChest(save, 'gear', 'seed')).toEqual({ save });
   });
-  it('queues an unlocked starter skill for the next run, with one active chest at a time', () => {
+  it('unlocks and equips an unowned skin deterministically without duplicates', () => {
     const save = defaultSave();
     save.account.bits = 500;
-    const result = openChest(save, 'skill', 'skill-seed');
-    expect(result.reward?.kind).toBe('skill');
+    const result = openChest(save, 'skin', 'skin-seed');
+    expect(result.reward?.kind).toBe('skin');
     const id = result.reward!.id;
-    expect(SKILL_BY_ID[id].unlockLevel).toBe(1);
-    expect(SKILL_BY_ID[id].prerequisites).toEqual([]);
-    expect(result.save.account.bits).toBe(500 - SKILL_CHEST_COST);
-    expect(result.save.account.queuedSkill).toBe(id);
-    expect(openChest(result.save, 'skill', 'another-seed')).toEqual({ save: result.save });
-    expect(new RunSession('start-with-chest', result.save).skills[id]).toBe(1);
-    expect(result.save.account.queuedSkill).toBe(id);
-    expect(migrateSave(result.save).account.queuedSkill).toBe(id);
+    expect(SKIN_BY_ID[id as keyof typeof SKIN_BY_ID]).toBeTruthy();
+    expect(save.account.ownedSkins).not.toContain(id);
+    expect(result.save.account.bits).toBe(500 - SKIN_CHEST_COST);
+    expect(result.save.account.ownedSkins).toContain(id);
+    expect(result.save.account.skinId).toBe(id);
+    const second = openChest(result.save, 'skin', 'skin-seed');
+    expect(second.reward?.id).not.toBe(id);
+    expect(new Set(second.save.account.ownedSkins).size).toBe(second.save.account.ownedSkins.length);
+  });
+  it('closes the skin chest when every costume is owned', () => {
+    const save = defaultSave();
+    save.account.bits = 1000;
+    save.account.ownedSkins = SKINS.map((skin) => skin.id);
+    expect(canOpenChest(save, 'skin')).toBe(false);
+    expect(openChest(save, 'skin', 'skin-seed')).toEqual({ save });
   });
   it('rejects a corrupt queued-skill ID during save validation', () => {
     const save = defaultSave();

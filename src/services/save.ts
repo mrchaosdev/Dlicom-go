@@ -7,7 +7,7 @@ export const SAVE_KEY = 'dlicom_attack_v1';
 const equipmentId = z.string().refine((id) => !!GEAR[id], 'Unknown equipment ID');
 const schema = z
   .object({
-    version: z.literal(4),
+    version: z.literal(5),
     account: z.object({
       bits: z.number().int().min(0).max(1e9),
       xp: z.number().int().min(0).max(1e9),
@@ -24,6 +24,7 @@ const schema = z
       dailyClaimedOn: z.string().regex(/^(?:|\d{4}-\d{2}-\d{2})$/),
       queuedSkill: z.string().refine((id) => !id || !!SKILL_BY_ID[id], 'Unknown skill ID'),
       skinId: z.enum(SKIN_IDS),
+      ownedSkins: z.array(z.enum(SKIN_IDS)).min(1).max(SKIN_IDS.length),
     }),
     settings: z.object({
       music: z.number().min(0).max(1),
@@ -40,11 +41,29 @@ const schema = z
           path: ['account', 'equipped', slot],
           message: 'Equipment must be owned and match its slot',
         });
+    if (!save.account.ownedSkins.includes(save.account.skinId))
+      ctx.addIssue({
+        code: 'custom',
+        path: ['account', 'skinId'],
+        message: 'Selected skin must be owned',
+      });
+    if (!save.account.ownedSkins.includes('signal_blue'))
+      ctx.addIssue({
+        code: 'custom',
+        path: ['account', 'ownedSkins'],
+        message: 'Signal Blue must remain owned',
+      });
+    if (new Set(save.account.ownedSkins).size !== save.account.ownedSkins.length)
+      ctx.addIssue({
+        code: 'custom',
+        path: ['account', 'ownedSkins'],
+        message: 'Owned skins must be unique',
+      });
   });
 export type SaveFile = z.infer<typeof schema>;
 export function defaultSave(now = Date.now()): SaveFile {
   return {
-    version: 4,
+    version: 5,
     account: {
       bits: 0,
       xp: 0,
@@ -65,17 +84,22 @@ export function defaultSave(now = Date.now()): SaveFile {
       dailyClaimedOn: '',
       queuedSkill: '',
       skinId: 'signal_blue',
+      ownedSkins: ['signal_blue'],
     },
     settings: { music: 0.25, sfx: 0.5, reducedMotion: false, speed: 1 },
   };
 }
 export function migrateSave(raw: unknown, now = Date.now()): SaveFile {
-  if (raw && typeof raw === 'object' && 'version' in raw && (raw.version === 1 || raw.version === 2 || raw.version === 3)
+  if (raw && typeof raw === 'object' && 'version' in raw && (raw.version === 1 || raw.version === 2 || raw.version === 3 || raw.version === 4)
     && 'account' in raw && raw.account && typeof raw.account === 'object') {
     const previous = raw as Record<string, unknown> & { account: Record<string, unknown> };
+    const selectedSkin = typeof previous.account.skinId === 'string'
+      && SKIN_IDS.includes(previous.account.skinId as typeof SKIN_IDS[number])
+      ? previous.account.skinId as typeof SKIN_IDS[number]
+      : 'signal_blue';
     return schema.parse({
       ...previous,
-      version: 4,
+      version: 5,
       account: {
         ...previous.account,
         ...(raw.version === 1 ? {
@@ -84,8 +108,11 @@ export function migrateSave(raw: unknown, now = Date.now()): SaveFile {
           activeRunEnergy: 0,
           dailyClaimedOn: '',
         } : {}),
-        queuedSkill: raw.version === 3 ? previous.account.queuedSkill : '',
-        skinId: 'signal_blue',
+        queuedSkill: raw.version === 3 || raw.version === 4 ? previous.account.queuedSkill : '',
+        skinId: raw.version === 4 ? selectedSkin : 'signal_blue',
+        ownedSkins: raw.version === 4
+          ? [...new Set(['signal_blue', selectedSkin])]
+          : ['signal_blue'],
       },
     });
   }

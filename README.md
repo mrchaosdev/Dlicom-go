@@ -4,7 +4,7 @@ Build an overpowered Dili, chain Dlicom-themed skills, and fight through a corru
 
 **Play now:** https://dlicom-attack.vercel.app
 
-**Version 0.2.3 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
+**Version 0.2.4 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
 
 ![Dlicom Attack home](artifacts/home-desktop.webp)
 
@@ -27,7 +27,7 @@ Open the URL printed by Vite. Choose an unlocked chapter and watch Dili fight au
 - Pause and ×1/×2 during battle.
 - Tap a skill/status to inspect it.
 - Music, SFX, reduced motion and default speed in Settings.
-- Equipment, Bits, Energy, daily claims, account unlocks, records and settings save locally. Loadout, Inventory and Shop let players buy specific gear, open gear or skill chests with earned Bits, equip items, and upgrade owned gear. A skill chest queues a Rank 1 starter skill for the next run. An active run is in memory; refreshing ends it and refunds its Energy while preserving a queued chest skill. A malformed save is backed up where storage permits and defaults recover safely.
+- Equipment, Bits, Energy, daily claims, account unlocks, skin ownership, records and settings save locally. Loadout, Inventory and Shop let players buy specific gear, open gear or skin chests with earned Bits, equip items, and upgrade owned gear. A Skin Chest permanently unlocks and equips one unowned Dili costume with no duplicate drops. An active run is in memory; refreshing ends it and refunds its Energy. A malformed save is backed up where storage permits and defaults recover safely.
 
 ## Included in v0.2
 

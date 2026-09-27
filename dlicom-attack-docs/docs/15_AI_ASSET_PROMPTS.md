@@ -179,3 +179,11 @@ Item subjects and palettes:
 - **Trust Module:** rare diamond-shaped navy processor with two interlocking gold energy links.
 
 Export each selected transparent master at 512 × 512 WebP, quality 82 and alpha quality 92. Keep source PNG files outside `public`; runtime files belong in `public/assets/equipment/`.
+
+---
+
+# 17. Skin Chest
+
+> Premium futuristic wardrobe chest for Dlicom Attack, dark navy metal with gold structural trim, opened slightly with a small round Dili-style helmet silhouette and cyan, magenta, gold, and jade costume materials spilling out. Polished 2D game inventory art, chunky hand-painted shapes, subtle cel shading, crisp edges, celebratory multicolor neon rim light. Exactly one chest centered in a front three-quarter view with generous transparent margin. Genuinely transparent background. No full character, hands, environment, pedestal, frame, text, letters, numbers, logo, or watermark. Readable at 160 pixels.
+
+Export only the 512 × 512 runtime asset to `public/assets/chest-skin.webp` at WebP quality 82 and alpha quality 92. Do not copy the heavier PNG master into the repository.

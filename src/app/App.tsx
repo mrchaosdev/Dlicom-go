@@ -38,7 +38,7 @@ import { ASSETS, EQUIPMENT_ART, SKILL_ART, diliWeaponPoses } from '../content/as
 import { SKINS, SKIN_BY_ID } from '../content/skins';
 import { EQUIPMENT, GEAR, UPGRADE_COSTS, gearPrice, loadoutStats, type Slot } from '../content/equipment';
 import { RUN_SHOP_COST } from '../game/run/RunSession';
-import { canOpenChest, GEAR_CHEST_COST, SKILL_CHEST_COST } from '../game/meta/chests';
+import { canOpenChest, GEAR_CHEST_COST, SKIN_CHEST_COST } from '../game/meta/chests';
 import { SKILLS, SKILL_BY_ID } from '../content/skills';
 import { NODES, generateEncounter } from '../content/encounters';
 import { CHAPTERS } from '../content/chapters';
@@ -363,7 +363,7 @@ function GuideScreen() {
     { number: '02', icon: ArrowRight, title: 'Choose a route', text: 'Pick a lane at each route map. Battles build your run; events, rest stops and elites offer different risks and rewards.' },
     { number: '03', icon: Swords, title: 'Watch Dili fight automatically', text: 'Attacks, skills and enemy turns resolve on their own. Pause or switch between ×1 and ×2 speed whenever you need.' },
     { number: '04', icon: Sparkles, title: 'Build a skill synergy', text: 'After a battle, choose 1 of 3 skills. Read each effect and tags, then combine skills that reinforce the same strategy. Tap a skill or status to inspect it.' },
-    { number: '05', icon: Crown, title: 'Reach the boss and improve', text: 'Clear 12 nodes to face the chapter boss. Spend earned Bits on gear, upgrades or chests in Shop. A skill chest gives your next run one starting skill.' },
+    { number: '05', icon: Crown, title: 'Reach the boss and improve', text: 'Clear 12 nodes to face the chapter boss. Spend earned Bits on gear, upgrades or chests in Shop. Skin chests permanently unlock new Dili costumes.' },
   ];
   return (
     <div className="guide-page">
@@ -401,8 +401,8 @@ function EquipmentScreen() {
         title={tab === 'loadout' ? 'Your loadout' : tab === 'inventory' ? 'Your inventory' : tab === 'shop' ? 'Network shop' : 'Dili skins'}
         text={tab === 'loadout' ? 'Three slots. A different way to break the network.'
           : tab === 'inventory' ? 'Every item you own, grouped by slot. Upgrade or equip for your next run.'
-            : tab === 'shop' ? 'Spend earned Bits on a known item or open a gear or skill chest.'
-              : 'Choose Dili\'s costume. Every outfit has unique armor, weapons and effects across all combat poses.'}
+            : tab === 'shop' ? 'Spend earned Bits on a known item or open a gear or skin chest.'
+              : 'Choose an unlocked Dili costume. Find the remaining outfits in Skin Chests.'}
       />
       <div className="gear-tabs" role="tablist" aria-label="Equipment views">
         {([['loadout', 'Loadout'], ['inventory', 'Inventory'], ['shop', 'Shop'], ['skins', 'Skins']] as const).map(([id, label]) => (
@@ -412,7 +412,7 @@ function EquipmentScreen() {
       {save.account.queuedSkill && (
         <p className="queued-skill-note">
           <SkillIcon skillId={save.account.queuedSkill} tag={SKILL_BY_ID[save.account.queuedSkill].tags[0]} />
-          <span>{run && !run.result ? 'Current run started with ' : 'Next run starts with '}<strong>{SKILL_BY_ID[save.account.queuedSkill].name}</strong> from your skill chest.</span>
+          <span>{run && !run.result ? 'Current run started with ' : 'Next run starts with '}<strong>{SKILL_BY_ID[save.account.queuedSkill].name}</strong> from a legacy Skill Chest reward.</span>
         </p>
       )}
       {tab === 'loadout' ? (
@@ -484,7 +484,7 @@ function EquipmentScreen() {
           </p>
         </div>
       </div>
-      ) : tab === 'inventory' ? <InventoryPanel /> : tab === 'shop' ? <GearShopPanel onPurchased={() => setTab('inventory')} /> : <SkinPanel />}
+      ) : tab === 'inventory' ? <InventoryPanel /> : tab === 'shop' ? <GearShopPanel onViewInventory={() => setTab('inventory')} onViewSkins={() => setTab('skins')} /> : <SkinPanel />}
     </>
   );
 }
@@ -527,11 +527,12 @@ function SkinPanel() {
       <div className="skin-grid">
         {SKINS.map((skin) => {
           const selected = save.account.skinId === skin.id;
+          const owned = save.account.ownedSkins.includes(skin.id);
           return (
-            <article className="panel skin-card" key={skin.id} data-skin-id={skin.id} data-selected={selected} style={{ '--skin-color': skin.accent } as CSSProperties}>
+            <article className="panel skin-card" key={skin.id} data-skin-id={skin.id} data-selected={selected} data-owned={owned} style={{ '--skin-color': skin.accent } as CSSProperties}>
               <div className="skin-card-art"><img src={diliWeaponPoses(skin.id, weaponId).idle} alt={`Dili wearing ${skin.name} and holding ${weapon.name}`} loading="lazy" /></div>
-              <div><span className="eyebrow">DILI COSTUME · {weapon.name.toUpperCase()}</span><h2>{skin.name}</h2><p>{skin.description}</p></div>
-              <Button disabled={selected} onClick={() => selectSkin(skin.id)}>{selected ? 'Selected' : 'Use this skin'}</Button>
+              <div><span className="eyebrow">{owned ? 'UNLOCKED' : 'LOCKED · SKIN CHEST'} · {weapon.name.toUpperCase()}</span><h2>{skin.name}</h2><p>{skin.description}</p></div>
+              <Button disabled={!owned || selected} onClick={() => selectSkin(skin.id)}>{selected ? 'Selected' : owned ? 'Use this skin' : 'Unlock in Shop'}</Button>
             </article>
           );
         })}
@@ -539,30 +540,32 @@ function SkinPanel() {
     </section>
   );
 }
-function GearShopPanel({ onPurchased }: { onPurchased: () => void }) {
-  const { save, buyGear, openChest, chestReward, clearChestReward, run } = useGame();
+function GearShopPanel({ onViewInventory, onViewSkins }: { onViewInventory: () => void; onViewSkins: () => void }) {
+  const { save, buyGear, openChest, chestReward, clearChestReward } = useGame();
   const available = EQUIPMENT.filter((item) => !save.account.inventory[item.id]);
+  const availableSkins = SKINS.filter((skin) => !save.account.ownedSkins.includes(skin.id));
   const rewardItem = chestReward?.kind === 'gear' ? GEAR[chestReward.id] : undefined;
-  const rewardSkill = chestReward?.kind === 'skill' ? SKILL_BY_ID[chestReward.id] : undefined;
+  const rewardSkin = chestReward?.kind === 'skin' ? SKINS.find((skin) => skin.id === chestReward.id) : undefined;
   return (
     <div className="collection-layout">
       <p className="shop-note">Earn Bits from every run, including defeats. Buy a known item below or open a chest for a surprise.</p>
       {chestReward && (
-        <div className={`panel chest-reveal ${rewardItem?.rarity ?? rewardSkill?.rarity ?? 'common'}`} role="status" aria-live="polite" key={`${chestReward.kind}:${chestReward.id}`}>
+        <div className={`panel chest-reveal ${rewardItem?.rarity ?? 'epic'}`} role="status" aria-live="polite" key={`${chestReward.kind}:${chestReward.id}`}>
           <div className="chest-reveal-visuals">
-            <div className="chest-reveal-burst"><img src={chestReward.kind === 'gear' ? ASSETS.chest_gear : ASSETS.chest_skill} alt="" /></div>
+            <div className="chest-reveal-burst"><img src={chestReward.kind === 'gear' ? ASSETS.chest_gear : ASSETS.chest_skin} alt="" /></div>
             <ArrowRight size={18} aria-hidden="true" />
             <div className="chest-reveal-reward" data-chest-reward-art={chestReward.kind}>
-              {rewardSkill ? <SkillIcon skillId={rewardSkill.id} tag={rewardSkill.tags[0]} /> : rewardItem ? <EquipmentArt itemId={rewardItem.id} className="reward-art" /> : null}
+              {rewardItem ? <EquipmentArt itemId={rewardItem.id} className="reward-art" /> : rewardSkin ? <img className="skin-reward-art" src={diliWeaponPoses(rewardSkin.id, save.account.equipped.weapon).idle} alt="" /> : null}
             </div>
           </div>
           <div>
-            <span className="eyebrow">CHEST OPENED · {(rewardItem?.rarity ?? rewardSkill?.rarity ?? 'common').toUpperCase()}</span>
-            <h2>{rewardItem?.name ?? rewardSkill?.name}</h2>
-            <p>{rewardItem ? `${rewardItem.description} · Added to your inventory.` : `${rewardSkill?.description} · Ready at the start of your next run.`}</p>
+            <span className="eyebrow">{rewardSkin ? 'SKIN UNLOCKED · PERMANENT' : `CHEST OPENED · ${(rewardItem?.rarity ?? 'common').toUpperCase()}`}</span>
+            <h2>{rewardItem?.name ?? rewardSkin?.name}</h2>
+            <p>{rewardItem ? `${rewardItem.description} · Added to your inventory.` : `${rewardSkin?.description} · Unlocked and equipped for your next run.`}</p>
           </div>
           <div className="chest-reveal-actions">
-            {rewardItem && <Button onClick={() => { clearChestReward(); onPurchased(); }}>View in inventory</Button>}
+            {rewardItem && <Button onClick={() => { clearChestReward(); onViewInventory(); }}>View in inventory</Button>}
+            {rewardSkin && <Button onClick={() => { clearChestReward(); onViewSkins(); }}>View skins</Button>}
             <Button onClick={clearChestReward}>Close</Button>
           </div>
         </div>
@@ -577,12 +580,12 @@ function GearShopPanel({ onPurchased }: { onPurchased: () => void }) {
             <Button disabled={!canOpenChest(save, 'gear')} onClick={() => openChest('gear')}><Gift size={16} /> Open · {GEAR_CHEST_COST} Bits</Button>
             {!available.length && <small>Collection complete.</small>}
           </article>
-          <article className="panel chest-card" data-chest-kind="skill">
-            <div className="chest-art skill"><img src={ASSETS.chest_skill} alt="Skill chest" loading="lazy" /></div>
-            <div><span className="eyebrow">NEXT-RUN BOOST</span><h3>Skill chest</h3><p>Reveal one random skill unlocked for your account. Start your next run with it at Rank 1.</p></div>
-            <p className="chest-odds">One skill may be queued. It is spent only when that run ends.</p>
-            <Button disabled={!canOpenChest(save, 'skill') || !!(run && !run.result)} onClick={() => openChest('skill')}><Sparkles size={16} /> Open · {SKILL_CHEST_COST} Bits</Button>
-            {save.account.queuedSkill && <small>{SKILL_BY_ID[save.account.queuedSkill].name} is already queued.</small>}
+          <article className="panel chest-card" data-chest-kind="skin">
+            <div className="chest-art skin"><img src={ASSETS.chest_skin} alt="Skin chest" loading="lazy" /></div>
+            <div><span className="eyebrow">PERMANENT COSMETIC</span><h3>Skin chest</h3><p>Unlock one random Dili costume you do not own yet. Every skin includes matching poses for every weapon.</p></div>
+            <p className="chest-odds">No duplicates. The revealed skin is equipped for your next run.</p>
+            <Button disabled={!canOpenChest(save, 'skin')} onClick={() => openChest('skin')}><Sparkles size={16} /> Open · {SKIN_CHEST_COST} Bits</Button>
+            {!availableSkins.length && <small>Skin collection complete.</small>}
           </article>
         </div>
       </section>
@@ -599,7 +602,7 @@ function GearShopPanel({ onPurchased }: { onPurchased: () => void }) {
                   <article className="panel collection-card" key={item.id} data-shop-id={item.id} data-rarity={item.rarity ?? 'common'}>
                     <EquipmentArt itemId={item.id} className="collection-art" />
                     <div className="collection-copy"><span className={`chip ${item.rarity ?? 'common'}`}>{slot.toUpperCase()} · {(item.rarity ?? 'common').toUpperCase()}</span><h3>{item.name}</h3><p>{item.description}</p></div>
-                    <div className="collection-actions"><Button disabled={save.account.bits < price} onClick={() => { buyGear(item.id); onPurchased(); }}><Hexagon size={14} /> Buy & equip · {price} Bits</Button></div>
+                    <div className="collection-actions"><Button disabled={save.account.bits < price} onClick={() => { buyGear(item.id); onViewInventory(); }}><Hexagon size={14} /> Buy & equip · {price} Bits</Button></div>
                   </article>
                 );
               })}
@@ -1326,7 +1329,7 @@ export default function App() {
       </main>
       <footer>
         <span>
-          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.2.3
+          <span className="live-dot" /> SYSTEM ONLINE <i>·</i> v0.2.4
         </span>
         <span>
           {inRun

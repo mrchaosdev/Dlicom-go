@@ -152,7 +152,6 @@ export const useGame = create<GameStore>((set, get) => {
       set({ chestReward: undefined });
     },
     openChest: (kind) => {
-      if (kind === 'skill' && get().run && !get().run?.result) return;
       const result = openChest(get().save, kind, crypto.randomUUID());
       if (!result.reward) return;
       save(result.save);
@@ -160,7 +159,7 @@ export const useGame = create<GameStore>((set, get) => {
     },
     clearChestReward: () => set({ chestReward: undefined }),
     selectSkin: (id) => {
-      if (!SKIN_BY_ID[id] || get().save.account.skinId === id) return;
+      if (!SKIN_BY_ID[id] || !get().save.account.ownedSkins.includes(id) || get().save.account.skinId === id) return;
       const current = get().save;
       save({ ...current, account: { ...current.account, skinId: id } });
     },
