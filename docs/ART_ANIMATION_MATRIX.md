@@ -8,10 +8,10 @@ The visual anchor is the supplied Dili mascot: rounded helmet and speech-bubble 
 
 | Asset class | Runtime size | On-screen role |
 | --- | --- | --- |
-| Dili poses | Transparent PNGs and 512 px wide WebP weapon variants | 230 logical px wide on the 760 x 510 battle canvas |
-| Normal enemies | Transparent 512 x 512 PNGs | 155 logical px wide, including elites |
-| Bosses | Transparent 768 x 768 PNGs | 245 logical px wide, larger than Dili |
-| Skill archetype icons | Transparent 256 x 256 PNGs | Draft cards, owned-skill list and selected battle effects |
+| Dili poses | Transparent WebPs, including 512 px wide weapon variants | 230 logical px wide on the 760 x 510 battle canvas |
+| Normal enemies | Transparent 512 x 512 WebPs | 155 logical px wide, including elites |
+| Bosses | Transparent 768 x 768 WebPs | 245 logical px wide, larger than Dili |
+| Skill archetype icons | Transparent WebPs | Draft cards, owned-skill list and selected battle effects |
 | Battle backgrounds | Four 1024 x 680 WebPs with original PNG masters outside `public` and procedural fallback | One environment per chapter, clear center floor behind fighters, two subtle moving parallax grids |
 
 The battle canvas scales as one unit for desktop and mobile. At a 390 px phone width, the normal enemy silhouette is about 70 px wide and a boss about 110 px. Art is loaded per chapter through the central asset manifest rather than hardcoded URLs. Source and attribution are recorded in [asset credits](ASSET_CREDITS.md).
@@ -22,17 +22,17 @@ Active run screens occupy one viewport on the documented phone sizes and desktop
 
 | Required state | Runtime asset | Presentation | Status |
 | --- | --- | --- | --- |
-| Idle | `dili-idle.png` | Subtle breathing tween | Implemented |
-| Attack | `dili-attack.png` | Short lunge and packet projectile; pose returns to Idle on the presentation clock | Implemented |
+| Idle | `dili-idle.webp` | Subtle breathing tween | Implemented |
+| Attack | `dili-attack.webp` | Short lunge and packet projectile; pose returns to Idle on the presentation clock | Implemented |
 | Crit | Attack pose | 70 ms yellow anticipation ring, warm impact flash, larger damage number and short camera shake | Implemented with shared pose |
-| Hurt | `dili-hurt.png` | Brief red tint and hit reaction; returns to Idle | Implemented |
+| Hurt | `dili-hurt.webp` | Brief red tint and hit reaction; returns to Idle | Implemented |
 | Dodge | Idle pose | Sidestep and ghost fade | Implemented with shared pose |
-| Ultimate | `dili-ultimate.png` | 700 ms network wave and camera feedback; returns to Idle | Implemented |
+| Ultimate | `dili-ultimate.webp` | 700 ms network wave and camera feedback; returns to Idle | Implemented |
 | Low HP | Idle pose | Pulsing aura below 25% HP | Implemented with shared pose |
 | Victory | Idle pose | Mint tint and short bounce after the final combat event | Implemented with shared pose |
 | Defeat | Hurt pose | Collapse and fade; the 150-turn stalemate also gets a defeat pose | Implemented with shared pose |
 
-Pose changes use the same pause and speed clock as the combat presentation queue. Reduced-motion mode suppresses positional tweens and camera shake while leaving readable pose and color changes. The three new pose PNGs are transparent 512 × 512 assets; Idle remains the existing supplied-reference-based runtime sprite. They are separate poses, not a frame animation sheet.
+Pose changes use the same pause and speed clock as the combat presentation queue. Reduced-motion mode suppresses positional tweens and camera shake while leaving readable pose and color changes. The pose WebPs are transparent 512 × 512 runtime assets; Idle remains the existing supplied-reference-based runtime sprite. They are separate poses, not a frame animation sheet.
 
 Idle has a different source resolution from the other poses. Breathing now animates a relative factor and recalculates the base scale on each texture change, so Attack, Hurt and Ultimate keep their intended on-screen size. This was checked against mobile battle captures.
 
@@ -80,7 +80,7 @@ Normal Rage gain has no floating text because it happens repeatedly; the HUD bar
 
 All ten normal enemy kinds and four bosses now have distinct original transparent sprites. Raid Master's summoned Raid Minions share Raid Bot art. Existing enemies have idle breathing, attack lunge, colored hurt flash with short knockback, and defeat collapse; character-specific attack and hurt poses remain open. Elite tint returns after a hit. Reduced-motion mode keeps the flash without the knockback. Summoned minions stay hidden until their combat cue, enter with a colored pulse, and occupy separate positions around the boss instead of covering it. Defeated sprites and their idle tweens are released after the fade. The battle scene loads only the enemy art needed for its chapter, plus Spam Bot for Spam King's summons and Raid Bot for elites.
 
-Runtime audio uses 23 generated mono MP3s at 96 kbps. Reproducible WAV masters live outside `public`; content validation enforces a 120 KB audio and 200 KB background maximum and rejects source WAVs or original background PNGs inside the runtime asset folder.
+Runtime audio uses 24 generated mono MP3s at 96 kbps. Reproducible WAV masters live outside `public`; content validation enforces a 120 KB audio and 200 KB background maximum and rejects source WAVs or original background PNGs inside the runtime asset folder.
 
 Bosses enter with a short sprite reveal and chapter-colored name banner before the first attack. Major moves show a warning icon above the boss during the existing 600 ms telegraph. Both cues use Phaser presentation objects and respect reduced motion, pause and battle speed; neither changes combat timing or results.
 
