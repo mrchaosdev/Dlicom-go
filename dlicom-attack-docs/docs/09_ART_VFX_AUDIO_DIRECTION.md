@@ -86,7 +86,7 @@ For each enemy:
 - defeat
 
 Can be:
-single PNG + transform animations.
+single transparent WebP state sprite + transform animations.
 
 ---
 

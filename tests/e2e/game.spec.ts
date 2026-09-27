@@ -488,16 +488,16 @@ test('unlocked chapters load their own backdrop, boss art and soundtrack', async
   });
   await page.reload();
   for (const chapter of [
-    ['The Feed', 'spam-king.png', 'feed-loop.mp3', ['spam-bot.png', 'scam-link.png', 'bug.png'], 'background-feed-city.webp'],
-    ['DliClips', 'loop-phantom.png', 'dliclips-loop.mp3', ['fake-account.png', 'data-leech.png', 'corrupted-clip.png'], 'background-dliclip-stream.webp'],
-    ['Dili Rooms', 'raid-master.png', 'rooms-loop.mp3', ['toxic-reply.png', 'popup.png', 'raid-bot.png'], 'background-dili-rooms.webp'],
-    ['Core Network', 'null-exe.png', 'core-loop.mp3', ['null-fragment.png', 'data-leech.png', 'corrupted-clip.png'], 'background-core-network.webp'],
+    ['The Feed', 'spam-king.webp', 'feed-loop.mp3', ['spam-bot.webp', 'scam-link.webp', 'bug.webp'], 'background-feed-city.webp'],
+    ['DliClips', 'loop-phantom.webp', 'dliclips-loop.mp3', ['fake-account.webp', 'data-leech.webp', 'corrupted-clip.webp'], 'background-dliclip-stream.webp'],
+    ['Dili Rooms', 'raid-master.webp', 'rooms-loop.mp3', ['toxic-reply.webp', 'popup.webp', 'raid-bot.webp'], 'background-dili-rooms.webp'],
+    ['Core Network', 'null-exe.webp', 'core-loop.mp3', ['null-fragment.webp', 'data-leech.webp', 'corrupted-clip.webp'], 'background-core-network.webp'],
   ] as const) {
     await page.getByRole('button', { name: new RegExp(chapter[0]) }).click();
     await page.getByRole('button', { name: /Data lane/ }).click();
     await expect(page.locator('.battle-canvas')).toHaveAttribute(
       'aria-label',
-      `Dili automatically battles in ${chapter[0]}`,
+      new RegExp(`^Dili automatically battles in ${chapter[0]} with `),
     );
     await expect(page.locator('.battle-canvas canvas').first()).toBeVisible();
     await expect.poll(() => page.evaluate((asset) =>

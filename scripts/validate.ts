@@ -8,43 +8,43 @@ for (const file of [
   'background-dliclip-stream.webp',
   'background-dili-rooms.webp',
   'background-core-network.webp',
-  'dili-idle.png',
-  'dili-attack.png',
+  'dili-idle.webp',
+  'dili-attack.webp',
   'dili-sword-idle.webp',
   'dili-sword-attack.webp',
   'dili-hammer-idle.webp',
   'dili-hammer-attack.webp',
-  'dili-hurt.png',
-  'dili-ultimate.png',
-  'skill-packet.png',
-  'skill-hammer.png',
-  'skill-firewall.png',
-  'skill-moderation.png',
-  'skill-encryption.png',
-  'skill-viral.png',
-  'skill-rage.png',
-  'skill-heal.png',
+  'dili-hurt.webp',
+  'dili-ultimate.webp',
+  'skill-packet.webp',
+  'skill-hammer.webp',
+  'skill-firewall.webp',
+  'skill-moderation.webp',
+  'skill-encryption.webp',
+  'skill-viral.webp',
+  'skill-rage.webp',
+  'skill-heal.webp',
   'chest-gear.webp',
   'chest-skill.webp',
   'spam-bot.svg',
-  'spam-bot.png',
-  'scam-link.png',
-  'bug.png',
-  'raid-bot.png',
-  'fake-account.png',
-  'data-leech.png',
-  'corrupted-clip.png',
-  'toxic-reply.png',
-  'popup.png',
-  'null-fragment.png',
+  'spam-bot.webp',
+  'scam-link.webp',
+  'bug.webp',
+  'raid-bot.webp',
+  'fake-account.webp',
+  'data-leech.webp',
+  'corrupted-clip.webp',
+  'toxic-reply.webp',
+  'popup.webp',
+  'null-fragment.webp',
   'spam-king.svg',
   'loop-phantom.svg',
   'raid-master.svg',
   'null-exe.svg',
-  'spam-king.png',
-  'loop-phantom.png',
-  'raid-master.png',
-  'null-exe.png',
+  'spam-king.webp',
+  'loop-phantom.webp',
+  'raid-master.webp',
+  'null-exe.webp',
   'dliclips-loop.mp3',
   'rooms-loop.mp3',
   'core-loop.mp3',
@@ -79,6 +79,17 @@ for (const file of [
 ]) {
   const bytes = statSync(`public/assets/${file}`).size;
   if (bytes > 200_000) throw new Error(`Compressed background too large: ${file} (${bytes} > 200000)`);
+}
+for (const file of [
+  'dili-idle.webp', 'dili-attack.webp', 'dili-hurt.webp', 'dili-ultimate.webp',
+  'skill-packet.webp', 'skill-hammer.webp', 'skill-firewall.webp', 'skill-moderation.webp',
+  'skill-encryption.webp', 'skill-viral.webp', 'skill-rage.webp', 'skill-heal.webp',
+  'spam-bot.webp', 'scam-link.webp', 'bug.webp', 'raid-bot.webp', 'fake-account.webp',
+  'data-leech.webp', 'corrupted-clip.webp', 'toxic-reply.webp', 'popup.webp',
+  'null-fragment.webp', 'spam-king.webp', 'loop-phantom.webp', 'raid-master.webp', 'null-exe.webp',
+]) {
+  const bytes = statSync(`public/assets/${file}`).size;
+  if (bytes > 200_000) throw new Error(`Compressed runtime art too large: ${file} (${bytes} > 200000)`);
 }
 for (const file of ['dili-sword-idle.webp', 'dili-sword-attack.webp', 'dili-hammer-idle.webp', 'dili-hammer-attack.webp']) {
   const bytes = statSync(`public/assets/${file}`).size;
@@ -117,7 +128,7 @@ for (const file of [
   if (bytes > 120_000) throw new Error(`Compressed audio too large: ${file} (${bytes} > 120000)`);
 }
 for (const file of readdirSync('public/assets'))
-  if (file.endsWith('.wav') || /^background-.*\.png$/i.test(file))
+  if (file.endsWith('.wav') || file.endsWith('.png'))
     throw new Error(`Source-only media must stay outside public/assets: ${file}`);
 console.log(
   `Validated ${SKILLS.length} skills, ${EQUIPMENT.length} equipment definitions and all runtime assets.`,

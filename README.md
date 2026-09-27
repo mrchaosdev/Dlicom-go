@@ -6,9 +6,9 @@ Build an overpowered Dili, chain Dlicom-themed skills, and fight through a corru
 
 **Version 0.2.0 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
 
-![Dlicom Attack home](artifacts/home-desktop.png)
+![Dlicom Attack home](artifacts/home-desktop.webp)
 
-Current release captures: [mobile home](artifacts/home-mobile.png), [mobile battle](artifacts/battle-mobile.png), [desktop skill draft](artifacts/skill-draft-desktop.png), and a [26s gameplay clip with the Feed soundtrack](artifacts/gameplay-clip.webm). With the Vite dev server running, `npm run capture:release` regenerates all media in `artifacts/` using a fixed demo seed. FFmpeg must be in `PATH` (or set `FFMPEG_PATH`) to mux the soundtrack; otherwise the generated clip stays silent.
+Current release captures: [mobile home](artifacts/home-mobile.webp), [mobile battle](artifacts/battle-mobile.webp), [desktop skill draft](artifacts/skill-draft-desktop.webp), and a [26s gameplay clip with the Feed soundtrack](artifacts/gameplay-clip.webm). With the Vite dev server running, `npm run capture:release` regenerates all media in `artifacts/` using a fixed demo seed. FFmpeg must be in `PATH` (or set `FFMPEG_PATH`) to mux the soundtrack; otherwise the generated clip stays silent.
 
 ## Play locally
 
