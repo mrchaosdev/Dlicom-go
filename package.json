@@ -15,7 +15,8 @@
     "simulate": "tsx scripts/simulate.ts",
     "capture:release": "tsx scripts/captureRelease.ts",
     "audit:equipment": "tsx scripts/auditEquipment.ts",
-    "simulate:balance": "tsx scripts/verifyBalance.ts"
+    "simulate:balance": "tsx scripts/verifyBalance.ts",
+    "smoke:production": "node scripts/production-smoke.mjs"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.3.0",
