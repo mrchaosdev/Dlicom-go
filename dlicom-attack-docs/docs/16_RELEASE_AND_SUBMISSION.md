@@ -67,7 +67,7 @@ Prepare:
 - known limitations
 - version number
 
-The current media set is checked in under `artifacts/`: desktop home, mobile home, mobile battle, desktop skill draft, and a 26-second gameplay WebM with the existing Feed soundtrack. Start Vite and run `npm run capture:release` to refresh it from the current UI with a fixed demo seed; FFmpeg must be available via `PATH` or `FFMPEG_PATH` to mux the soundtrack. Review the clip manually before submission; the deployed game URL is also pending.
+The current media set is checked in under `artifacts/`: desktop home, mobile home, mobile battle, desktop skill draft, and a 26-second gameplay WebM with the existing Feed soundtrack. Start Vite and run `npm run capture:release` to refresh it from the current UI with a fixed demo seed; FFmpeg must be available via `PATH` or `FFMPEG_PATH` to mux the soundtrack. Review the clip manually before submission. The production game is available at `https://dlicom-attack.vercel.app`.
 
 ---
 
@@ -115,7 +115,7 @@ PLAY DLICOM ATTACK.
 
 ## 8. Final release checklist
 
-- [ ] production build deployed
+- [x] production build deployed and smoke-tested at `https://dlicom-attack.vercel.app`
 - [x] no uncaught app exceptions or unexpected console errors in automated Chromium, Firefox and WebKit flows (Firefox logs a filtered `Navigated away from page` cancellation on explicit test reloads)
 - [x] save works (settings and upgraded equipment survive page reload)
 - [x] fresh isolated browser-context test (equivalent storage isolation; physical incognito check remains useful)

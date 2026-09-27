@@ -2,6 +2,8 @@
 
 Build an overpowered Dili, chain Dlicom-themed skills, and fight through a corrupted social network. A browser auto-battle roguelite built with React, TypeScript and Phaser 3.
 
+**Play now:** https://dlicom-attack.vercel.app
+
 **Version 0.2.0 — four playable chapters.** Clear each boss to unlock the next corrupted layer of the network.
 
 ![Dlicom Attack home](artifacts/home-desktop.png)
@@ -81,7 +83,7 @@ Import `mrchaosdev/Dlicom-go` into Vercel. Root directory: repository root. Buil
 
 - Character-specific pose polish remains conditional on physical-device readability checks. The [art and animation matrix](docs/ART_ANIMATION_MATRIX.md) tracks state coverage and remaining device QA.
 - Human balance/pacing pass: a deterministic 500-run stress bot with max-level gear won 38.8% of DliClips, 27.0% of Dili Rooms, and 36.0% of Core Network runs; it does not model human build choices. Core tuning now gets nearly every run to Null.exe, where the boss remains the main win gate. The overall 8–15 minute target has **not** been met or verified; human playtesting and a deliberate pacing pass remain necessary.
-- Human pacing, balance and readability playtests; physical Android/iOS device testing; Edge and long-session performance checks; deployed smoke test, trailer and final submission. The 10,000-run simulation's combat-only medians are 148–181 seconds; the 8–15 minute full-session target is not verified.
+- Human pacing, balance and readability playtests; physical Android/iOS device testing; Edge and long-session performance checks; trailer and final submission. The 10,000-run simulation's combat-only medians are 148–181 seconds; the 8–15 minute full-session target is not verified.
 - Share result copies the score, build and seed as text. A graphical share-card export is not implemented.
 
 ## Specification and provenance

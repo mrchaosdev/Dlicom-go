@@ -10,6 +10,6 @@ Fight through four chapters and defeat Spam King, Loop Phantom, Raid Master, and
 
 The game supports desktop and mobile, mouse and touch controls, local saves, original music, and AI-assisted original artwork. No account, wallet, payment, or download is required.
 
-**Play:** [ADD PRODUCTION URL]
+**Play:** https://dlicom-attack.vercel.app
 
 **Source:** https://github.com/mrchaosdev/Dlicom-go
